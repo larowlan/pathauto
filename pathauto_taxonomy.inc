@@ -31,7 +31,7 @@ function taxonomy_pathauto($op) {
         $settings['patternitems'] = array();
         foreach ($vocabularies as $vocab) {
           $vocabname = $vocab->name;
-          $fieldlabel = t('Pattern for all %vocab-name paths', array('%vocab-name' => theme('placeholder', $vocabname)));
+          $fieldlabel = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabname));
           $settings['patternitems'][$vocab->vid] = $fieldlabel;
         }
       }
