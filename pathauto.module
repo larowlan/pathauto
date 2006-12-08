@@ -14,7 +14,17 @@ function pathauto_help($section) {
   $output = '';
   switch ($section) {
     case 'admin/help#pathauto':
-      $output = t('Provides a mechanism for modules to automatically generate aliases for the content they manage.');
+      $output = t("<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
+                  <h2>Settings</h2>
+                  <p>The <strong>Maximum Alias Length</strong> and <strong>Maximum component length</strong> values
+                  default to 100 and have a limit of 128 from pathauto.  This length is limited by the length of the dst 
+                  column of the url_alias database table. The default database schema for this column is 128. If you 
+                  set a length that is equal to that of the one set in the dst column it will cause problems in situations 
+                  where the system needs to append additional words to the aliased URL. For example... URLs generated
+                  for feeds will have '/feed' added to the end. You should enter a value that is the length of the dst
+                  column minus the length of any strings that might get added to the end of the URL. The length of 
+                  strings that might get added to the end of your URLs depends on which modules you have enabled and 
+                  on your Pathauto settings. The recommended and default value is 100.</p>");
       break;
   }
 
@@ -72,12 +82,12 @@ function pathauto_admin_settings() {
   $form["general"]["pathauto_max_length"] = array('#type' => 'textfield',
     '#title' => t('Maximum alias length'), '#size' => 3, '#maxlength' => 3,
     '#default_value' => variable_get('pathauto_max_length', 100),
-    '#description' => t('Maximum text length of aliases to generate. 128 is the maximum permissible.'));
+    '#description' => t('Maximum length of aliases to generate. 100 is recommended.  See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'))));
 
   $form["general"]["pathauto_max_component_length"] = array('#type' => 'textfield',
     '#title' => t('Maximum component length'), '#size' => 3, '#maxlength' => 3,
     '#default_value' => variable_get('pathauto_max_component_length', 100),
-    '#description' => t('Maximum text length of any single component in the alias (e.g., [title]). 128 is the maximum permissible.'));
+    '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is recommended. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'))));
 
   $form["general"]["pathauto_indexaliases"] = array('#type' => 'checkbox',
     '#title' => t('Create index aliases'),
