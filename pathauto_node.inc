@@ -133,10 +133,9 @@ function node_get_placeholders($node) {
 
   // Book title
   if (module_exists('book') and $node->type == 'book') {
-    $nodebook = book_load($node);
-    $path = book_location($nodebook);
+    $path = book_location($node);
     $placeholders[t('[book]')] = pathauto_cleanstring($path[0]->title);
-    $bookhierarchy = book_location($nodebook);
+    $bookhierarchy = book_location($node);
     $bookpath = '';
     foreach ($bookhierarchy as $bookelement) {
       if ($bookpath == '') {
