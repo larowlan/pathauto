@@ -14,5 +14,14 @@ sure "administer pathauto" is enabled through access control administration.
   When installing a new version of pathauto, to have any necessary
     database and variable upgrades applied.
 
-    
+**Transliteration support:
+
+If you desire transliteration support in the creation of URLs (e.g. the 
+replacement of Ã€ with A) then you will need to rename the file 
+i18n-ascii.example.txt to i18n-ascii.txt 
+
+You can then freely edit the i18n-ascii.txt without worrying that your changes 
+will be over-written by upgrades of Pathauto.
+
+
 $Id$
