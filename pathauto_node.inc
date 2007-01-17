@@ -154,27 +154,77 @@ function node_get_placeholders($node) {
 
   // And now taxonomy, which is a bit more work
   if (module_exists('taxonomy') && is_array($node->taxonomy) && count($node->taxonomy) > 0) {
-    // When editing a node, the taxonomy array might have one or more zero
-    // term IDs. Ignore them...
-    foreach ($node->taxonomy as $firsttermid) {
-      if ($firsttermid) {
-        break;
+    $first_term_id = FALSE;
+    // We loop through the array assuming it's in wheigh order, which is false, but close enough TODO: fix that
+    
+    // I'd use more descriptive variables, but the content isn't always a tid
+    foreach ($node->taxonomy as $key => $value) { 
+      if ($key == 'tags') { 
+        // It's a freetag so make sure that there is a value in the array
+        // Shamelessly stolen from taxonomy_node_save - most of it should be refactored out of that
+        // So it can be easily reused, but until then: copy-paste-antipattern here we come!
+        
+        $typed_input = $value;
+        foreach ((array)$typed_input as $vid => $vid_value) {
+          if ($first_term_id) break;
+          // This regexp allows the following types of user input:
+          // this, "somecmpany, llc", "and ""this"" w,o.rks", foo bar
+          $regexp = '%(?:^|,\ *)("(?>[^"]*)(?>""[^"]* )*"|(?: [^",]*))%x';
+          preg_match_all($regexp, $vid_value, $matches);
+          $typed_terms = array_unique($matches[1]);
+          
+          $inserted = array();
+          foreach ($typed_terms as $typed_term) {
+            if ($first_term_id) break;
+            // If a user has escaped a term (to demonstrate that it is a group,
+            // or includes a comma or quote character), we remove the escape
+            // formatting so to save the term into the DB as the user intends.
+            $typed_term = str_replace('""', '"', preg_replace('/^"(.*)"$/', '\1', $typed_term));
+            $typed_term = trim($typed_term);
+            if ($typed_term == "") { continue; }
+  
+            // See if the term exists in the chosen vocabulary
+            // and return the tid, otherwise, add a new record.
+            $possibilities = taxonomy_get_term_by_name($typed_term);
+            $typed_term_tid = NULL; // tid match if any.
+            foreach ($possibilities as $possibility) {
+              if ($possibility->vid == $vid) {
+                $first_term_id =  $possibility->tid;
+                break; //we've got our first term ID, get out of here
+              }
+            }
+          }
+        }
+       }  
+       // It's not freetagging
+       // When editing a node, a multiselect vocabulary with nothing selected will have  "zero"
+       // term IDs. Ignore them...
+       elseif (is_array($value)) {
+         $temptid = array_shift($value);
+         if ($temptid) {
+           $first_term_id = $temptid;
+           break;
+         }
+       }
+       elseif ($value) {
+         $first_term_id = $value;
+           break;
       }
     }
-    $term = taxonomy_get_term($firsttermid);
+    $term = taxonomy_get_term($first_term_id);
     $placeholders[t('[cat]')] = pathauto_cleanstring($term->name);
 
     $vid = $term->vid;
     $vocabulary = taxonomy_get_vocabulary($vid);
     $placeholders[t('[vocab]')] = pathauto_cleanstring($vocabulary->name);
 
-    $placeholders[t('[catalias]')] = drupal_get_path_alias('taxonomy/term/'.$firsttermid);
+    $placeholders[t('[catalias]')] = drupal_get_path_alias('taxonomy/term/'.$first_term_id);
     if (!strncasecmp($placeholders['[catalias]'], 'taxonomy', 8)) {
       $placeholders[t('[catalias]')] = $placeholders['[cat]'];
     }
 
     $catpath = '';
-    $parents = taxonomy_get_parents_all($firsttermid);
+    $parents = taxonomy_get_parents_all($first_term_id);
     foreach ($parents as $parent) {
       $catpath = pathauto_cleanstring($parent->name).'/'.$catpath;
     }
