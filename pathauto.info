@@ -2,3 +2,4 @@
 name = Pathauto
 description = Provides a mechanism for modules to automatically generate aliases for the content they manage.
 dependencies = path
+version = "$Name$"
