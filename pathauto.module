@@ -3,12 +3,14 @@
 
   // Look for any extensions installed in the pathauto directory
   // we include this here instead of hook_menu for a reason - see http://drupal.org/node/60526
-  include_once('pathauto_menu.inc');
-  include_once('pathauto_node.inc');
-  include_once('pathauto_taxonomy.inc');
-  include_once('pathauto_user.inc');
-  include_once('contrib/pathauto_node_event.inc');
-  include_once('contrib/pathauto_node_i18n.inc');
+  $pathauto_path = drupal_get_path('module', 'pathauto');
+  include_once("$pathauto_path/pathauto_menu.inc");
+  include_once("$pathauto_path/pathauto_node.inc");
+  include_once("$pathauto_path/pathauto_taxonomy.inc");
+  include_once("$pathauto_path/pathauto_user.inc");
+  include_once("$pathauto_path/contrib/pathauto_node_event.inc");
+  include_once("$pathauto_path/contrib/pathauto_node_i18n.inc");
+  unset($pathauto_path);
   
 function pathauto_help($section) {
   $output = '';
