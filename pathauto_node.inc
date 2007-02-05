@@ -159,7 +159,7 @@ function node_get_placeholders($node) {
     
     // I'd use more descriptive variables, but the content isn't always a tid
     foreach ($node->taxonomy as $key => $value) { 
-      if ($key == 'tags') { 
+      if ($key === 'tags') { 
         // It's a freetag so make sure that there is a value in the array
         // Shamelessly stolen from taxonomy_node_save - most of it should be refactored out of that
         // So it can be easily reused, but until then: copy-paste-antipattern here we come!
