@@ -207,9 +207,9 @@ function node_pathauto_bulkupdate() {
   $count = 0;
   $placeholders = array();
   while ($node_ref) {
-  $node = node_load($node_ref->nid);
-  $node->src = $node_ref->src;
-  $node->dst = $node_ref->dst;
+    $node = node_load($node_ref->nid, NULL, TRUE);
+    $node->src = $node_ref->src;
+    $node->dst = $node_ref->dst;
     if (module_exists('taxonomy')) {
       // Must populate the terms for the node here for the category
       // placeholders to work
