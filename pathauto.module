@@ -88,19 +88,6 @@ function pathauto_admin_settings() {
     '#default_value' => variable_get('pathauto_max_component_length', 100),
     '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is recommended. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'))));
 
-  $form["general"]["pathauto_indexaliases"] = array('#type' => 'checkbox',
-    '#title' => t('Create index aliases'),
-    '#default_value' => variable_get('pathauto_indexaliases', FALSE),
-    '#description' => t('When a pattern generates a hierarchical alias (i.e., any alias containing a slash), generate aliases for each step of the hierarchy which can be used to list content within that hierarchy. For example, if a node alias "music/concert/beethoven" is created, also create an alias "music/concert" which will list all concert nodes, and an alias "music" which will list all music nodes.'));
-
-  // If requested, do a bulk generation of index aliases
-  $do_index_bulkupdate = variable_get('pathauto_indexaliases_bulkupdate', FALSE);
-  variable_set('pathauto_indexaliases_bulkupdate', FALSE);
-  $form["general"]["pathauto_indexaliases_bulkupdate"] = array('#type' => 'checkbox',
-    '#title' => t('Bulk generate index aliases'),
-    '#default_value' => FALSE,
-    '#description' => t('Generate index aliases based on all pre-existing aliases.  Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.'));
-
   $form["general"]["pathauto_update_action"] = array('#type' => 'radios',
     '#title' => t('Update action'), '#default_value' => variable_get('pathauto_update_action', 2),
     '#options' => array(t('Do nothing, leaving the old alias intact'),
@@ -385,11 +372,6 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
     _pathauto_set_alias("$src/$feedappend", "$alias/feed", NULL, $verbose);
   }
 
-  // Create any relevant index aliases if requested
-  if (variable_get('pathauto_indexaliases', FALSE)) {
-    pathauto_create_index_alias($alias, $module);
-  }
-
   return $alias;
 }
 /**
@@ -436,29 +418,6 @@ function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $oldalia
   }
 }
 
-function pathauto_create_index_alias($alias, $module) {
-  $count = 0;
-  $components = explode('/', $alias);
-  // Not interested in the trailing component
-  array_pop($components);
-  $alias = '';
-  foreach ($components as $component) {
-    if ($alias) {
-      $alias .= '/'.$component;
-    } 
-    else {
-      $alias .= $component;
-    }
-    $alias_count = db_result(db_query("SELECT COUNT(dst) FROM {url_alias} WHERE dst = '%s'", $alias));
-    if (!$alias_count) {
-      $src = "pathauto/$module/$alias";
-      _pathauto_set_alias($src, $alias);
-      $count++;
-    }
-  }
-  return $count;
-}
-
 function pathauto_menu($may_cache) {
   
   $items = array();
@@ -474,19 +433,6 @@ function pathauto_menu($may_cache) {
     );
   }
 
-  $modulelist = variable_get('pathauto_modulelist', array());
-  if (is_array($modulelist)) {
-    foreach ($modulelist as $module) {
-      $indexfunc = $module.'_pathauto_page';
-      if (function_exists($indexfunc)) {
-        $items[] = array('path' => 'pathauto/'.$module,
-          'title' => t('Pathauto'),
-          'callback' => $indexfunc,
-          'access' => 1,
-          'type' => MENU_CALLBACK);
-      }
-    }
-  }
   return $items;
 }
 

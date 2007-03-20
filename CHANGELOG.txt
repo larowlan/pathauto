@@ -1,5 +1,14 @@
 
 ***DRUPAL-5 only***
+2006-03-19
+  Removed _pathauto_page capability which wasn't used by many sites
+    nor by any contrib modules.  If your site or module used this
+    consider creating a separate contributed module.  This also 
+    requires removing the index alias function.  See the Pathauto section
+    of the handbook for ideas on how to replace this functionality using views:
+    http://drupal.org/handbook/modules/pathauto and more specificially the 
+    Pathauto Pattern Recipes: http://drupal.org/node/124462
+
 2006-11-11
   .inc files are now hardcoded instead of being dynamically included
   	Note: may break your site if you use additional .inc files
