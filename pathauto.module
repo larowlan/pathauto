@@ -102,7 +102,7 @@ function pathauto_admin_settings() {
   $form["general"]["pathauto_indexaliases_bulkupdate"] = array('#type' => 'checkbox',
     '#title' => t('Bulk generate index aliases'),
     '#default_value' => FALSE,
-    '#description' => t('Generate index aliases based on all pre-existing aliases.'));
+    '#description' => t('Generate index aliases based on all pre-existing aliases.  Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.'));
 
   $form["general"]["pathauto_update_action"] = array('#type' => 'radios',
     '#title' => t('Update action'), '#default_value' => variable_get('pathauto_update_action', 2),

@@ -20,8 +20,9 @@ enhanced.
 **Installation AND Upgrades:
 See the INSTALL.txt - especially step 4.
 
-**Notice
+**Notices:
 
+Urls (not) Getting Replaced With Aliases
 Please bear in mind that only URLs passed through Drupal's l() or url()
 functions will be replaced with their aliases during page output. If a module
 or your template contains hardcoded links, such as 'href="node/$node->nid"'
@@ -32,6 +33,16 @@ those won't get replaced with their corresponding aliases. Use instead
 
 See http://api.drupal.org/api/HEAD/function/url and 
 http://api.drupal.org/api/HEAD/function/l for more information.
+
+Bulk Updates May Destroy Existing Aliases:
+Bulk Updates may not work if your site has a large number of items to alias 
+and/or if your server is particularly slow. If you are concerned about this 
+problem you should backup your database (particularly the url_alias table) prior
+to executing the Bulk Update. If you are interested in helping speed up this 
+operation look at the Pathauto issue queue - 
+http://drupal.org/project/issues/pathauto - and specifically at the issues 
+http://drupal.org/node/76172 and http://drupal.org/node/67665 You can help 
+provide ideas, code, and testing in those issues to make pathauto better.
 
 
 **Credits:

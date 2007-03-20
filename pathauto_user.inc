@@ -41,7 +41,7 @@ function blog_pathauto($op) {
       );
       $settings['supportsfeeds'] = 'feed';
       $settings['bulkname'] = t('Bulk update blog paths');
-      $settings['bulkdescr'] = t('Generate aliases for all existing blog pages which do not already have aliases.');
+      $settings['bulkdescr'] = t('Generate aliases for all existing blog pages which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       return (object) $settings;
     default:
       break;

@@ -16,7 +16,7 @@ function node_pathauto($op) {
       $settings['supportsfeeds'] = 'feed';
       $settings['bulkname'] = t('Bulk update node paths');
       $settings['bulkdescr'] =
-        t('Generate aliases for all existing nodes which do not already have aliases.');
+        t('Generate aliases for all existing nodes which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       $settings['placeholders'] = array(
         t('[title]') => t('The title of the node, with spaces and punctuation replaced by the separator.'),
         t('[nid]') => t('The id number of the node.'),

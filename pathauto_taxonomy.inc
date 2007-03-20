@@ -24,7 +24,7 @@ function taxonomy_pathauto($op) {
       $settings['placeholders'] = array_merge($settings['placeholders'], $placeholders);
       $settings['supportsfeeds'] = '0/feed';
       $settings['bulkname'] = t('Bulk update category paths');
-      $settings['bulkdescr'] = t('Generate aliases for all existing categories which do not already have aliases.');
+      $settings['bulkdescr'] = t('Generate aliases for all existing categories which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
 
       $vocabularies = taxonomy_get_vocabularies();
       if (sizeof($vocabularies) > 0) {
