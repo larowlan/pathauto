@@ -1,4 +1,15 @@
-$Id$
+
+***DRUPAL-5 only***
+2006-11-11
+  .inc files are now hardcoded instead of being dynamically included
+  	Note: may break your site if you use additional .inc files
+  New Defaults:
+  	Use - (dash) as the separator by default
+  	Limit aliases and components to 100 characters
+  	Make "Create new alias, replacing the old one." the default update action
+
+2006-10-12
+  Allow users to specify a list of words to strip out of the url
 
 ***DRUPAL-4-7 only***
 2006-01-02
@@ -135,3 +146,4 @@ $Id$
   Initial merger of Mike Ryan's autopath with Tommy Sundstrom's 
   path_automatic.
 
+$Id$

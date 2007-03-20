@@ -3,18 +3,30 @@
 
   // Look for any extensions installed in the pathauto directory
   // we include this here instead of hook_menu for a reason - see http://drupal.org/node/60526
-  include_once('pathauto_menu.inc');
-  include_once('pathauto_node.inc');
-  include_once('pathauto_taxonomy.inc');
-  include_once('pathauto_user.inc');
-  include_once('contrib/pathauto_node_event.inc');
-  include_once('contrib/pathauto_node_i18n.inc');
+  $pathauto_path = drupal_get_path('module', 'pathauto');
+  include_once("$pathauto_path/pathauto_menu.inc");
+  include_once("$pathauto_path/pathauto_node.inc");
+  include_once("$pathauto_path/pathauto_taxonomy.inc");
+  include_once("$pathauto_path/pathauto_user.inc");
+  include_once("$pathauto_path/contrib/pathauto_node_event.inc");
+  include_once("$pathauto_path/contrib/pathauto_node_i18n.inc");
+  unset($pathauto_path);
   
 function pathauto_help($section) {
   $output = '';
   switch ($section) {
     case 'admin/help#pathauto':
-      $output = t('Provides a mechanism for modules to automatically generate aliases for the content they manage.');
+      $output = t("<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
+                  <h2>Settings</h2>
+                  <p>The <strong>Maximum Alias Length</strong> and <strong>Maximum component length</strong> values
+                  default to 100 and have a limit of 128 from pathauto.  This length is limited by the length of the dst 
+                  column of the url_alias database table. The default database schema for this column is 128. If you 
+                  set a length that is equal to that of the one set in the dst column it will cause problems in situations 
+                  where the system needs to append additional words to the aliased URL. For example... URLs generated
+                  for feeds will have '/feed' added to the end. You should enter a value that is the length of the dst
+                  column minus the length of any strings that might get added to the end of the URL. The length of 
+                  strings that might get added to the end of your URLs depends on which modules you have enabled and 
+                  on your Pathauto settings. The recommended and default value is 100.</p>");
       break;
   }
 
@@ -60,7 +72,7 @@ function pathauto_admin_settings() {
 
   $form["general"]["pathauto_separator"] = array('#type' => 'textfield',
     '#title' => t('Separator'), '#size' => 1, '#maxlength' => 1,
-    '#default_value' => variable_get('pathauto_separator', '_'),
+    '#default_value' => variable_get('pathauto_separator', '-'),
     '#description' => t('Character used to separate words in titles. This will replace any spaces and punctuation characters.'));
 
   $form["general"]["pathauto_quotes"] = array('#type' => 'radios',
@@ -71,13 +83,13 @@ function pathauto_admin_settings() {
     
   $form["general"]["pathauto_max_length"] = array('#type' => 'textfield',
     '#title' => t('Maximum alias length'), '#size' => 3, '#maxlength' => 3,
-    '#default_value' => variable_get('pathauto_max_length', 128),
-    '#description' => t('Maximum text length of aliases to generate. 128 is the maximum permissible.'));
+    '#default_value' => variable_get('pathauto_max_length', 100),
+    '#description' => t('Maximum length of aliases to generate. 100 is recommended.  See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'))));
 
   $form["general"]["pathauto_max_component_length"] = array('#type' => 'textfield',
     '#title' => t('Maximum component length'), '#size' => 3, '#maxlength' => 3,
-    '#default_value' => variable_get('pathauto_max_component_length', 128),
-    '#description' => t('Maximum text length of any single component in the alias (e.g., [title]). 128 is the maximum permissible.'));
+    '#default_value' => variable_get('pathauto_max_component_length', 100),
+    '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is recommended. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'))));
 
   $form["general"]["pathauto_indexaliases"] = array('#type' => 'checkbox',
     '#title' => t('Create index aliases'),
@@ -93,7 +105,7 @@ function pathauto_admin_settings() {
     '#description' => t('Generate index aliases based on all pre-existing aliases.'));
 
   $form["general"]["pathauto_update_action"] = array('#type' => 'radios',
-    '#title' => t('Update action'), '#default_value' => variable_get('pathauto_update_action', 0),
+    '#title' => t('Update action'), '#default_value' => variable_get('pathauto_update_action', 2),
     '#options' => array(t('Do nothing, leaving the old alias intact'),
           t('Create a new alias in addition to the old alias'),
           t('Create a new alias, replacing the old one')),
@@ -127,8 +139,8 @@ function pathauto_admin_settings() {
     $variable = 'pathauto_'.$module.'_pattern';
     $form[$module][$variable] = array('#type' => 'textfield',
       '#title' => $patterndescr,
-      '#default_value' => variable_get($variable,$patterndefault),
-      '#size' => 65, '#maxlength' => 128);
+      '#default_value' => variable_get($variable, $patterndefault),
+      '#size' => 65, '#maxlength' => variable_get('pathauto_max_length', 100));
 
     // If the module supports a set of specialized patterns, set
     // them up here
@@ -137,8 +149,8 @@ function pathauto_admin_settings() {
         $variable = 'pathauto_'.$module.'_'.$itemname.'_pattern';
         $form[$module][$variable] = array('#type' => 'textfield',
           '#title' => $itemlabel,
-          '#default_value' => variable_get($variable,''),
-          '#size' => 65, '#maxlength' => 128);
+          '#default_value' => variable_get($variable, ''),
+          '#size' => 65, '#maxlength' => variable_get('pathauto_max_length', 100));
       }
     }
 
@@ -215,55 +227,20 @@ function pathauto_cleanstring($string) {
     "with"
   );
 
-  static $translations = array(
-    'À'=>'A','Á'=>'A','Â'=>'A','Ã'=>'A','Ä'=>'A','Å'=>'A','Ā'=>'A','Ą'=>'A','Ă'=>'A',
-    'à'=>'a','á'=>'a','â'=>'a','ã'=>'a','ä'=>'a','å'=>'a','ā'=>'a','ą'=>'a','ă'=>'a',
-    'Æ'=>'Ae',
-    'æ'=>'ae',
-    'Ç'=>'C','Ć'=>'C','Č'=>'C','Ĉ'=>'C','Ċ'=>'C',
-    'ç'=>'c','ć'=>'c','č'=>'c','ĉ'=>'c','ċ'=>'c',
-    'Ď'=>'D','Đ'=>'D','Ð'=>'D',
-    'ď'=>'d','đ'=>'d','ð'=>'d',
-    'È'=>'E','É'=>'E','Ê'=>'E','Ë'=>'E','Ē'=>'E','Ę'=>'E','Ě'=>'E','Ĕ'=>'E','Ė'=>'E',
-    'è'=>'e','é'=>'e','ê'=>'e','ë'=>'e','ē'=>'e','ę'=>'e','ě'=>'e','ĕ'=>'e','ė'=>'e',
-    'ƒ'=>'f',
-    'Ĝ'=>'G','Ğ'=>'G','Ġ'=>'G','Ģ'=>'G',
-    'ĝ'=>'g','ğ'=>'g','ġ'=>'g','ģ'=>'g',
-    'Ĥ'=>'H','Ħ'=>'H',
-    'ĥ'=>'h','ħ'=>'h',
-    'Ì'=>'I','Í'=>'I','Î'=>'I','Ï'=>'I','Ī'=>'I','Ĩ'=>'I','Ĭ'=>'I','Į'=>'I','İ'=>'I',
-    'ì'=>'i','í'=>'i','î'=>'i','ï'=>'i','ī'=>'i','ĩ'=>'i','ĭ'=>'i','į'=>'i','ı'=>'i',
-    'Ĳ'=>'Ij',
-    'ĳ'=>'ij',
-    'Ĵ'=>'J',
-    'ĵ'=>'j',
-    'Ķ'=>'K',
-    'ķ'=>'k','ĸ'=>'k',
-    'Ł'=>'L','Ľ'=>'L','Ĺ'=>'L','Ļ'=>'L','Ŀ'=>'L',
-    'ł'=>'l','ľ'=>'l','ĺ'=>'l','ļ'=>'l','ŀ'=>'l',
-    'Ñ'=>'N','Ń'=>'N','Ň'=>'N','Ņ'=>'N','Ŋ'=>'N',
-    'ñ'=>'n','ń'=>'n','ň'=>'n','ņ'=>'n','ŉ'=>'n','ŋ'=>'n',
-    'Ò'=>'O','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','Ø'=>'O','Ō'=>'O','Ő'=>'O','Ŏ'=>'O',
-    'ò'=>'o','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','ø'=>'o','ō'=>'o','ő'=>'o','ŏ'=>'o',
-    'Œ'=>'Oe',
-    'œ'=>'oe',
-    'Ŕ'=>'R','Ř'=>'R','Ŗ'=>'R',
-    'ŕ'=>'r','ř'=>'r','ŗ'=>'r',
-    'Ś'=>'S','Š'=>'S','Ş'=>'S','Ŝ'=>'S','Ș'=>'S',
-    'Ť'=>'T','Ţ'=>'T','Ŧ'=>'T','Ț'=>'T','Þ'=>'T',
-    'þ'=>'t',
-    'Ù'=>'U','Ú'=>'U','Û'=>'U','Ü'=>'U','Ū'=>'U','Ů'=>'U','Ű'=>'U','Ŭ'=>'U','Ũ'=>'U','Ų'=>'U',
-    'ú'=>'u','û'=>'u','ü'=>'u','ū'=>'u','ů'=>'u','ű'=>'u','ŭ'=>'u','ũ'=>'u','ų'=>'u',
-    'Ŵ'=>'W',
-    'ŵ'=>'w',
-    'Ý'=>'Y','Ŷ'=>'Y','Ÿ'=>'Y','Y'=>'Y',
-    'ý'=>'y','ÿ'=>'y','ŷ'=>'y',
-    'Ź'=>'Z','Ž'=>'Z','Ż'=>'Z',
-    'ž'=>'z','ż'=>'z','ź'=>'z',
-    'ß'=>'ss','ſ'=>'ss');
+  static $i18n_loaded = false;
+  static $translations = array();
+  if (!$i18n_loaded) {
+    $path = drupal_get_path('module', 'pathauto');
+    if (is_file($path. '/i18n-ascii.txt')) {
+      $translations = parse_ini_file($path. '/i18n-ascii.txt');
+    }
+    $i18n_loaded = true;
+  }
+
+  $output = strtr($output, $translations);
 
   // Replace or drop apostrophes based on user settings
-  $separator = variable_get('pathauto_separator', '_');
+  $separator = variable_get('pathauto_separator', '-');
   $quotes = variable_get('pathauto_quotes', 0);
   $output = str_replace("'", ($quotes ? $separator : ''), $string);
   
@@ -302,7 +279,7 @@ function pathauto_cleanstring($string) {
   }
 
   // Enforce the maximum component length
-  $maxlength = min(variable_get('pathauto_max_component_length', 128), 128);
+  $maxlength = min(variable_get('pathauto_max_component_length', 100), 128);
   $output = drupal_substr($output, 0, $maxlength);
 
   return $output;
@@ -357,7 +334,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
     $result = db_query("SELECT pid,dst FROM {url_alias} WHERE src='%s'", $src);
     if ($data = db_fetch_object($result)) {
       // The item is already aliased, check what to do...
-      switch (variable_get('pathauto_update_action', 0)) {
+      switch (variable_get('pathauto_update_action', 2)) {
         // Do nothing
         case 0:
           return '';
@@ -386,11 +363,11 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
   // Trim any leading or trailing slashes
   $alias = preg_replace("/^\/|\/+$/", "", $alias);
 
-  $maxlength = min(variable_get('pathauto_max_length', 128), 128);
+  $maxlength = min(variable_get('pathauto_max_length', 100), 128);
   $alias = drupal_substr($alias, 0, $maxlength);
 
   // If the alias already exists, generate a new variant
-  $separator = variable_get('pathauto_separator', '_');
+  $separator = variable_get('pathauto_separator', '-');
   if (_pathauto_alias_exists($alias, $src)) {
     for ($i = 0; _pathauto_alias_exists($alias.$separator.$i, $src); $i++) {
     }

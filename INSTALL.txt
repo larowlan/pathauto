@@ -1,0 +1,27 @@
+
+**Installation:
+
+Note that pathauto is an extension to the path module, which must
+be enabled.
+
+1. Unpack the pathauto folder and contents in the modules directory of 
+your Drupal installation.
+2. Enable the pathauto module in the administration tools.
+3. If you're not using Drupal's default administrative account, make
+sure "administer pathauto" is enabled through access control administration.
+4. Visit the pathauto settings page:
+  When first installing pathauto, to define the desired alias patterns.
+  When installing a new version of pathauto, to have any necessary
+    database and variable upgrades applied.
+
+**Transliteration support:
+
+If you desire transliteration support in the creation of URLs (e.g. the 
+replacement of Ã€ with A) then you will need to rename the file 
+i18n-ascii.example.txt to i18n-ascii.txt 
+
+You can then freely edit the i18n-ascii.txt without worrying that your changes 
+will be over-written by upgrades of Pathauto.
+
+
+$Id$

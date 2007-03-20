@@ -31,7 +31,7 @@ function taxonomy_pathauto($op) {
         $settings['patternitems'] = array();
         foreach ($vocabularies as $vocab) {
           $vocabname = $vocab->name;
-          $fieldlabel = t('Pattern for all %vocab-name paths', array('%vocab-name' => theme('placeholder', $vocabname)));
+          $fieldlabel = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabname));
           $settings['patternitems'][$vocab->vid] = $fieldlabel;
         }
       }
@@ -64,15 +64,8 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
             $placeholders[t('[cat]')] = pathauto_cleanstring($category->name);
             $placeholders[t('[tid]')] = $category->tid;
             
-            if ($category->parent) {
-              $catpath = pathauto_cleanstring($category->name);
-              $parents = taxonomy_get_parents_all($category->parent);
-            } 
-            else {
-              $catpath = '';
-              $parents = taxonomy_get_parents_all($category->tid);
-            }
-            
+            $catpath = ''; 
+            $parents = taxonomy_get_parents_all($category->tid);
             foreach ($parents as $parent) {
               $catpath = pathauto_cleanstring($parent->name).'/'.$catpath;
             }

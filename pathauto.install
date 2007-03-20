@@ -1,0 +1,19 @@
+<?php
+// $Id$
+
+/**
+ *
+ * @file Provides install, updated, and uninstall functions for pathauto.
+ * 
+ */
+
+ 
+ 
+/**
+ * Implementation of hook_uninstall().
+ */
+function pathauto_uninstall() {
+  // Delete all the pathauto variables and then clear the variable cache  
+  db_query("delete from variable where name like 'pathauto_%'");
+  cache_clear_all('variables', 'cache');
+}
