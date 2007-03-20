@@ -47,16 +47,13 @@ function pathauto_admin_settings() {
 
   $output = '';
 
-  // Check for any updates
-  _pathauto_update();
-
-   // Default words to ignore
-   $ignore_words = array(
-     "a", "an", "as", "at", "before", "but", "by", "for", "from",
-     "is", "in", "into", "like", "of", "off", "on", "onto", "per",
-     "since", "than", "the", "this", "that", "to", "up", "via",
-     "with"
-   );
+  // Default words to ignore
+  $ignore_words = array(
+    "a", "an", "as", "at", "before", "but", "by", "for", "from",
+    "is", "in", "into", "like", "of", "off", "on", "onto", "per",
+    "since", "than", "the", "this", "that", "to", "up", "via",
+    "with"
+  );
 
   // Generate the form - settings applying to all patterns first
   $group_weight = -20;
@@ -503,130 +500,3 @@ function _pathauto_version() {
   return array("text" => "2005-9-18", "build" => 5);
 } // function _pathauto_version
 
-/**
- * Makes updates to saved variables and the database structure.
- **/
-function _pathauto_update() {
-  $installed_version  = variable_get('pathauto_version', array('text'=> 'Unknown', 'build' => 1));
-  $current_version =  _pathauto_version();
-
-  if ( $installed_version["build"] < $current_version["build"]) {
-    // Upgrading from original version - variable names were changed
-    if ( $installed_version["build"] <= 1 ) {
-      // Remove obsolete bulkupdate variables
-      variable_del('pathauto_bulkupdate');
-      variable_del('pathauto_cat_bulkupdate');
-
-      // The original global node and taxonomy patterns got renamed
-      $old_pattern = variable_get('pathauto_pattern', 0);
-      if ($old_pattern != 0) {
-        variable_set('pathauto_node_pattern', $old_pattern);
-        variable_del('pathauto_pattern');
-      }
-      $old_pattern = variable_get('pathauto_cat_pattern', 0);
-      if ($old_pattern != 0) {
-        variable_set('pathauto_taxonomy_pattern', $old_pattern);
-        variable_del('pathauto_cat_pattern');
-      }
-      // And the form of the type-specific patterns was changed
-      $query = 'SELECT name,value FROM {variable} '.
-        "WHERE name LIKE '%_pathauto_pattern'";
-      $result = db_query($query);
-      $var = db_fetch_object($result);
-      while ($var) {
-        $type = drupal_substr($var->name, 0, drupal_strlen($var->name)-drupal_strlen('_pathauto_pattern'));
-        $old_pattern = variable_get($var->name, '');
-        $new_name = 'pathauto_node_'.$type.'_pattern';
-        variable_set($new_name, $old_pattern);
-        variable_del($var->name);
-        $var = db_fetch_object($result);
-      }
-      $query = 'SELECT name,value FROM {variable} '.
-        "WHERE name LIKE '%_pathauto_cat_pattern'";
-      $result = db_query($query);
-      $var = db_fetch_object($result);
-      while ($var) {
-        $type = drupal_substr($var->name, 0, drupal_strlen($var->name)-drupal_strlen('_pathauto_cat_pattern'));
-        $old_pattern = variable_get($var->name, '');
-        $new_name = 'pathauto_taxonomy_'.$type.'_pattern';
-        variable_set($new_name, $old_pattern);
-        variable_del($var->name);
-        $var = db_fetch_object($result);
-      }
-    }
-    if ( $installed_version["build"] <= 2 ) {
-      // Change feed support variables from booleans to appended strings
-      $query = 'SELECT name,value FROM {variable} '.
-        "WHERE name LIKE 'pathauto_%_supportsfeeds'";
-      $result = db_query($query);
-      $var = db_fetch_object($result);
-      while ($var) {
-        $type = drupal_substr($var->name, 9, drupal_strlen($var->name)-23);
-        $old_value = variable_get($var->name, FALSE);
-        if ($old_value) {
-          switch ($type) {
-            case 'blog':
-            case 'node':
-              variable_set($var->name, 'feed');
-              break;
-            case 'taxonomy':
-              variable_set($var->name, '0/feed');
-              break;
-          }
-        } 
-        else {
-          variable_set($var->name, '');
-        }
-        $var = db_fetch_object($result);
-      }
-      // Update previously-generated taxonomy aliases to remove the "/0"
-      $query = "SELECT * FROM {url_alias} WHERE src LIKE 'taxonomy/term/%/0'";
-      $result = db_query($query);
-      $aliasrow = db_fetch_object($result);
-      while ($aliasrow) {
-        $src = drupal_substr($aliasrow->src, 0, -2);
-        _pathauto_set_alias($src, $aliasrow->dst, $aliasrow->pid, FALSE);
-        $aliasrow = db_fetch_object($result);
-      }
-    }
-    if ($installed_version["build"] <= 3) {
-      // Change taxonomy pattern variables to use IDs instead
-      // of names
-      $query = 'SELECT name,value FROM {variable} '.
-        "WHERE name LIKE 'pathauto_taxonomy_%_pattern'";
-      $result = db_query($query);
-      $var = db_fetch_object($result);
-      while ($var) {
-        $vocabname = drupal_substr($var->name, 18, drupal_strlen($var->name)-26);
-        $query = "SELECT vid FROM {vocabulary} WHERE name='$vocabname'";
-        $vid = db_result(db_query($query));
-        variable_set("pathauto_taxonomy_$vid_pattern", $var->value);
-        variable_del($var->name);
-        $var = db_fetch_object($result);
-      }
-    }
-    if ($installed_version["build"] <= 4) {
-      // Make feed generation variables module-specific.
-      $applytofeed = variable_get('pathauto_applytofeed', FALSE);
-      if ($applytofeed) {
-        // Feeds were enabled, enable for each module supporting them
-        $query = 'SELECT name,value FROM {variable} '.
-          "WHERE name LIKE 'pathauto_%_supportsfeeds'";
-        $result = db_query($query);
-        while ($var = db_fetch_object($result)) {
-          if (variable_get($var->name, FALSE)) {
-            $varname = str_replace('_supportsfeed', '_applytofeed', $var->name);
-            variable_set($varname, TRUE);
-          }
-        }
-      }
-      variable_del('pathauto_applytofeed');
-    }
-
-    // Set the current version
-    variable_set('pathauto_version', $current_version);
-
-    drupal_set_message('Upgraded pathauto from '.$installed_version["build"] .
-      ' to '. $current_version["build"]);
-  }
-} // end function _pathauto_update
