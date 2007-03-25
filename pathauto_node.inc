@@ -60,7 +60,7 @@ function node_pathauto($op) {
       
       $nodetypes = node_get_types();
       foreach ($nodetypes as $ntype => $nodetype) {
-        $fieldlabel = t('Pattern for all '. $nodetype->name .' paths');
+        $fieldlabel = t('Pattern for all %nodetypename paths', array('%nodetypename' => $nodetype->name));
         $settings['patternitems'][$ntype] = $fieldlabel;
       }
       return (object) $settings;
