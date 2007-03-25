@@ -11,7 +11,7 @@ function user_pathauto($op) {
       $settings['module'] = 'user';
       $settings['groupheader'] = t('User path settings');
       $settings['patterndescr'] = t('Pattern for user account page paths');
-      $settings['patterndefault'] = t('user/[user]');
+      $settings['patterndefault'] = t('users/[user]');
       $settings['placeholders'] = array(
         t('[user]') => t('The name of the user.'),
         t('[uid]') => t('The id number of the user.')
@@ -34,7 +34,7 @@ function blog_pathauto($op) {
       $settings['module'] = 'blog';
       $settings['groupheader'] = t('Blog path settings');
       $settings['patterndescr'] = t('Pattern for blog page paths');
-      $settings['patterndefault'] = t('blog/[user]');
+      $settings['patterndefault'] = t('blogs/[user]');
       $settings['placeholders'] = array(
         t('[user]') => t('The name of the user.'),
         t('[uid]') => t('The id number of the user.')
@@ -58,7 +58,7 @@ function tracker_pathauto($op) {
       $settings['module'] = 'tracker';
       $settings['groupheader'] = t('User-tracker path settings');
       $settings['patterndescr'] = t('Pattern for user-tracker page paths');
-      $settings['patterndefault'] = t('user/[user]/track');
+      $settings['patterndefault'] = t('users/[user]/track');
       $settings['placeholders'] = array(
         t('[user]') => t('The name of the user.'),
         t('[uid]') => t('The id number of the user.')

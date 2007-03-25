@@ -12,7 +12,7 @@ function taxonomy_pathauto($op) {
       $settings['module'] = 'taxonomy';
       $settings['groupheader'] = t('Category path settings');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
-      $settings['patterndefault'] = t('[vocab]/[catpath]');
+      $settings['patterndefault'] = t('category/[vocab]/[catpath]');
       $settings['placeholders'] = array(
         t('[vocab]') => t("The vocabulary that the page's first category belongs to."),
         t('[cat]') => t('The name of the category.'),
