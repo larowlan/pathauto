@@ -1,16 +1,19 @@
 # $Id$
 #
-# LANGUAGE translation of Drupal (sites/all/modules/pathauto/pathauto.module)
+# LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  pathauto.module,v 1.44.2.5 2007/01/20 23:26:24 greggles
-#  pathauto.info,v 1.3.2.2 2007/01/17 16:53:41 greggles
+#  pathauto_node.inc,v 1.29.2.3 2007/02/05 18:31:41 greggles
+#  pathauto_user.inc,v 1.17 2006/11/11 23:17:58 greggles
+#  pathauto_taxonomy.inc,v 1.20.2.2 2007/01/17 16:53:41 greggles
+#  pathauto_menu.inc,v 1.6 2006/10/12 14:54:14 greggles
+#  pathauto_node_i18n.inc,v 1.3 2006/10/12 14:54:15 greggles
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2007-03-23 21:57+0100\n"
+"POT-Creation-Date: 2007-03-25 20:16+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -19,7 +22,56 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: sites/all/modules/pathauto/pathauto.module:19
+#: pathauto_node.inc:23;132 pathauto_user.inc:16;39;63;88;130;153;176
+msgid "[user]"
+msgstr ""
+
+#: pathauto_node.inc:39;219;236 pathauto_taxonomy.inc:17;62;109
+msgid "[vocab]"
+msgstr ""
+
+#: pathauto_node.inc:40 pathauto_taxonomy.inc:17
+msgid "The vocabulary that the page's first category belongs to."
+msgstr ""
+
+#: pathauto_node.inc:41;215;234 pathauto_taxonomy.inc:18;64;110
+msgid "[cat]"
+msgstr ""
+
+#: pathauto_node.inc:43;231;235 pathauto_taxonomy.inc:19;72
+msgid "[catpath]"
+msgstr ""
+
+#: pathauto_node.inc:44 pathauto_taxonomy.inc:19
+msgid "As [cat], but including its supercategories."
+msgstr ""
+
+#: pathauto_menu.inc:18;53;56
+msgid "[menu]"
+msgstr ""
+
+#: pathauto_menu.inc:19
+msgid "The name of the menu the node belongs to."
+msgstr ""
+
+#: pathauto_menu.inc:20;60;63
+msgid "[menupath]"
+msgstr ""
+
+#: pathauto_menu.inc:21
+msgid ""
+"The menu path (as reflected in the breadcrumb), not including Home or [menu]."
+msgstr ""
+
+#: contrib/pathauto_node_i18n.inc:12;16
+msgid "[lang]"
+msgstr ""
+
+#: contrib/pathauto_node_i18n.inc:12
+msgid "Language code of the document"
+msgstr ""
+
+#: pathauto.module:19
 msgid ""
 "<p>Provides a mechanism for modules to automatically generate aliases for "
 "the content they manage.</p>\n"
@@ -44,61 +96,69 @@ msgid ""
 "value is 100.</p>"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:44
+#: pathauto.module:44
 msgid "You are not authorized to access the pathauto settings."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:69
+#: pathauto.module:64
+msgid "General settings"
+msgstr ""
+
+#: pathauto.module:69
 msgid "Verbose"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:71
+#: pathauto.module:71
 msgid "Display alias changes (except during bulk updates)."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:74
+#: pathauto.module:74
 msgid "Separator"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:76
+#: pathauto.module:76
 msgid ""
 "Character used to separate words in titles. This will replace any spaces and "
 "punctuation characters."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:79
+#: pathauto.module:79
 msgid "Quotation marks"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:81
+#: pathauto.module:81
+msgid "Remove"
+msgstr ""
+
+#: pathauto.module:81
 msgid "Replace by separator"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:85
+#: pathauto.module:85
 msgid "Maximum alias length"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:87
+#: pathauto.module:87
 msgid ""
 "Maximum length of aliases to generate. 100 is recommended.  See <a href="
 "\"@pathauto-help\">Pathauto help</a> for details."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:90
+#: pathauto.module:90
 msgid "Maximum component length"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:92
+#: pathauto.module:92
 msgid ""
 "Maximum text length of any component in the alias (e.g., [title]). 100 is "
 "recommended. See <a href=\"@pathauto-help\">Pathauto help</a> for details."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:95
+#: pathauto.module:95
 msgid "Create index aliases"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:97
+#: pathauto.module:97
 msgid ""
 "When a pattern generates a hierarchical alias (i.e., any alias containing a "
 "slash), generate aliases for each step of the hierarchy which can be used to "
@@ -108,451 +168,453 @@ msgid ""
 "music nodes."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:103
+#: pathauto.module:103
 msgid "Bulk generate index aliases"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:105
+#: pathauto.module:105
 msgid "Generate index aliases based on all pre-existing aliases."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:108
+#: pathauto.module:108
 msgid "Update action"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:109
+#: pathauto.module:109
 msgid "Do nothing, leaving the old alias intact"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:110
+#: pathauto.module:110
 msgid "Create a new alias in addition to the old alias"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:111
+#: pathauto.module:111
 msgid "Create a new alias, replacing the old one"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:112
+#: pathauto.module:112
 msgid ""
 "What should pathauto do when updating an existing content item which already "
 "has an alias?"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:115
+#: pathauto.module:115
 msgid "Strings to Remove"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:116
+#: pathauto.module:116
 msgid "Words to strip out of the URL alias, separated by commas"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:193
+#: pathauto.module:193
 msgid "Create feed aliases"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:195
+#: pathauto.module:195
 msgid "Also generate aliases for RSS feeds."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:423
+#: pathauto.module:423
 msgid "Ignoring alias "
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:423
+#: pathauto.module:423
 msgid " due to existing path conflict"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:433
+#: pathauto.module:433
 msgid "Created new alias %dst for %src, replacing %oldalias"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:436
+#: pathauto.module:436
 msgid "Created new alias %dst for %src"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:471;486
-#: sites/all/modules/pathauto/pathauto.info:0
+#: pathauto.module:471;486 pathauto.info:0
 msgid "Pathauto"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:472
+#: pathauto.module:472
 msgid "Configure how pathauto generates clean URLs for your content."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:201
+#: pathauto.module:201
 msgid "Bulk update of index aliases completed, one alias generated."
 msgid_plural ""
 "Bulk update of index aliases completed, @count aliases generated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: sites/all/modules/pathauto/pathauto.module:37
+#: pathauto.module:37
 msgid "administer pathauto"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.module:0
-#: sites/all/modules/pathauto/pathauto.info:0
+#: pathauto.module:0 pathauto.info:0
 msgid "pathauto"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto.info:0
+#: pathauto.info:0
 msgid ""
 "Provides a mechanism for modules to automatically generate aliases for the "
 "content they manage."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:13
+#: pathauto_node.inc:13
 msgid "Node path settings"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:14
+#: pathauto_node.inc:14
 msgid ""
 "Default path pattern (applies to all node types with blank patterns below)"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:15;21;116
+#: pathauto_node.inc:15;21;116
 msgid "[title]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:17
+#: pathauto_node.inc:17
 msgid "Bulk update node paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:19
+#: pathauto_node.inc:19
 msgid ""
 "Generate aliases for all existing nodes which do not already have aliases."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:21
+#: pathauto_node.inc:21
 msgid ""
 "The title of the node, with spaces and punctuation replaced by the separator."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:22;126
+#: pathauto_node.inc:22;126
 msgid "[nid]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:22
+#: pathauto_node.inc:22
 msgid "The id number of the node."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:23
+#: pathauto_node.inc:23
 msgid "The name of the user who created the node."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:24;127
+#: pathauto_node.inc:24;127
 msgid "[type]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:24
+#: pathauto_node.inc:24
 msgid "The node type (e.g., \"page\", \"story\", etc.)."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:25;117
+#: pathauto_node.inc:25;117
 msgid "[yyyy]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:25
+#: pathauto_node.inc:25
 msgid "The year the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:26;118
+#: pathauto_node.inc:26;118
 msgid "[mm]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:26
+#: pathauto_node.inc:26
 msgid "The two-digit month (01-12) the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:27;119
+#: pathauto_node.inc:27;119
 msgid "[mon]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:27
+#: pathauto_node.inc:27
 msgid "The three-letter month (jan-dec) the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:28;120
+#: pathauto_node.inc:28;120
 msgid "[dd]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:28
+#: pathauto_node.inc:28
 msgid "The two-digit day of the month (00-31) the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:29;121
+#: pathauto_node.inc:29;121
 msgid "[day]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:29
+#: pathauto_node.inc:29
 msgid "The three-letter day of the week (sun-sat) that the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:30;122
+#: pathauto_node.inc:30;122
 msgid "[hour]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:30
+#: pathauto_node.inc:30
 msgid "The two-digit hour (00-23) the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:31;123
+#: pathauto_node.inc:31;123
 msgid "[min]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:31
+#: pathauto_node.inc:31
 msgid "The two-digit minute (00-59) the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:32;124
+#: pathauto_node.inc:32;124
 msgid "[sec]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:32
+#: pathauto_node.inc:32
 msgid "The two-digit second (00-59) the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:33;125
+#: pathauto_node.inc:33;125
 msgid "[week]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:33
+#: pathauto_node.inc:33
 msgid "The week number (1-52) of the year the node was created."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:42
+#: pathauto_node.inc:42
 msgid "The name of the lowest-weight category that the page belongs to."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:45;221;223;237
+#: pathauto_node.inc:45;221;223;237
 msgid "[catalias]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:46
+#: pathauto_node.inc:46
 msgid ""
 "The alias for the lowest-weight category that the page belongs to. This is "
 "useful for long category names. You must first set up aliases for your "
 "categories."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:51;137;151
+#: pathauto_node.inc:51;137;151
 msgid "[book]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:52
+#: pathauto_node.inc:52
 msgid "For book pages, the title of the top-level book."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:53;148;152
+#: pathauto_node.inc:53;148;152
 msgid "[bookpath]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:54
+#: pathauto_node.inc:54
 msgid "For book pages, the full hierarchy from the top-level book."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:101
+#: pathauto_node.inc:63
+msgid "Pattern for all %nodetypename paths"
+msgstr ""
+
+#: pathauto_node.inc:101
 msgid ""
 "An alias will be automatically generated from the title and other node "
 "attributes, in addition to any alias manually provided above."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:103
+#: pathauto_node.inc:103
 msgid ""
 " To control the format of the generated aliases, see the <a href=\"admin/"
 "settings/pathauto\">pathauto settings</a>."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_node.inc:273
+#: pathauto_node.inc:273
 msgid "Bulk update of nodes completed, one alias generated."
 msgid_plural "Bulk update of nodes completed, @count aliases generated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:12;22
+#: contrib/pathauto_node_event.inc:12;22
 msgid "[eventyyyy]"
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:12
+#: contrib/pathauto_node_event.inc:12
 msgid "The year the event starts."
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:13;23
+#: contrib/pathauto_node_event.inc:13;23
 msgid "[eventmm]"
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:13
+#: contrib/pathauto_node_event.inc:13
 msgid "The two-digit month (01-12) the event starts."
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:14;24
+#: contrib/pathauto_node_event.inc:14;24
 msgid "[eventmon]"
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:14
+#: contrib/pathauto_node_event.inc:14
 msgid "The three-letter month (jan-dec) the event starts."
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:15;25
+#: contrib/pathauto_node_event.inc:15;25
 msgid "[eventdd]"
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:15
+#: contrib/pathauto_node_event.inc:15
 msgid "The two-digit day of the month (00-31) the event starts."
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:16;26
+#: contrib/pathauto_node_event.inc:16;26
 msgid "[eventday]"
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:16
+#: contrib/pathauto_node_event.inc:16
 msgid "The three-letter day of the week (sun-sat) the event starts."
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:17;27
+#: contrib/pathauto_node_event.inc:17;27
 msgid "[eventweek]"
 msgstr ""
 
-#: sites/all/modules/pathauto/contrib/pathauto_node_event.inc:17
+#: contrib/pathauto_node_event.inc:17
 msgid "The week number (1-52) of the year the event starts."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:13
+#: pathauto_taxonomy.inc:13
 msgid "Category path settings"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:14
+#: pathauto_taxonomy.inc:14
 msgid ""
 "Default path pattern (applies to all vocabularies with blank patterns below)"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:15
+#: pathauto_taxonomy.inc:15
 msgid "[vocab]/[catpath]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:18
+#: pathauto_taxonomy.inc:18
 msgid "The name of the category."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:20;65;111
+#: pathauto_taxonomy.inc:20;65;111
 msgid "[tid]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:20
+#: pathauto_taxonomy.inc:20
 msgid "The id number of the category."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:26
+#: pathauto_taxonomy.inc:26
 msgid "Bulk update category paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:27
+#: pathauto_taxonomy.inc:27
 msgid ""
 "Generate aliases for all existing categories which do not already have "
 "aliases."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:34
+#: pathauto_taxonomy.inc:34
 msgid "Pattern for all %vocab-name paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_taxonomy.inc:145
+#: pathauto_taxonomy.inc:145
 msgid "Bulk update of terms completed, one alias generated."
 msgid_plural "Bulk update of terms completed, @count aliases generated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:12
+#: pathauto_user.inc:12
 msgid "User path settings"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:13
+#: pathauto_user.inc:13
 msgid "Pattern for user account page paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:14
+#: pathauto_user.inc:14
 msgid "user/[user]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:16;39;63
+#: pathauto_user.inc:16;39;63
 msgid "The name of the user."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:17;40;64;89;131;154;177
+#: pathauto_user.inc:17;40;64;89;131;154;177
 msgid "[uid]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:17;40;64
+#: pathauto_user.inc:17;40;64
 msgid "The id number of the user."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:19
+#: pathauto_user.inc:19
 msgid "Bulk update user paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:20
+#: pathauto_user.inc:20
 msgid ""
 "Generate aliases for all existing user account pages which do not already "
 "have aliases."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:35
+#: pathauto_user.inc:35
 msgid "Blog path settings"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:36
+#: pathauto_user.inc:36
 msgid "Pattern for blog page paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:37
+#: pathauto_user.inc:37
 msgid "blog/[user]"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:43
+#: pathauto_user.inc:43
 msgid "Bulk update blog paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:44
+#: pathauto_user.inc:44
 msgid ""
 "Generate aliases for all existing blog pages which do not already have "
 "aliases."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:59
+#: pathauto_user.inc:59
 msgid "User-tracker path settings"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:60
+#: pathauto_user.inc:60
 msgid "Pattern for user-tracker page paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:61
+#: pathauto_user.inc:61
 msgid "user/[user]/track"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:67
+#: pathauto_user.inc:67
 msgid "Bulk update user-tracker paths"
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:68
+#: pathauto_user.inc:68
 msgid ""
 "Generate aliases for all existing user-tracker pages which do not already "
 "have aliases."
 msgstr ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:139
+#: pathauto_user.inc:139
 msgid "Bulk update of users completed, one alias generated."
 msgid_plural "Bulk update of users completed, @count aliases generated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:162
+#: pathauto_user.inc:162
 msgid "Bulk update of user blogs completed, one alias generated."
 msgid_plural "Bulk update of user blogs completed, @count aliases generated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: sites/all/modules/pathauto/pathauto_user.inc:185
+#: pathauto_user.inc:185
 msgid "Bulk update of user tracker pages completed, one alias generated."
 msgid_plural ""
 "Bulk update of user tracker pages completed, @count aliases generated."
