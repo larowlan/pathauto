@@ -23,7 +23,8 @@ function pathauto_install() {
     variable_set('pathauto_taxonomy_2_pattern', '');
     variable_set('pathauto_taxonomy_1_pattern', '');
   }
-  else { // Node and user are required so we don't have to check
+  // Node and user are required so we don't have to check
+  else {
     variable_set('pathauto_modulelist', array('node', 'user'));
   }
   // Set the rest of the pathauto default variables

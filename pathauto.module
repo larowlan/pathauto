@@ -95,6 +95,17 @@ function pathauto_admin_settings() {
           t('Create a new alias, replacing the old one')),
     '#description' => t('What should pathauto do when updating an existing content item which already has an alias?'));
 
+  $disable_transliteration = TRUE;
+  if (is_file($path. '/i18n-ascii.txt')) {
+    $disable_transliteration = FALSE;
+  }
+  
+  $form["general"]["pathauto_transliterate"] = array('#type' => 'checkbox',
+    '#title' => t('Transliterate prior to creating alias'),
+    '#default_value' => variable_get('pathauto_transliterate', FALSE),
+    '#description' => t('When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet? For this feature to work you will also need to edit the i18n-ascii.txt file in your Pathauto directory.'),
+    '#disabled' => $disable_transliteration,);
+
   $form["general"]["pathauto_ignore_words"] = array('#type' => 'textarea',
     '#title' => t('Strings to Remove'), '#default_value' => variable_get('pathauto_ignore_words', implode(",", $ignore_words)),
     '#description' => t('Words to strip out of the URL alias, separated by commas')
@@ -211,44 +222,37 @@ function pathauto_cleanstring($string) {
     "with"
   );
 
-  static $i18n_loaded = false;
-  static $translations = array();
-  if (!$i18n_loaded) {
-    $path = drupal_get_path('module', 'pathauto');
-    if (is_file($path. '/i18n-ascii.txt')) {
-      $translations = parse_ini_file($path. '/i18n-ascii.txt');
-    }
-    $i18n_loaded = true;
-  }
-
-  $output = strtr($output, $translations);
-
   // Replace or drop apostrophes based on user settings
   $separator = variable_get('pathauto_separator', '-');
   $quotes = variable_get('pathauto_quotes', 0);
   $output = str_replace("'", ($quotes ? $separator : ''), $string);
   
-  // Convert accented characters to their ASCII counterparts...
-/*  $output = strtr(utf8_decode($output),
-       "\xA1\xAA\xBA\xBF".
-       "\xC0\xC1\xC2\xC3\xC5\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF".
-       "\xD0\xD1\xD2\xD3\xD4\xD5\xD8\xD9\xDA\xDB\xDD".
-       "\xE0\xE1\xE2\xE3\xE5\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF".
-       "\xF0\xF1\xF2\xF3\xF4\xF5\xF8\xF9\xFA\xFB\xFD\xFF",
-       "!ao?AAAAACEEEEIIIIDNOOOOOUUUYaaaaaceeeeiiiidnooooouuuyy");
-  // ...and ligatures too
-  $output = utf8_encode(strtr($output, array("\xC4"=>"Ae", "\xC6"=>"AE", "\xD6"=>"Oe",
-    "\xDC"=>"Ue", "\xDE"=>"TH", "\xDF"=>"ss", "\xE4"=>"ae", "\xE6"=>"ae",
-    "\xF6"=>"oe", "\xFC"=>"ue", "\xFE"=>"th")));*/
-  $output = strtr($output, $translations);
-
   // Get rid of words that are on the ignore list
   $ignore_re = "\b". preg_replace("/,/", "\b|\b", variable_get('pathauto_ignore_words', $ignore_words)) ."\b";
   $output = preg_replace("/$ignore_re/ie", "", $output);
 
-  // Preserve alphanumerics, everything else becomes a separator
-  $pattern = '/[^a-zA-Z0-9]+/ ';
-  $output = preg_replace($pattern, $separator, $output);
+  // Optionally remove accents and transliterate to a subset of ASCII-96 characters.
+  if (variable_get('pathauto_transliterate', FALSE)) { 
+
+    static $i18n_loaded = false;
+    static $translations = array();
+    if (!$i18n_loaded) {
+      $path = drupal_get_path('module', 'pathauto');
+      if (is_file($path. '/i18n-ascii.txt')) {
+        $translations = parse_ini_file($path. '/i18n-ascii.txt');
+      }
+      $i18n_loaded = true;
+    }
+  
+    $output = strtr($output, $translations);
+  
+    // Preserve alphanumerics, everything else becomes a separator.
+    $pattern = '/[^a-zA-Z0-9]+/ ';
+    $output = preg_replace($pattern, $separator, $output);
+  }
+
+  // Always replace whitespace with the separator.
+  $output = preg_replace("/\s+/", $separator, $output);
 
   // Trim any leading or trailing separators (note the need to
   // escape the separator if and only if it is not alphanumeric)
