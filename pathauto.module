@@ -436,13 +436,3 @@ function pathauto_menu($may_cache) {
   return $items;
 }
 
-/**
- * Returns the version of this release of the pathauto module.
- *
- * @return array An array with keys 'text' and 'build' containing the
- *         text version and build ID of this release, respectively.
- */
-function _pathauto_version() {
-  return array("text" => "2005-9-18", "build" => 5);
-} // function _pathauto_version
-
