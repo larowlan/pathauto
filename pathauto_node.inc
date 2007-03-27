@@ -21,6 +21,7 @@ function node_pathauto($op) {
         t('[title]') => t('The title of the node, with spaces and punctuation replaced by the separator.'),
         t('[nid]') => t('The id number of the node.'),
         t('[user]') => t('The name of the user who created the node.'),
+        t('[uid]') => t('The id number of the user.'),
         t('[type]') => t('The node type (e.g., "page", "story", etc.).'),
         t('[yyyy]') => t('The year the node was created.'),
         t('[mm]') => t('The two-digit month (01-12) the node was created.'),
@@ -125,6 +126,7 @@ function node_get_placeholders($node) {
   $placeholders[t('[week]')] = date('W', $node->created);
   $placeholders[t('[nid]')] = $node->nid;
   $placeholders[t('[type]')] = pathauto_cleanstring(node_get_types('name', $node));
+  $placeholders[t('[uid]')] = $node->uid;
 
   // Then the slightly less simple stuff
   $result = db_query("SELECT name FROM {users} WHERE uid='%d'", $node->uid);
