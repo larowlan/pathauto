@@ -144,7 +144,7 @@ function node_get_placeholders($node) {
         $bookpath = pathauto_cleanstring($bookelement->title);
       } 
       else {
-        $bookpath = $bookpath . '/' . pathauto_cleanstring($bookelement->title);
+        $bookpath = $bookpath .'/'. pathauto_cleanstring($bookelement->title);
       }
     }
     $placeholders[t('[bookpath]')] = $bookpath;

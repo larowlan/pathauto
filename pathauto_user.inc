@@ -87,14 +87,14 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
         $placeholders = array();
         $placeholders[t('[user]')] = pathauto_cleanstring($user->name);
         $placeholders[t('[uid]')] = $user->uid;
-        $src = 'user/'.$user->uid;
+        $src = 'user/'. $user->uid;
         $alias = pathauto_create_alias('user', $op, $placeholders, $src);
         if (module_exists('blog')) {
-          $src = 'blog/'.$user->uid;
+          $src = 'blog/'. $user->uid;
           $alias = pathauto_create_alias('blog', $op, $placeholders, $src);
         }
         if (module_exists('tracker')) {
-          $src = 'user/'.$user->uid.'/track';
+          $src = 'user/'. $user->uid .'/track';
           $alias = pathauto_create_alias('tracker', $op, $placeholders, $src);
         }
       }
@@ -105,12 +105,12 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
       **
       */
       $user = (object) $user;
-      path_set_alias('user/'.$user->uid);
+      path_set_alias('user/'. $user->uid);
       if (module_exists('blog')) {
-        path_set_alias('blog/'.$user->uid);
+        path_set_alias('blog/'. $user->uid);
       }
       if (module_exists('tracker')) {
-        path_set_alias('user/'.$user->uid.'/track');
+        path_set_alias('user/'. $user->uid .'/track');
       }
       break;
     default:
@@ -129,7 +129,7 @@ function user_pathauto_bulkupdate() {
   while ($user) {
     $placeholders[t('[user]')] = pathauto_cleanstring($user->name);
     $placeholders[t('[uid]')] = $user->uid;
-    $src = 'user/'.$user->uid;
+    $src = 'user/'. $user->uid;
     if ($alias = pathauto_create_alias('user', 'bulkupdate', $placeholders, $src)) {
       $count++;
     }
@@ -152,7 +152,7 @@ function blog_pathauto_bulkupdate() {
   while ($user) {
     $placeholders[t('[user]')] = pathauto_cleanstring($user->name);
     $placeholders[t('[uid]')] = $user->uid;
-    $src = 'blog/'.$user->uid;
+    $src = 'blog/'. $user->uid;
     if ($alias = pathauto_create_alias('blog', 'bulkupdate', $placeholders, $src)) {
       $count++;
     }
@@ -175,7 +175,7 @@ function tracker_pathauto_bulkupdate() {
   while ($user) {
     $placeholders[t('[user]')] = pathauto_cleanstring($user->name);
     $placeholders[t('[uid]')] = $user->uid;
-    $src = 'user/'.$user->uid.'/track';
+    $src = 'user/'. $user->uid .'/track';
     if ($alias = pathauto_create_alias('tracker', 'bulkupdate', $placeholders, $src)) {
       $count++;
     }
@@ -186,4 +186,3 @@ function tracker_pathauto_bulkupdate() {
     "Bulk update of user tracker pages completed, one alias generated.",
     "Bulk update of user tracker pages completed, @count aliases generated."));
 }
-

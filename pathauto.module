@@ -128,7 +128,7 @@ function pathauto_admin_settings() {
     $patterndefault = $settings->patterndefault;
     $groupheader = $settings->groupheader;
     $supportsfeeds = isset($settings->supportsfeeds) ? $settings->supportsfeeds : NULL;
-    variable_set('pathauto_'.$module.'_supportsfeeds', $supportsfeeds);
+    variable_set('pathauto_'. $module .'_supportsfeeds', $supportsfeeds);
 
     $form[$module] = array('#type' => 'fieldset',
       '#title' => $groupheader, '#weight' => $group_weight,
@@ -136,7 +136,7 @@ function pathauto_admin_settings() {
     $group_weight++;
 
     // Prompt for the default pattern for this module
-    $variable = 'pathauto_'.$module.'_pattern';
+    $variable = 'pathauto_'. $module .'_pattern';
     $form[$module][$variable] = array('#type' => 'textfield',
       '#title' => $patterndescr,
       '#default_value' => variable_get($variable, $patterndefault),
@@ -146,7 +146,7 @@ function pathauto_admin_settings() {
     // them up here
     if (isset($settings->patternitems)) {
       foreach ($settings->patternitems as $itemname => $itemlabel) {
-        $variable = 'pathauto_'.$module.'_'.$itemname.'_pattern';
+        $variable = 'pathauto_'. $module .'_'. $itemname .'_pattern';
         $form[$module][$variable] = array('#type' => 'textfield',
           '#title' => $itemlabel,
           '#default_value' => variable_get($variable, ''),
@@ -158,18 +158,18 @@ function pathauto_admin_settings() {
     // this module, as a description on the last pattern
     $doc = "<dl>\n";
     foreach ($settings->placeholders as $name => $description) {
-      $doc .= '<dt>'.$name.'</dt>';
-      $doc .= '<dd>'.$description.'</dd>';
+      $doc .= '<dt>'. $name .'</dt>';
+      $doc .= '<dd>'. $description .'</dd>';
     }
     $doc .= "</dl>\n";
     $form[$module][$variable]["#description"] = $doc;
 
     // If the module supports bulk updates, offer the update action here
     if ($settings->bulkname) {
-      $variable = 'pathauto_'.$module.'_bulkupdate';
+      $variable = 'pathauto_'. $module .'_bulkupdate';
       if (variable_get($variable, FALSE)) {
         variable_set($variable, FALSE);
-        $function = $module.'_pathauto_bulkupdate';
+        $function = $module .'_pathauto_bulkupdate';
         call_user_func($function);
       }
       $form[$module][$variable] = array('#type' => 'checkbox',
@@ -180,7 +180,7 @@ function pathauto_admin_settings() {
 
     // Perform bulk updates of indexes for this module, if asked
     if ($do_index_bulkupdate) {
-      $function = $module.'_pathauto_bulkupdate_indexes';
+      $function = $module .'_pathauto_bulkupdate_indexes';
       if (is_callable($function)) {
         $indexcount += call_user_func($function);
       }
@@ -188,7 +188,7 @@ function pathauto_admin_settings() {
 
     // If the module supports feeds, offer to generate aliases for them
     if ($supportsfeeds) {
-      $variable = 'pathauto_'.$module.'_applytofeeds';
+      $variable = 'pathauto_'. $module .'_applytofeeds';
       $form[$module][$variable] = array('#type' => 'checkbox',
         '#title' => t('Create feed aliases'),
         '#default_value' => variable_get($variable, FALSE),
@@ -231,8 +231,8 @@ function pathauto_cleanstring($string) {
   static $translations = array();
   if (!$i18n_loaded) {
     $path = drupal_get_path('module', 'pathauto');
-    if (is_file($path. '/i18n-ascii.txt')) {
-      $translations = parse_ini_file($path. '/i18n-ascii.txt');
+    if (is_file($path .'/i18n-ascii.txt')) {
+      $translations = parse_ini_file($path .'/i18n-ascii.txt');
     }
     $i18n_loaded = true;
   }
@@ -273,7 +273,7 @@ function pathauto_cleanstring($string) {
       $seppattern = $separator;
     } 
     else {
-      $seppattern = '\\'.$separator;
+      $seppattern = '\\'. $separator;
     }
     $output = preg_replace("/^$seppattern+|$seppattern+$/", "", $output);
   }
@@ -317,10 +317,10 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
   // Retrieve and apply the pattern for this content type
   $pattern = '';
   if ($type) {
-    $pattern = drupal_strtolower(variable_get('pathauto_'.$module.'_'.$type.'_pattern', ''));
+    $pattern = drupal_strtolower(variable_get('pathauto_'. $module .'_'. $type .'_pattern', ''));
   }
   if (!trim($pattern)) {
-    $pattern = drupal_strtolower(variable_get('pathauto_'.$module.'_pattern', ''));
+    $pattern = drupal_strtolower(variable_get('pathauto_'. $module .'_pattern', ''));
   }
 
   // No pattern? Do nothing (otherwise we may blow away existing aliases...)
@@ -369,11 +369,11 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
   // If the alias already exists, generate a new variant
   $separator = variable_get('pathauto_separator', '-');
   if (_pathauto_alias_exists($alias, $src)) {
-    for ($i = 0; _pathauto_alias_exists($alias.$separator.$i, $src); $i++) {
+    for ($i = 0; _pathauto_alias_exists($alias . $separator . $i, $src); $i++) {
     }
     // Make room for the sequence number
     $alias = drupal_substr($alias, 0, $maxlength - 1 -($i/10 + 1));
-    $alias = $alias.$separator.$i;
+    $alias = $alias . $separator . $i;
   }
 
   // If $pid is NULL, a new alias is created - otherwise, the existing
@@ -382,8 +382,8 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
 
   // Also create a related feed alias if requested, and if supported
   // by the module
-  if (variable_get('pathauto_'.$module.'_applytofeeds', FALSE)) {
-    $feedappend = variable_get('pathauto_'.$module.'_supportsfeeds', '');
+  if (variable_get('pathauto_'. $module .'_applytofeeds', FALSE)) {
+    $feedappend = variable_get('pathauto_'. $module .'_supportsfeeds', '');
     // Handle replace case (get existing pid)
     _pathauto_set_alias("$src/$feedappend", "$alias/feed", NULL, $verbose);
   }
@@ -420,7 +420,7 @@ function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $oldalia
   //  
   if (_pathauto_path_is_callback($dst)) {
     if ($verbose and user_access('create url aliases')) {
-      drupal_set_message(t('Ignoring alias '). $dst .t(' due to existing path conflict'));
+      drupal_set_message(t('Ignoring alias ') . $dst . t(' due to existing path conflict'));
     }
     return;
   }
@@ -447,7 +447,7 @@ function pathauto_create_index_alias($alias, $module) {
   $alias = '';
   foreach ($components as $component) {
     if ($alias) {
-      $alias .= '/'.$component;
+      $alias .= '/'. $component;
     } 
     else {
       $alias .= $component;
@@ -480,9 +480,9 @@ function pathauto_menu($may_cache) {
   $modulelist = variable_get('pathauto_modulelist', array());
   if (is_array($modulelist)) {
     foreach ($modulelist as $module) {
-      $indexfunc = $module.'_pathauto_page';
+      $indexfunc = $module .'_pathauto_page';
       if (function_exists($indexfunc)) {
-        $items[] = array('path' => 'pathauto/'.$module,
+        $items[] = array('path' => 'pathauto/'. $module,
           'title' => t('Pathauto'),
           'callback' => $indexfunc,
           'access' => 1,
@@ -507,7 +507,7 @@ function _pathauto_version() {
  * Makes updates to saved variables and the database structure.
  **/
 function _pathauto_update() {
-  $installed_version  = variable_get('pathauto_version', array('text'=> 'Unknown', 'build' => 1));
+  $installed_version  = variable_get('pathauto_version', array('text' => 'Unknown', 'build' => 1));
   $current_version =  _pathauto_version();
 
   if ( $installed_version["build"] < $current_version["build"]) {
@@ -536,7 +536,7 @@ function _pathauto_update() {
       while ($var) {
         $type = drupal_substr($var->name, 0, drupal_strlen($var->name)-drupal_strlen('_pathauto_pattern'));
         $old_pattern = variable_get($var->name, '');
-        $new_name = 'pathauto_node_'.$type.'_pattern';
+        $new_name = 'pathauto_node_'. $type .'_pattern';
         variable_set($new_name, $old_pattern);
         variable_del($var->name);
         $var = db_fetch_object($result);
@@ -548,7 +548,7 @@ function _pathauto_update() {
       while ($var) {
         $type = drupal_substr($var->name, 0, drupal_strlen($var->name)-drupal_strlen('_pathauto_cat_pattern'));
         $old_pattern = variable_get($var->name, '');
-        $new_name = 'pathauto_taxonomy_'.$type.'_pattern';
+        $new_name = 'pathauto_taxonomy_'. $type .'_pattern';
         variable_set($new_name, $old_pattern);
         variable_del($var->name);
         $var = db_fetch_object($result);
@@ -626,7 +626,7 @@ function _pathauto_update() {
     // Set the current version
     variable_set('pathauto_version', $current_version);
 
-    drupal_set_message('Upgraded pathauto from '.$installed_version["build"] .
+    drupal_set_message('Upgraded pathauto from '. $installed_version["build"] .
       ' to '. $current_version["build"]);
   }
 } // end function _pathauto_update

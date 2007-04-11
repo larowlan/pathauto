@@ -67,7 +67,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
             $catpath = ''; 
             $parents = taxonomy_get_parents_all($category->tid);
             foreach ($parents as $parent) {
-              $catpath = pathauto_cleanstring($parent->name).'/'.$catpath;
+              $catpath = pathauto_cleanstring($parent->name) .'/'. $catpath;
             }
             $placeholders[t('[catpath]')] = $catpath;
             
@@ -83,8 +83,8 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
         case 'delete':
           //If the category is deleted, remove the path aliases
           $category = (object) $object;
-          path_set_alias('taxonomy/term/'.$category->tid);
-          path_set_alias('forum/'.$category->tid);
+          path_set_alias('taxonomy/term/'. $category->tid);
+          path_set_alias('forum/'. $category->tid);
           break;
         default:
           break;
@@ -120,7 +120,7 @@ function taxonomy_pathauto_bulkupdate() {
     }
     
     foreach ($parents as $parent) {
-      $catpath = pathauto_cleanstring($parent->name).'/'.$catpath;
+      $catpath = pathauto_cleanstring($parent->name) .'/'. $catpath;
     }
     $placeholders['[catpath]'] = $catpath;
     
@@ -130,12 +130,12 @@ function taxonomy_pathauto_bulkupdate() {
     
     $forumvid = variable_get('forum_nav_vocabulary', '');
     if ($forumvid == $vid) {
-      $src = 'forum/'.$category->tid;
+      $src = 'forum/'. $category->tid;
       if ($forumalias = pathauto_create_alias('taxonomy', 'bulkupdate', $placeholders, $src, $forumvid)) {
         $count++;
       }
     }
-    $src = 'taxonomy/term/'.$category->tid;
+    $src = 'taxonomy/term/'. $category->tid;
     if ($alias = pathauto_create_alias('taxonomy', 'bulkupdate', $placeholders, $src, $vid)) {
       $count++;
     }

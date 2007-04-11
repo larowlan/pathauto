@@ -21,7 +21,7 @@ function menu_pathauto_node($op, $node = NULL) {
         t('The menu path (as reflected in the breadcrumb), not including Home or [menu].');
       return $placeholders;
     case 'values':
-      $results = pathauto_menu_get_placeholders('node/'.$node->nid);
+      $results = pathauto_menu_get_placeholders('node/'. $node->nid);
       return $results;
     default:
       break;
@@ -94,4 +94,3 @@ function pathauto_menu_get_mid($in) {
 
   return $mid;
 }
-
