@@ -1,5 +1,14 @@
 
 ***DRUPAL-5 only***
+2007-04-01
+  Major update to use the token module.  The pattern set is now _much_ richer.  
+    Certain patterns have changed as noted below:
+      Node patterns: 
+      	[user] => [author-name]
+      	[uid]  => [author-uid]
+      	[cat] => [term]  (only for node patterns!!!)
+      	[catalias] => Nothing - so far this is not supported
+
 2006-03-19
   Removed _pathauto_page capability which wasn't used by many sites
     nor by any contrib modules.  If your site or module used this

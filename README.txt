@@ -1,3 +1,7 @@
+Please read this file and also the INSTALL.txt.  
+They contain answers to many common questions.
+If you are developing for this module, the API.txt may be interesting.
+If you are upgrading, check the CHANGELOG.txt for major changes.
 
 **Description:
 The Pathauto module provides support functions for other modules to 

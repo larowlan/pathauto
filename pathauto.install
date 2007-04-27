@@ -23,8 +23,7 @@ function pathauto_install() {
     variable_set('pathauto_taxonomy_2_pattern', '');
     variable_set('pathauto_taxonomy_1_pattern', '');
   }
-  // Node and user are required so we don't have to check
-  else {
+  else { // Node and user are required so we don't have to check
     variable_set('pathauto_modulelist', array('node', 'user'));
   }
   // Set the rest of the pathauto default variables
@@ -48,7 +47,9 @@ function pathauto_install() {
   variable_set('pathauto_user_pattern', 'users/[user]');
   variable_set('pathauto_user_supportsfeeds', NULL);
   variable_set('pathauto_verbose', FALSE);
-  variable_get('pathauto_transliterate', FALSE);
+  
+  // Clear the cache to get these to take effect.
+  cache_clear_all();
 }
  
 /**

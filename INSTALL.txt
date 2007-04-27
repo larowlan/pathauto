@@ -11,8 +11,6 @@ your Drupal installation.
 sure "administer pathauto" is enabled through access control administration.
 4. Visit the pathauto settings page:
   When first installing pathauto, to define the desired alias patterns.
-  When installing a new version of pathauto, to have any necessary
-    database and variable upgrades applied.
 
 **Transliteration support:
 
