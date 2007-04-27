@@ -2,26 +2,6 @@
 // $Id$
 
 /*
- * Implementation of hook_pathauto_node()
- */
-
-function i18n_pathauto_node($op, $node = NULL) {
-  switch ($op) {
-    case 'placeholders':
-      $placeholders = array();
-      $placeholders[t('[lang]')] = t('');
-      return $placeholders;
-    case 'values':
-      $results = array();
-      $results[t('[lang]')] = 
-      return $results;
-    default:
-      break;
-  }
-}
-
-
-/*
  * Implementation of hook_token_list()
  */
 function pathauto_node_i18n_token_list($type = 'all') {
