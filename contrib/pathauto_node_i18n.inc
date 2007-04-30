@@ -5,7 +5,7 @@
  * Implementation of hook_token_list()
  */
 function pathauto_node_i18n_token_list($type = 'all') {
-  if ($type == 'node' || $type == 'all'):
+  if ($type == 'node' || $type == 'all') {
     $tokens['node']['lang']   = t("Language code of the document");
     return $tokens;
   }
