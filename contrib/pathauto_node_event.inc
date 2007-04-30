@@ -21,7 +21,7 @@ function pathauto_node_event_token_list($type = 'all') {
  */
  
 function pathauto_node_event_token_values($type, $object = NULL) {
-  if ($type == 'node'):
+  if ($type == 'node') {
     $tokens['eventyyyy']      = date('Y', $eventstart);
     $tokens['eventmm']      = date('m', $eventstart);
     $tokens['eventmon']      = pathauto_cleanstring(date('M', $eventstart));

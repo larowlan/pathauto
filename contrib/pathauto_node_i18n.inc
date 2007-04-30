@@ -16,7 +16,7 @@ function pathauto_node_i18n_token_list($type = 'all') {
  */
  
 function pathauto_node_i18n_token_values($type, $object = NULL) {
-  if ($type == 'node'):
+  if ($type == 'node') {
     $tokens['lang']      = i18n_node_get_lang($node->nid, i18n_get_lang());
     return $tokens;
   }
