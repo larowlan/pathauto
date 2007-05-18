@@ -121,8 +121,8 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
  * Bulk generate aliases for all users without aliases
  */
 function user_pathauto_bulkupdate() {
-  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
-  $result = db_query($query);
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
   
   $count = 0;
   $placeholders = array();
@@ -144,19 +144,17 @@ function user_pathauto_bulkupdate() {
  * Bulk generate aliases for all blogs without aliases 
  */
 function blog_pathauto_bulkupdate() {
-  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
-  $result = db_query($query);
-  $user = db_fetch_object($result);
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
   
   $count = 0;
   $placeholders = array();
-  while ($user) {
+  while ($user = db_fetch_object($result)) {
     $placeholders = pathauto_get_placeholders('user', $user);
     $src = 'blog/'.$user->uid;
     if ($alias = pathauto_create_alias('blog', 'bulkupdate', $placeholders, $src)) {
       $count++;
     }
-    $user = db_fetch_object($result);
   }
   
   drupal_set_message(format_plural($count,
@@ -168,19 +166,17 @@ function blog_pathauto_bulkupdate() {
  * Bulk generate aliases for user trackers without aliases 
  */
 function tracker_pathauto_bulkupdate() {
-  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
-  $result = db_query($query);
-  $user = db_fetch_object($result);
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
   
   $count = 0;
   $placeholders = array();
-  while ($user) {
+  while ($user = db_fetch_object($result)) {
     $placeholders = pathauto_get_placeholders('user', $user);
     $src = 'user/'.$user->uid.'/track';
     if ($alias = pathauto_create_alias('tracker', 'bulkupdate', $placeholders, $src)) {
       $count++;
     }
-    $user = db_fetch_object($result);
   }
   
   drupal_set_message(format_plural($count,

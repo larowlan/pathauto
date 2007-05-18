@@ -78,12 +78,11 @@ function pathauto_form_alter($formid, &$form) {
  */
 function node_pathauto_bulkupdate() {
   $query = "SELECT nid, type, title, uid, created, src, dst, vid FROM {node} LEFT JOIN {url_alias} ON CONCAT('node/', nid) = src WHERE src IS NULL";
-  $result = db_query($query);
-  $node_ref = db_fetch_object($result);
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
   $placeholders = array();
-  while ($node_ref) {
+  while ($node_ref = db_fetch_object($result)) {
     $node = node_load($node_ref->nid, NULL, TRUE);
     $node->src = $node_ref->src;
     $node->dst = $node_ref->dst;
@@ -97,7 +96,6 @@ function node_pathauto_bulkupdate() {
     if ($alias = pathauto_create_alias('node', 'bulkupdate', $placeholders, $src, $node->type)) {
       $count++;
     }
-    $node_ref = db_fetch_object($result);
   }
 
   drupal_set_message(format_plural($count,
