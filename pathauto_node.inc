@@ -77,7 +77,7 @@ function pathauto_form_alter($formid, &$form) {
  * Generate aliases for all nodes without aliases. 
  */
 function node_pathauto_bulkupdate() {
-  $query = "SELECT nid, type, title, uid, created, src, dst, vid FROM {node} LEFT JOIN {url_alias} ON CONCAT('node/', nid) = src";
+  $query = "SELECT nid, type, title, uid, created, src, dst, vid FROM {node} LEFT JOIN {url_alias} ON CONCAT('node/', nid) = src WHERE src IS NULL";
   $result = db_query($query);
   $node_ref = db_fetch_object($result);
 

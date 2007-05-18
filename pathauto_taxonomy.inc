@@ -74,7 +74,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
  * 
  */ 
 function taxonomy_pathauto_bulkupdate() {
-  $query = "SELECT tid, vid, name, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', tid) = src OR CONCAT('forum/', tid) = src";
+  $query = "SELECT tid, vid, name, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', tid) = src OR CONCAT('forum/', tid) = src WHERE src IS NULL";
   $result = db_query($query);
   
   $count = 0;

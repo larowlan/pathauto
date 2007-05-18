@@ -17,7 +17,7 @@ function user_pathauto($op) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
       $settings['bulkname'] = t('Bulk update user paths');
-      $settings['bulkdescr'] = t('Generate aliases for all existing user account pages which do not already have aliases.');
+      $settings['bulkdescr'] = t('Generate aliases for all existing user account pages which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       return (object) $settings;
     default:
       break;
@@ -121,7 +121,7 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
  * Bulk generate aliases for all users without aliases
  */
 function user_pathauto_bulkupdate() {
-  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0";
+  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
   $result = db_query($query);
   
   $count = 0;
@@ -144,7 +144,7 @@ function user_pathauto_bulkupdate() {
  * Bulk generate aliases for all blogs without aliases 
  */
 function blog_pathauto_bulkupdate() {
-  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0";
+  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
   $result = db_query($query);
   $user = db_fetch_object($result);
   
@@ -168,7 +168,7 @@ function blog_pathauto_bulkupdate() {
  * Bulk generate aliases for user trackers without aliases 
  */
 function tracker_pathauto_bulkupdate() {
-  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0";
+  $query = "SELECT uid,name,src,dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
   $result = db_query($query);
   $user = db_fetch_object($result);
   

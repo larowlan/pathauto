@@ -4,6 +4,12 @@
   Forum aliases are now handled separately.  Forum vocabularies will not get 
     a regular taxonomy/term/[tid] alias and the pattern input is not available.
 
+  Added a "Delete all aliases" function.  See tabs at admin/build/path.
+
+  Bulk updates claim that they only impact non-aliased objects but really affect
+    everything (depending on update action).  Changed the queries so that now
+    pathauto will only impact items which are not aliased.  To get a clean slate 
+
 2007-04-01
   Major update to use the token module.  The pattern set is now _much_ richer.  
     Certain patterns have changed as noted below:
