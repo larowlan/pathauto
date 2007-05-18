@@ -1,5 +1,9 @@
 
 ***DRUPAL-5 only***
+2007-05-16
+  Forum aliases are now handled separately.  Forum vocabularies will not get 
+    a regular taxonomy/term/[tid] alias and the pattern input is not available.
+
 2007-04-01
   Major update to use the token module.  The pattern set is now _much_ richer.  
     Certain patterns have changed as noted below:

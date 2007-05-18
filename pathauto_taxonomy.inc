@@ -17,15 +17,6 @@ function taxonomy_pathauto($op) {
       foreach ($patterns['taxonomy'] as $pattern => $description) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
-
-
-//      $settings['placeholders'] = array(
-//        t('[vocab]') => t("The vocabulary that the page's first category belongs to."),
-//        t('[cat]') => t('The name of the category.'),
-//        t('[catpath]') => t('As [cat], but including its supercategories.'),
-//        t('[tid]') => t('The id number of the category.')
-//      );
-      
       $settings['supportsfeeds'] = '0/feed';
       $settings['bulkname'] = t('Bulk update category paths');
       $settings['bulkdescr'] = t('Generate aliases for all existing categories which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
@@ -59,7 +50,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           */
           $category = (object) $object;
           if ($category->name) {
-            $count = _taxonomy_pathauto_alias($category);
+            $count = _taxonomy_pathauto_alias($category, $op);
           }
           break;
         case 'delete':
@@ -83,13 +74,13 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
  * 
  */ 
 function taxonomy_pathauto_bulkupdate() {
-  $query = "SELECT tid,vid,name,src,dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', tid) = src OR CONCAT('forum/', tid) = src";
+  $query = "SELECT tid, vid, name, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', tid) = src OR CONCAT('forum/', tid) = src";
   $result = db_query($query);
   
   $count = 0;
   $placeholders = array();
   while ($category = db_fetch_object($result)) {
-    $count = _taxonomy_pathauto_alias($category) + $count;
+    $count = _taxonomy_pathauto_alias($category, 'bulkupdate') + $count;
   }
   
   drupal_set_message(format_plural($count,
@@ -104,23 +95,22 @@ function taxonomy_pathauto_bulkupdate() {
  * @param object $category a taxonomy object
  * 
  */
-function _taxonomy_pathauto_alias($category) {
+function _taxonomy_pathauto_alias($category, $op) {
 
   $count = 0;
 
-
   $placeholders = pathauto_get_placeholders('taxonomy', $category);    
   
-  $forumvid = variable_get('forum_nav_vocabulary', '');
-  if ($forumvid == $vid) {
+  $forum_vid = variable_get('forum_nav_vocabulary', '');
+  if ($forum_vid != $category->vid) {
     $src = 'forum/'.$category->tid;
-    if ($forumalias = pathauto_create_alias('taxonomy', 'bulkupdate', $placeholders, $src, $forumvid)) {
+    if ($forumalias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $forum_vid)) {
       $count++;
     }
   }
 
   $src = 'taxonomy/term/'.$category->tid;
-  if ($alias = pathauto_create_alias('taxonomy', 'bulkupdate', $placeholders, $src, $vid)) {
+  if ($alias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $category->vid)) {
     $count++;
   }
   return $count;

@@ -58,10 +58,15 @@ function pathauto_menu($may_cache) {
       'access' => user_access('administer site configuration'),
       'type' => MENU_NORMAL_ITEM,
     );
-    $items[] = array('path' => 'admin/build/path/delete_all', 'title' => t('Delete All Paths'),
-      'callback' => 'drupal_get_form', 'callback arguments' => array('pathauto_admin_delete_confirm'),
-      'access' => user_access('administer site configuration'), 'type' => MENU_LOCAL_TASK,
+    $items[] = array(
+      'path' => 'admin/build/path/delete_all', 
+      'title' => t('Delete All Paths'),
+      'callback' => 'drupal_get_form', 
+      'callback arguments' => array('pathauto_admin_delete_confirm'),
+      'access' => user_access('administer site configuration'), 
+      'type' => MENU_LOCAL_TASK,
     );
+    
   }
 
   return $items;
@@ -341,7 +346,7 @@ function pathauto_cleanstring($string) {
  * @param $src
  *   The "real" URI of the content to be aliased (e.g., "node/$node->nid")
  * @param $type
- *   For modules which provided patternitems in hook_autopath(),
+ *   For modules which provided patternitems in hook_pathauto(),
  *   the relevant identifier for the specific item to be aliased (e.g.,
  *   $node->type)
  * @return
