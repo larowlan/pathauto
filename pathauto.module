@@ -557,7 +557,7 @@ function pathauto_token_list($type = 'all') {
  *  
  */
 function pathauto_get_placeholders($type, $object) {
-  $full = token_get_values($type, $object);
+  $full = token_get_values($type, $object, TRUE);
   $tokens = token_prepare_tokens($full->tokens);
   $values = pathauto_clean_token_values($full->values);
   
