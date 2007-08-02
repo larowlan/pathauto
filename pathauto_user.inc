@@ -35,7 +35,7 @@ function blog_pathauto($op) {
       $settings['groupheader'] = t('Blog path settings');
       $settings['patterndescr'] = t('Pattern for blog page paths');
       $settings['patterndefault'] = t('blogs/[user]');
-      $patterns = module_invoke_all('token_list', 'user');
+      $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
