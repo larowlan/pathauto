@@ -518,7 +518,6 @@ function pathauto_token_values($type, $object = NULL) {
       }
 
       $parents = taxonomy_get_parents_all($category->tid);
-      $catpath = $category->name;
       foreach ($parents as $parent) {
         $catpath = $parent->name .'/'. $catpath;
       }
