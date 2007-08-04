@@ -317,17 +317,23 @@ function pathauto_cleanstring($string) {
   // Always replace whitespace with the separator.
   $output = preg_replace("/\s+/", $separator, $output);
 
-  // Trim any leading or trailing separators (note the need to
+  // In preparation for pattern matching, 
   // escape the separator if and only if it is not alphanumeric)
-  if ($separator) {
+  if (isset($separator)) {
     if (ctype_alnum($separator)) {
       $seppattern = $separator;
     } 
     else {
       $seppattern = '\\'. $separator;
     }
+    // Trim any leading or trailing separators (note the need to
     $output = preg_replace("/^$seppattern+|$seppattern+$/", "", $output);
+
+    // Replace multiple separators with a single one
+    $output = preg_replace("/$seppattern+/", "$separator", $output);
+
   }
+
 
   // Enforce the maximum component length
   $maxlength = min(variable_get('pathauto_max_component_length', 100), 128);
