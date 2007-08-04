@@ -12,7 +12,7 @@ function node_pathauto($op) {
       $settings['groupheader'] = t('Node path settings');
       $settings['patterndescr'] = t('Default path pattern (applies to all node types with blank patterns below)');
       $settings['patterndefault'] = t('content/[title]');
-      $settings['bulkname'] = t('Bulk update node paths');
+      $settings['bulkname'] = t('Bulk generate aliases for nodes that are not aliased');
       $settings['bulkdescr'] =
         t('Generate aliases for all existing nodes which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       $patterns = token_get_list('node');
@@ -99,6 +99,6 @@ function node_pathauto_bulkupdate() {
   }
 
   drupal_set_message(format_plural($count,
-    "Bulk update of nodes completed, one alias generated.",
-    "Bulk update of nodes completed, @count aliases generated."));
+    "Bulk generation of nodes completed, one alias generated.",
+    "Bulk generation of nodes completed, @count aliases generated."));
 }

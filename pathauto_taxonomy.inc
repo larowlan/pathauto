@@ -18,7 +18,7 @@ function taxonomy_pathauto($op) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
       $settings['supportsfeeds'] = '0/feed';
-      $settings['bulkname'] = t('Bulk update category paths');
+      $settings['bulkname'] = t('Bulk generate aliases for categories that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing categories which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
 
       $vocabularies = taxonomy_get_vocabularies();
@@ -84,8 +84,8 @@ function taxonomy_pathauto_bulkupdate() {
   }
   
   drupal_set_message(format_plural($count,
-    "Bulk update of terms completed, one alias generated.",
-    "Bulk update of terms completed, @count aliases generated."));
+    "Bulk generation of terms completed, one alias generated.",
+    "Bulk generation of terms completed, @count aliases generated."));
 }
 
 /**

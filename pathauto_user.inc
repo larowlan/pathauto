@@ -16,7 +16,7 @@ function user_pathauto($op) {
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
-      $settings['bulkname'] = t('Bulk update user paths');
+      $settings['bulkname'] = t('Bulk generate aliases for users that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing user account pages which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       return (object) $settings;
     default:
@@ -40,7 +40,7 @@ function blog_pathauto($op) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
       $settings['supportsfeeds'] = 'feed';
-      $settings['bulkname'] = t('Bulk update blog paths');
+      $settings['bulkname'] = t('Bulk generate aliases for blogs that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing blog pages which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       return (object) $settings;
     default:
@@ -64,7 +64,7 @@ function tracker_pathauto($op) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);
       }
       $settings['supportsfeeds'] = 'feed';
-      $settings['bulkname'] = t('Bulk update user-tracker paths');
+      $settings['bulkname'] = t('Bulk generate aliases for user-tracker paths that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing user-tracker pages which do not already have aliases.');
       return (object) $settings;
     default:
@@ -135,8 +135,8 @@ function user_pathauto_bulkupdate() {
   }
   
   drupal_set_message(format_plural($count,
-    "Bulk update of users completed, one alias generated.",
-    "Bulk update of users completed, @count aliases generated."));
+    "Bulk generation of users completed, one alias generated.",
+    "Bulk generation of users completed, @count aliases generated."));
 }
 
 
@@ -158,8 +158,8 @@ function blog_pathauto_bulkupdate() {
   }
   
   drupal_set_message(format_plural($count,
-    "Bulk update of user blogs completed, one alias generated.",
-    "Bulk update of user blogs completed, @count aliases generated."));
+    "Bulk generation of user blogs completed, one alias generated.",
+    "Bulk generation of user blogs completed, @count aliases generated."));
 }
 
 /**
@@ -180,6 +180,6 @@ function tracker_pathauto_bulkupdate() {
   }
   
   drupal_set_message(format_plural($count,
-    "Bulk update of user tracker pages completed, one alias generated.",
-    "Bulk update of user tracker pages completed, @count aliases generated."));
+    "Bulk generation of user tracker pages completed, one alias generated.",
+    "Bulk generation of user tracker pages completed, @count aliases generated."));
 }
