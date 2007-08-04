@@ -47,6 +47,9 @@ function pathauto_install() {
   variable_set('pathauto_user_pattern', 'users/[user]');
   variable_set('pathauto_user_supportsfeeds', NULL);
   variable_set('pathauto_verbose', FALSE);
+
+  // Set the weight to 1
+  db_query("UPDATE {system} SET weight = 1 WHERE name = 'pathauto'");
   
   // Clear the cache to get these to take effect.
   cache_clear_all();
@@ -59,4 +62,11 @@ function pathauto_uninstall() {
   // Delete all the pathauto variables and then clear the variable cache  
   db_query("DELETE FROM {variable} WHERE name LIKE 'pathauto_%'");
   cache_clear_all('variables', 'cache');
+}
+
+
+function pathauto_update_1() {
+  $items = array();
+  $items[] = update_sql("UPDATE {system} SET weight = 1 WHERE name = 'pathauto'");
+  return $items;
 }
