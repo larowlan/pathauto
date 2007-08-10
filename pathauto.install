@@ -64,9 +64,30 @@ function pathauto_uninstall() {
   cache_clear_all('variables', 'cache');
 }
 
-
+/**
+ * Set the weight a little heavier to allow taxonomy to do its work
+ *
+ */
 function pathauto_update_1() {
   $items = array();
   $items[] = update_sql("UPDATE {system} SET weight = 1 WHERE name = 'pathauto'");
   return $items;
+}
+
+/**
+ * Increase the maximum length of variable names from 48 to 128.
+ * Copied from DRUPAL-6 sytem_update_6002 per http://drupal.org/node/66795
+ */
+function pathauto_update_2() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'pgsql':
+      db_change_column($ret, 'variable', 'name', 'name', 'varchar(128)', array('not null' => TRUE, 'default' => "''"));
+      break;
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {variable} CHANGE name name varchar(128) NOT NULL default ''");
+      break;
+  }
+  return $ret;
 }
