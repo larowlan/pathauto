@@ -48,7 +48,7 @@ function pathauto_perm() {
 function pathauto_menu($may_cache) {
   
   $items = array();
-  if (!$may_cache) {
+  if ($may_cache) {
     $items[] = array(
       'path' => 'admin/settings/pathauto',
       'title' => t('Pathauto'),
@@ -320,7 +320,7 @@ function pathauto_cleanstring($string) {
   // In preparation for pattern matching, 
   // escape the separator if and only if it is not alphanumeric)
   if (isset($separator)) {
-    if (ctype_alnum($separator)) {
+    if (preg_match('/^(\pL|\pN)+$/D', $separator)) {
       $seppattern = $separator;
     } 
     else {
@@ -331,7 +331,6 @@ function pathauto_cleanstring($string) {
 
     // Replace multiple separators with a single one
     $output = preg_replace("/$seppattern+/", "$separator", $output);
-
   }
 
 
