@@ -15,10 +15,15 @@ function node_pathauto($op) {
       $settings['bulkname'] = t('Bulk generate aliases for nodes that are not aliased');
       $settings['bulkdescr'] =
         t('Generate aliases for all existing nodes which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
+
       $patterns = token_get_list('node');
-      foreach ($patterns['node'] as $pattern => $description) {
-        $settings['placeholders'][t('['. $pattern .']')] = t($description);
+      $pattern_types = array('node', 'book', 'CCK text', 'CCK node reference', 'CCK number', 'CCK user reference', 'CCK link');
+      foreach ($pattern_types as $pattern_type) {
+	foreach ($patterns[$pattern_type] as $pattern => $description) {
+	  $settings['placeholders'][t('['. $pattern .']')] = t($description);
+	}
       }
+
       $nodetypes = node_get_types();
       foreach ($nodetypes as $ntype => $nodetype) {
         $fieldlabel = t('Pattern for all '. $nodetype->name .' paths');
