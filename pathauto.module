@@ -524,7 +524,9 @@ function pathauto_token_values($type, $object = NULL) {
 
       $parents = taxonomy_get_parents_all($category->tid);
       foreach ($parents as $parent) {
-        $catpath = $parent->name .'/'. $catpath;
+        // Replace any / characters in individual terms which might create confusing URLs
+        $separator = variable_get('pathauto_separator', '-');
+        $catpath = preg_replace('/\//', '', $parent->name) .'/'. $catpath;
       }
       $values['catpath'] = $catpath;
 
