@@ -37,39 +37,6 @@ function taxonomy_pathauto($op) {
 }
 
 /**
- * Implementation of hook_taxonomy().
- */
-function pathauto_taxonomy($op, $type, $object = NULL) {
-  switch ($type) {
-    case 'term':
-      switch ($op) {
-        case 'insert':
-        case 'update':
-          /*
-          ** Use the category info to automatically create an alias
-          */
-          $category = (object) $object;
-          if ($category->name) {
-            $count = _taxonomy_pathauto_alias($category, $op);
-          }
-          break;
-        case 'delete':
-          //If the category is deleted, remove the path aliases
-          $category = (object) $object;
-          path_set_alias('taxonomy/term/'. $category->tid);
-          path_set_alias('forum/'.$category->tid);
-          path_set_alias('taxonomy/term/'. $category->tid .'/0/feed');
-          break;
-        default:
-          break;
-      }
-      break;
-    default:
-      break;
-  }
-}
-
-/**
  * Generate aliases for all categories without aliases
  * 
  */ 

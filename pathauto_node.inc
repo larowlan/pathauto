@@ -36,49 +36,6 @@ function node_pathauto($op) {
 }
 
 /**
- * Implementation of hook_nodeapi().
- */
-function pathauto_nodeapi(&$node, $op, $teaser, $page) {
-  if (module_exists('path')) {
-    switch ($op) {
-      case 'insert':
-      case 'update':
-        $placeholders = pathauto_get_placeholders('node', $node);
-        $src = "node/$node->nid";
-        $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->type);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-/**
- * Implementation of hook_form_alter().
- * 
- * A helpful hint to the users with access to alias creation (pathauto
- * will be invisible to other users). Inserted into the path module's
- * fieldset in the node form
- */
-function pathauto_form_alter($formid, &$form) {
-  
-  
-  if (isset($form['#attributes']['id']) && ($form['#attributes']['id'] == 'node-form')) {
-    if (user_access('create url aliases')) {
-      $output .= t('An alias will be automatically generated from the title and other node attributes, in addition to any alias manually provided above.');
-      if (user_access('administer pathauto')) {
-        $output .= t(' To control the format of the generated aliases, see the <a href="admin/settings/pathauto">pathauto settings</a>.');
-      }
-    }
-    if ($output) {
-      $form['path']['pathauto'] = array('#type' => 'item',
-        '#description' => $output);
-    }
-  }
-}
-
-
-/**
  * Generate aliases for all nodes without aliases. 
  */
 function node_pathauto_bulkupdate() {

@@ -73,51 +73,6 @@ function tracker_pathauto($op) {
 }
 
 /**
- * Implementation of hook_user() for users, trackers, and blogs
- */
-function pathauto_user($op, &$edit, &$user, $category = FALSE) {
-  switch ($op) {
-    case 'insert':
-    case 'update':
-      /*
-      ** Use the username to automatically create an alias
-      */
-      $user = (object) $user;
-      if ($user->name) {
-        $placeholders = pathauto_get_placeholders('user', $user);
-        $src = 'user/'.$user->uid;
-        $alias = pathauto_create_alias('user', $op, $placeholders, $src);
-        if (module_exists('blog')) {
-          $src = 'blog/'.$user->uid;
-          $alias = pathauto_create_alias('blog', $op, $placeholders, $src);
-        }
-        if (module_exists('tracker')) {
-          $src = 'user/'.$user->uid.'/track';
-          $alias = pathauto_create_alias('tracker', $op, $placeholders, $src);
-        }
-      }
-      break;
-    case 'delete':
-      /*
-      ** If the user is deleted, remove the path aliases
-      **
-      */
-      $user = (object) $user;
-      path_set_alias('user/'.$user->uid);
-
-      //  They may have enabled these modules and/or feeds when the user was created, so let's try to delete all of them
-      path_set_alias('blog/'.$user->uid);
-      path_set_alias('blog/'. $user->uid .'/feed');
-      path_set_alias('user/'.$user->uid.'/track');
-      path_set_alias('user/'.$user->uid.'/track/feed');
-
-      break;
-    default:
-      break;
-  }
-}
-
-/**
  * Bulk generate aliases for all users without aliases
  */
 function user_pathauto_bulkupdate() {
