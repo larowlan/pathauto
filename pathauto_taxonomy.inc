@@ -14,8 +14,12 @@ function taxonomy_pathauto($op) {
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
       $settings['patterndefault'] = t('category/[vocab]/[catpath]');
       $patterns = token_get_list('taxonomy');
-      foreach ($patterns['taxonomy'] as $pattern => $description) {
-        $settings['placeholders'][t('['. $pattern .']')] = t($description);
+      foreach ($patterns as $type => $pattern_set) {
+        if ($type != 'global') {
+          foreach ($pattern_set as $pattern => $description) {
+            $settings['placeholders'][t('['. $pattern .']')] = t($description);
+          }
+        }
       }
       $settings['supportsfeeds'] = '0/feed';
       $settings['bulkname'] = t('Bulk generate aliases for categories that are not aliased');

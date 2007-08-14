@@ -13,9 +13,14 @@ function user_pathauto($op) {
       $settings['patterndescr'] = t('Pattern for user account page paths');
       $settings['patterndefault'] = t('users/[user]');
       $patterns = token_get_list('user');
-      foreach ($patterns['user'] as $pattern => $description) {
-        $settings['placeholders'][t('['. $pattern .']')] = t($description);
+      foreach ($patterns as $type => $pattern_set) {
+        if ($type != 'global') {
+          foreach ($pattern_set as $pattern => $description) {
+            $settings['placeholders'][t('['. $pattern .']')] = t($description);
+          }
+        }
       }
+
       $settings['bulkname'] = t('Bulk generate aliases for users that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing user account pages which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
       return (object) $settings;

@@ -13,14 +13,15 @@ function node_pathauto($op) {
       $settings['patterndescr'] = t('Default path pattern (applies to all node types with blank patterns below)');
       $settings['patterndefault'] = t('content/[title]');
       $settings['bulkname'] = t('Bulk generate aliases for nodes that are not aliased');
-      $settings['bulkdescr'] =
-        t('Generate aliases for all existing nodes which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
+      $settings['bulkdescr'] = t('Generate aliases for all existing nodes which do not already have aliases. Note: Bulk Update may not complete on large or slow sites. See the README.txt for more information.');
 
       $patterns = token_get_list('node');
-      $pattern_types = array('node', 'book', 'CCK text', 'CCK node reference', 'CCK number', 'CCK user reference', 'CCK link');
-      foreach ($pattern_types as $pattern_type) {
-        foreach ($patterns[$pattern_type] as $pattern => $description) {
-          $settings['placeholders'][t('['. $pattern .']')] = t($description);
+      drupal_set_message(dprint_r($patterns,true));
+      foreach ($patterns as $type => $pattern_set) {
+        if ($type != 'global') {
+          foreach ($pattern_set as $pattern => $description) {
+            $settings['placeholders'][t('['. $pattern .']')] = t($description);
+          }
         }
       }
 
