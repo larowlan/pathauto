@@ -69,7 +69,7 @@ function pathauto_cleanstring($string) {
   // In preparation for pattern matching, 
   // escape the separator if and only if it is not alphanumeric)
   if (isset($separator)) {
-    if (ctype_alnum($separator)) {
+    if (preg_match('/^(\pL|\pN)+$/D', $separator)) {
       $seppattern = $separator;
     } 
     else {
