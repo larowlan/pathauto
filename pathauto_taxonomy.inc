@@ -70,13 +70,13 @@ function _taxonomy_pathauto_alias($category, $op) {
   
   $forum_vid = variable_get('forum_nav_vocabulary', '');
   if ($forum_vid === $category->vid) {
-    $src = 'forum/'.$category->tid;
+    $src = 'forum/'. $category->tid;
     if ($forumalias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $forum_vid)) {
       $count++;
     }
   }
 
-  $src = 'taxonomy/term/'.$category->tid;
+  $src = 'taxonomy/term/'. $category->tid;
   if ($alias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $category->vid)) {
     $count++;
   }

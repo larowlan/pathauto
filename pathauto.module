@@ -89,10 +89,9 @@ function pathauto_admin_settings() {
 
   // Default words to ignore
   $ignore_words = array(
-    "a", "an", "as", "at", "before", "but", "by", "for", "from",
-    "is", "in", "into", "like", "of", "off", "on", "onto", "per",
-    "since", "than", "the", "this", "that", "to", "up", "via",
-    "with"
+    "a", "an", "as", "at", "before", "but", "by", "for", "from", "is", "in",
+    "into", "like", "of", "off", "on", "onto", "per", "since", "than", "the", 
+    "this", "that", "to", "up", "via", "with"
   );
 
   // Generate the form - settings applying to all patterns first
@@ -144,7 +143,7 @@ function pathauto_admin_settings() {
   $disable_text = "";
   $path = drupal_get_path('module', 'pathauto');
   $transliteration_help = "When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet?  Transliteration is determined by the i18n-ascii.txt file in the Pathauto directory. <strong>This option is disabled on your site because you do not have an i18n-ascii.txt file in the Pathauto directory.</strong>";
-  if (is_file($path . '/i18n-ascii.txt')) {
+  if (is_file($path .'/i18n-ascii.txt')) {
     $disable_transliteration = FALSE;
     $transliteration_help = "When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet?  Transliteration is determined by the i18n-ascii.txt file in the Pathauto directory.";
   }
@@ -214,7 +213,7 @@ function pathauto_admin_settings() {
       $variable = 'pathauto_'. $module .'_bulkupdate';
       if (variable_get($variable, FALSE)) {
         variable_set($variable, FALSE);
-        $function = $module.'_pathauto_bulkupdate';
+        $function = $module .'_pathauto_bulkupdate';
         call_user_func($function);
       }
       $form[$module][$variable] = array('#type' => 'checkbox',
@@ -225,7 +224,7 @@ function pathauto_admin_settings() {
 
     // Perform bulk updates of indexes for this module, if asked
     if ($do_index_bulkupdate) {
-      $function = $module.'_pathauto_bulkupdate_indexes';
+      $function = $module .'_pathauto_bulkupdate_indexes';
       if (is_callable($function)) {
         $indexcount += call_user_func($function);
       }
@@ -307,7 +306,7 @@ function pathauto_admin_delete_confirm($aid = 0) {
   $output = confirm_form($form,
                   t('Are you sure you want to delete ALL of your Path aliases?'),
                   'admin/build/path',
-		  t('Continuing will delete %count aliases.  This action cannot be undone.', array('%count' => $count)),
+                  t('Continuing will delete %count aliases.  This action cannot be undone.', array('%count' => $count)),
                   t('Delete all'),
                   t('Cancel'));
   return $output;
@@ -386,7 +385,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           //If the category is deleted, remove the path aliases
           $category = (object) $object;
           path_set_alias('taxonomy/term/'. $category->tid);
-          path_set_alias('forum/'.$category->tid);
+          path_set_alias('forum/'. $category->tid);
           path_set_alias('taxonomy/term/'. $category->tid .'/0/feed');
           break;
         default:
@@ -415,14 +414,14 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
       $user = (object) $user;
       if ($user->name) {
         $placeholders = pathauto_get_placeholders('user', $user);
-        $src = 'user/'.$user->uid;
+        $src = 'user/'. $user->uid;
         $alias = pathauto_create_alias('user', $op, $placeholders, $src);
         if (module_exists('blog')) {
-          $src = 'blog/'.$user->uid;
+          $src = 'blog/'. $user->uid;
           $alias = pathauto_create_alias('blog', $op, $placeholders, $src);
         }
         if (module_exists('tracker')) {
-          $src = 'user/'.$user->uid.'/track';
+          $src = 'user/'. $user->uid .'/track';
           $alias = pathauto_create_alias('tracker', $op, $placeholders, $src);
         }
       }
@@ -433,13 +432,13 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
       **
       */
       $user = (object) $user;
-      path_set_alias('user/'.$user->uid);
+      path_set_alias('user/'. $user->uid);
 
       //  They may have enabled these modules and/or feeds when the user was created, so let's try to delete all of them
-      path_set_alias('blog/'.$user->uid);
+      path_set_alias('blog/'. $user->uid);
       path_set_alias('blog/'. $user->uid .'/feed');
-      path_set_alias('user/'.$user->uid.'/track');
-      path_set_alias('user/'.$user->uid.'/track/feed');
+      path_set_alias('user/'. $user->uid .'/track');
+      path_set_alias('user/'. $user->uid .'/track/feed');
 
       break;
     default:

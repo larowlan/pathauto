@@ -19,9 +19,9 @@ function node_pathauto($op) {
       $patterns = token_get_list('node');
       $pattern_types = array('node', 'book', 'CCK text', 'CCK node reference', 'CCK number', 'CCK user reference', 'CCK link');
       foreach ($pattern_types as $pattern_type) {
-	foreach ($patterns[$pattern_type] as $pattern => $description) {
-	  $settings['placeholders'][t('['. $pattern .']')] = t($description);
-	}
+        foreach ($patterns[$pattern_type] as $pattern => $description) {
+          $settings['placeholders'][t('['. $pattern .']')] = t($description);
+        }
       }
 
       $nodetypes = node_get_types();
