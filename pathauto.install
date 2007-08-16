@@ -39,7 +39,6 @@ function pathauto_install() {
   variable_set('pathauto_node_page_pattern', '');
   variable_set('pathauto_node_pattern', 'content/[title]');
   variable_set('pathauto_node_story_pattern', '');
-  variable_set('pathauto_node_supportsfeeds', 'feed');
   variable_set('pathauto_quotes', '0');
   variable_set('pathauto_separator', '-');
   variable_set('pathauto_update_action', '2');
@@ -90,4 +89,14 @@ function pathauto_update_2() {
       break;
   }
   return $ret;
+}
+
+/**
+ * Delete the pathauto_node_supportsfeeds
+ *
+ */
+function pathauto_update_3() {
+  $items = array();
+  variable_del('pathauto_node_supportsfeeds');
+  return $items;
 }
