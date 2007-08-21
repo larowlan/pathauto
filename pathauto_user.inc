@@ -104,7 +104,7 @@ function user_pathauto_bulkupdate() {
  * Bulk generate aliases for all blogs without aliases 
  */
 function blog_pathauto_bulkupdate() {
-  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('blog/', uid) = src WHERE uid > 0 AND src IS NULL";
   $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
   
   $count = 0;
@@ -126,7 +126,7 @@ function blog_pathauto_bulkupdate() {
  * Bulk generate aliases for user trackers without aliases 
  */
 function tracker_pathauto_bulkupdate() {
-  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid) = src WHERE uid > 0 AND src IS NULL";
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', uid,'/track') = src WHERE uid > 0 AND src IS NULL";
   $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
   
   $count = 0;
