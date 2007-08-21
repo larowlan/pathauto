@@ -4,7 +4,7 @@
 /*
  * Implementation of hook_token_list()
  */
-function pathauto_node_event_token_list($type = 'all') {
+function event_token_list($type = 'all') {
   if ($type == 'node' || $type == 'all') {
     $tokens['node']['eventyyyy']   = t("The year the event starts.");
     $tokens['node']['eventmm']     = t("The two-digit month (01-12) the event starts.");
@@ -20,7 +20,7 @@ function pathauto_node_event_token_list($type = 'all') {
  * Implementation of hook_token_values()
  */
  
-function pathauto_node_event_token_values($type, $object = NULL) {
+function event_token_values($type, $object = NULL) {
   if ($type == 'node') {
     $tokens['eventyyyy']      = date('Y', $eventstart);
     $tokens['eventmm']      = date('m', $eventstart);
