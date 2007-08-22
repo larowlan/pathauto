@@ -21,5 +21,17 @@ i18n-ascii.example.txt to i18n-ascii.txt
 You can then freely edit the i18n-ascii.txt without worrying that your changes 
 will be over-written by upgrades of Pathauto.
 
+**Upgrading from previous versions:
+If you are upgrading from Pathauto 5.x-1.x to 5.x-2.x (or 6.x-2.x) then you will
+probably need to change your patterns.
+
+For content patterns:
+    [user] is now [author-name]
+    [cat] is now [term]
+
+There may be other changes as well.  Please review the pattern examples on
+      Administration > Site Configuration > Pathauto 
+
+
 
 $Id$
