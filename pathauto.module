@@ -82,6 +82,8 @@ function _pathauto_include() {
  * 
  */
 function pathauto_admin_settings() {
+  _pathauto_include();
+
   // Restrict administration of this module
   if (!user_access('administer pathauto')) {
     $form["error"] = array('#type' => 'item',
