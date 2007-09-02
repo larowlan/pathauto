@@ -39,8 +39,32 @@ function node_pathauto($op) {
  * Generate aliases for all nodes without aliases. 
  */
 function node_pathauto_bulkupdate() {
-  $query = "SELECT nid, type, title, uid, created, src, dst, vid FROM {node} LEFT JOIN {url_alias} ON CONCAT('node/', nid) = src WHERE src IS NULL";
-  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
+
+  // From all node types, only attempt to update those with patterns
+  $pattern_types = array();
+  $type_where = '';
+  foreach (node_get_types() as $type => $info) {
+    $pattern = '';
+    $pattern = variable_get('pathauto_node_'. $type .'_pattern', '');
+
+    // If it's not set, check the default
+    if (!trim($pattern)) {
+      $pattern = drupal_strtolower(variable_get('pathauto_node_pattern', ''));
+    }
+    if (trim($pattern)) {
+      $pattern_types[] = $type;
+      if (!trim($type_where)) {
+        $type_where = " AND (type = '%s' ";
+      }
+      else {
+        $type_where .= " OR type = '%s'";
+      }
+    }
+  }
+  $type_where .= ')';
+
+  $query = "SELECT nid, type, title, uid, created, src, dst, vid FROM {node} LEFT JOIN {url_alias} ON CONCAT('node/', nid) = src WHERE src IS NULL ". $type_where;
+  $result = db_query_range($query, $pattern_types, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
   $placeholders = array();
