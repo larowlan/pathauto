@@ -32,6 +32,10 @@ For content patterns:
 There may be other changes as well.  Please review the pattern examples on
       Administration > Site Configuration > Pathauto 
 
+NOTE: You must also have the token module installed.  If you upgraded from 
+Pathauto 5.x-1.x directly without enabling token first then you will need to
+1) download/install the token module 2) disable the Pathauto module 3) re-enable
+the Pathauto module 4) confirm the dependency on the token module.
 
 
 $Id$
