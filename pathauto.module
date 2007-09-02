@@ -50,10 +50,10 @@ function pathauto_menu($may_cache) {
       'type' => MENU_NORMAL_ITEM,
     );
     $items[] = array(
-      'path' => 'admin/build/path/delete_all', 
-      'title' => t('Delete all aliases'),
+      'path' => 'admin/build/path/delete_bulk', 
+      'title' => t('Delete aliases'),
       'callback' => 'drupal_get_form', 
-      'callback arguments' => array('pathauto_admin_delete_confirm'),
+      'callback arguments' => array('pathauto_admin_delete'),
       'access' => user_access('administer url aliases'), 
       'type' => MENU_LOCAL_TASK,
     );
@@ -91,8 +91,6 @@ function pathauto_admin_settings() {
     return system_settings_form($form);
   }
 
-  $output = '';
-
   // Default words to ignore
   $ignore_words = array(
     "a", "an", "as", "at", "before", "but", "by", "for", "from", "is", "in",
@@ -122,6 +120,13 @@ function pathauto_admin_settings() {
     '#default_value' => variable_get('pathauto_quotes', 0),
     '#options' => array(t('Remove'), t('Replace by separator')),
     );
+
+  $form["general"]["pathauto_case"] = array('#type' => 'radios',
+    '#title' => t('Character case'),
+    '#default_value' => variable_get('pathauto_case', 1),
+    '#options' => array(t('Leave case the same as source token values.'), t('Change to lower case')),
+    );
+
     
   $form["general"]["pathauto_max_length"] = array('#type' => 'textfield',
     '#title' => t('Maximum alias length'), '#size' => 3, '#maxlength' => 3,
@@ -136,7 +141,7 @@ function pathauto_admin_settings() {
   $form["general"]["pathauto_max_bulk_update"] = array('#type' => 'textfield',
     '#title' => t('Maximum number of objects to alias in a bulk update'), '#size' => 3, '#maxlength' => 3,
     '#default_value' => variable_get('pathauto_max_bulk_update', 50),
-    '#description' => t('Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server.  If you bulk updates "time out" or result in a "white screen" then reduce the number.'));
+    '#description' => t('Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server.  If bulk updates "time out" or result in a "white screen" then reduce the number.'));
 
   $form["general"]["pathauto_update_action"] = array('#type' => 'radios',
     '#title' => t('Update action'), '#default_value' => variable_get('pathauto_update_action', 2),
@@ -283,7 +288,14 @@ function pathauto_token_values($type, $object = NULL) {
 
       if ($type == 'taxonomy') { 
         $values['cat'] = $category->name;
-      } 
+      }
+
+      $values['catalias'] = drupal_get_path_alias('taxonomy/term/'.$category->tid);
+      if (!strncasecmp($values['catalias'], 'taxonomy', 8)) {
+        $values['catalias'] = $values['cat'];
+      }
+
+
       break;
   }
   return $values;
@@ -295,35 +307,88 @@ function pathauto_token_values($type, $object = NULL) {
 function pathauto_token_list($type = 'all') {
   if ($type == 'taxonomy' || $type == 'all') {
     $tokens['taxonomy']['catpath'] = t("As [cat], but including its supercategories separated by /.");
+    $tokens['taxonomy']['catalias'] = t("URL alias for the category.");
     return $tokens;
   }
   if ($type == 'node' || $type == 'all') {
     $tokens['node']['catpath'] = t("As [cat], but including its supercategories separated by /.");
+    $tokens['node']['catalias'] = t("URL alias for the term.");
     return $tokens;
   }
 }
 
 /**
- * Menu callback: confirm deletion of all aliases
+ * Menu callback: select certain alias types to delete
  */
-function pathauto_admin_delete_confirm($aid = 0) {
-  $count = db_result(db_query("SELECT count(1) FROM {url_alias}"));
+function pathauto_admin_delete() {
+  /* TODO:
+   1) all - DONE
+   2) all node aliases - DONE
+   4) all user aliases - DONE
+   5) all taxonomy aliases - DONE
+   6) by node type
+   7) by taxonomy vocabulary
+   8) no longer existing aliases (see http://drupal.org/node/128366 )
+   9) where src like 'pattern' - DON'T DO
+   10) where dst like 'pattern' - DON'T DO
+  */
+
   $form = array();
-  $output = confirm_form($form,
-                  t('Are you sure you want to delete ALL of your Path aliases?'),
-                  'admin/build/path',
-                  t('Continuing will delete %count aliases.  This action cannot be undone.', array('%count' => $count)),
-                  t('Delete all'),
-                  t('Cancel'));
-  return $output;
+  $form["delete"] = array('#type' => 'fieldset',
+    '#title' => t('Choose Aliases to Delete'), '#collapsible' => FALSE,
+    '#collapsed' => FALSE);
+
+  // First we do the "all" case
+  $total_count = db_result(db_query("SELECT count(1) FROM {url_alias}"));
+  $form['delete']['all_aliases'] = array('#type' => 'checkbox',
+                                         '#title' => t('all aliases'),
+                                         '#default_value' => FALSE,
+                                         '#description' => t('Delete all aliases.  Number of aliases which will be deleted: %count.', array('%count' => $total_count)));
+
+  // Next, iterate over an array of objects/alias types which can be deleted and provide checkboxes
+  $objects = _pathauto_objects_to_delete();
+  foreach ($objects as $internal_name => $label) {
+    $count = db_result(db_query("SELECT count(1) FROM {url_alias} WHERE src LIKE '%s%%'", $internal_name));
+    $form['delete'][$internal_name] = array('#type' => 'checkbox',
+                                            '#title' => t($label),
+                                            '#default_value' => FALSE,
+                                            '#description' => t('Delete aliases for all @label. Number of aliases which will be deleted: %count.', array('@label' => $label, '%count' => $count)));
+  }
+
+  // Warn them and give a button that shows we mean business
+  $form["warning"] = array('#value' => t('<p><strong>Note:</strong> there is no confirmation.  Be sure of your action before clicking the "Delete aliases now!" button.  You may want to make a backup of the database and/or the url_alias table prior to using this feature.</p>'));
+  $form['buttons']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete aliases now!'),
+  );
+
+  return $form;
 }
 
-function pathauto_admin_delete_confirm_submit($form_id, $form_values) {
-  db_query('DELETE FROM {url_alias}');
-  drupal_set_message(t('All of your path aliases have been deleted.'));
-  return 'admin/build/path';
+/**
+ *  Submit handler for the bulk delete form
+ */
+function pathauto_admin_delete_submit($form_id, $form_values) {
+  foreach ($form_values as $key => $value) {
+    if ($value) {
+      if ($key == 'all_aliases') {
+        db_query('DELETE FROM {url_alias}');
+        drupal_set_message(t('All of your path aliases have been deleted.'));
+      }
+      $objects = _pathauto_objects_to_delete();
+      if (array_key_exists($key, $objects)) {
+        drupal_set_message($key);
+        db_query("DELETE FROM {url_alias} WHERE src LIKE '%s%%'", $key);
+        drupal_set_message(t('All of your %type path aliases have been deleted.', array('%type' => $objects[$key])));
+      }
+    }
+  }
+  return 'admin/build/path/delete_bulk';
 }
 
+function _pathauto_objects_to_delete() {
+  return array('user/' => t('users'), 'node/' => t('content') , 'taxonomy/' => t('vocabularies and terms'), 'blog/' => t('user blogs'), 'user/%/track' => t('user trackers'));
+}
 
 //==============================================================================
 // Some node related functions.

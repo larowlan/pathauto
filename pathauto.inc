@@ -204,10 +204,12 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
   }
 
   // Replace the placeholders with the values provided by the module,
-  // and lower-case the result
-  
+  // and optionally lower-case the result
   $alias = str_replace($placeholders['tokens'], $placeholders['values'], $pattern);
-  $alias = drupal_strtolower($alias);
+
+  if (variable_get('pathauto_case',1)) {
+    $alias = drupal_strtolower($alias);
+  }
   
   // Two or more slashes should be collapsed into one
   $alias = preg_replace("/\/+/", "/", $alias);
