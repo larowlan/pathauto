@@ -428,9 +428,9 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
       /*
       ** Use the username to automatically create an alias
       */
-      $user = (object) $user;
+      $pathauto_user = (object) array_merge((array) $user, $edit);
       if ($user->name) {
-        $placeholders = pathauto_get_placeholders('user', $user);
+        $placeholders = pathauto_get_placeholders('user', $pathauto_user);
         $src = 'user/'. $user->uid;
         $alias = pathauto_create_alias('user', $op, $placeholders, $src);
         if (module_exists('blog')) {
