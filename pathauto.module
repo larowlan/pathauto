@@ -337,9 +337,11 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
     switch ($op) {
       case 'insert':
       case 'update':
-        $placeholders = pathauto_get_placeholders('node', $node);
-        $src = "node/$node->nid";
-        $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->type);
+        if ($node->pathauto_perform_alias) {
+          $placeholders = pathauto_get_placeholders('node', $node);
+          $src = "node/$node->nid";
+          $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->type);
+        }
         break;
       default:
         break;
@@ -350,21 +352,26 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
 /**
  * Implementation of hook_form_alter().
  * 
- * A helpful hint to the users with access to alias creation (pathauto
- * will be invisible to other users). Inserted into the path module's
- * fieldset in the node form
+ * This allows alias creators to override Pathauto and specify their
+ * own aliases (Pathauto will be invisible to other users). Inserted
+ * into the path module's fieldset in the node form.
  */
 function pathauto_form_alter($formid, &$form) {
-  if (isset($form['#attributes']['id']) && ($form['#attributes']['id'] == 'node-form')) {
+  if (isset($form['#id']) && ($form['#id'] == 'node-form')) {
     if (user_access('create url aliases')) {
-      $output .= t('An alias will be automatically generated from the title and other node attributes, in addition to any alias manually provided above.');
+      $output .= t('An alias will be generated for you. If you wish to create your own alias below, untick this option.');
       if (user_access('administer pathauto')) {
-        $output .= t(' To control the format of the generated aliases, see the <a href="admin/settings/pathauto">pathauto settings</a>.');
+        $output .= t(' To control the format of the generated aliases, see the <a href="/admin/settings/pathauto">Pathauto settings</a>.');
       }
-    }
-    if ($output) {
-      $form['path']['pathauto'] = array('#type' => 'item',
-        '#description' => $output);
+
+      drupal_add_js(drupal_get_path('module', 'pathauto') . '/pathauto.js');
+
+      $form['path']['pathauto_perform_alias'] = array('#type' => 'checkbox',
+        '#title' => t('Automatic alias'),
+        '#default_value' => TRUE,
+        '#description' => $output,
+        '#weight' => 0
+      );
     }
   }
 }

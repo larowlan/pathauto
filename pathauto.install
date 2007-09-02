@@ -100,3 +100,15 @@ function pathauto_update_3() {
   variable_del('pathauto_node_supportsfeeds');
   return $items;
 }
+
+/**
+ * New style naming for the punctuation chars
+ *
+ */
+function pathauto_update_4() {
+  $quotes = variable_get('pathauto_quotes', 0);
+  variable_set("pathauto_punctuation_quotes"),
+  variable_del('pathauto_quotes');
+  $items = array();
+  return $items;
+}
