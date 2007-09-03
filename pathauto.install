@@ -107,7 +107,7 @@ function pathauto_update_3() {
  */
 function pathauto_update_4() {
   $quotes = variable_get('pathauto_quotes', 0);
-  variable_set("pathauto_punctuation_quotes"),
+  variable_set("pathauto_punctuation_quotes", $quotes);
   variable_del('pathauto_quotes');
   $items = array();
   return $items;
