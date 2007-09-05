@@ -226,7 +226,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
     for ($i = 0; _pathauto_alias_exists($alias . $separator . $i, $src); $i++) {
     }
     // Make room for the sequence number
-    $alias = drupal_substr($alias, 0, $maxlength - 1 -($i/10 + 1));
+    $alias = drupal_substr($alias, 0, $maxlength - strlen($i));
     $alias = $alias . $separator . $i;
   }
 
