@@ -402,7 +402,7 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
     switch ($op) {
       case 'insert':
       case 'update':
-        if ($node->pathauto_perform_alias) {
+        if ($node->pathauto_perform_alias || !isset($node->pathauto_perform_alias)) {
           $placeholders = pathauto_get_placeholders('node', $node);
           $src = "node/$node->nid";
           $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->type);
