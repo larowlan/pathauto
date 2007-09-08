@@ -268,36 +268,45 @@ function pathauto_admin_settings() {
  * Implementation of hook_token_values() for Pathauto specific tokens
  */
 function pathauto_token_values($type, $object = NULL) {
-  switch ($type) {
-    case 'node':
-      $vid = db_result(db_query("SELECT t.vid FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {vocabulary} v ON t.vid = v.vid WHERE r.nid = %d ORDER BY v.weight, t.weight, t.name LIMIT 1", $object->nid));
-      $category = db_fetch_object(db_query("SELECT t.tid, t.name FROM {term_data} t INNER JOIN {term_node} r ON r.tid = t.tid WHERE t.vid = %d AND r.nid = %d ORDER BY weight LIMIT 1", $vid, $object->nid));
-      $category->vid = $vid;
-    case 'taxonomy':
-      if (!isset($category)) {
-        $category = $object;
-      }
 
-      $parents = taxonomy_get_parents_all($category->tid);
-      foreach ($parents as $parent) {
-        // Replace any / characters in individual terms which might create confusing URLs
-        $separator = variable_get('pathauto_separator', '-');
-        $catpath = preg_replace('/\//', '', $parent->name) .'/'. $catpath;
-      }
-      $values['catpath'] = $catpath;
-
-      if ($type == 'taxonomy') { 
-        $values['cat'] = $category->name;
-      }
-
-      $values['catalias'] = drupal_get_path_alias('taxonomy/term/'.$category->tid);
-      if (!strncasecmp($values['catalias'], 'taxonomy', 8)) {
-        $values['catalias'] = $values['cat'];
-      }
-
-
-      break;
+  if (module_exists('taxonomy')) {
+    switch ($type) {
+      case 'node':
+        $vid = db_result(db_query("SELECT t.vid FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {vocabulary} v ON t.vid = v.vid WHERE r.nid = %d ORDER BY v.weight, t.weight, t.name LIMIT 1", $object->nid));
+        $category = db_fetch_object(db_query("SELECT t.tid, t.name FROM {term_data} t INNER JOIN {term_node} r ON r.tid = t.tid WHERE t.vid = %d AND r.nid = %d ORDER BY weight LIMIT 1", $vid, $object->nid));
+        $category->vid = $vid;
+      case 'taxonomy':
+        if (!isset($category)) {
+          $category = $object;
+        }
+        
+        $parents = taxonomy_get_parents_all($category->tid);
+        foreach ($parents as $parent) {
+          // Replace any / characters in individual terms which might create confusing URLs
+          $separator = variable_get('pathauto_separator', '-');
+          $catpath = preg_replace('/\//', '', $parent->name) .'/'. $catpath;
+        }
+        $values['catpath'] = $catpath;
+        
+        if ($type == 'taxonomy') { 
+          $values['cat'] = $category->name;
+        }
+        
+        $values['catalias'] = drupal_get_path_alias('taxonomy/term/'.$category->tid);
+        if (!strncasecmp($values['catalias'], 'taxonomy', 8)) {
+          $values['catalias'] = $values['cat'];
+        }
+        
+        
+        break;
+    }
   }
+  // Provide some defaults if they aren't set.
+  if (!isset($values['catpath'])) {
+    $values['catpath'] = '';
+    $values['catalias'] = '';
+  }
+
   return $values;
 }
 
