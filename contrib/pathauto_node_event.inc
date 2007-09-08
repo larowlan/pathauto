@@ -22,11 +22,12 @@ function event_token_list($type = 'all') {
  
 function event_token_values($type, $object = NULL) {
   if ($type == 'node') {
+    $eventstart=event_format_date($object->event['start']);
     $tokens['eventyyyy']      = date('Y', $eventstart);
-    $tokens['eventmm']      = date('m', $eventstart);
-    $tokens['eventmon']      = pathauto_cleanstring(date('M', $eventstart));
-    $tokens['eventdd']      = date('d', $eventstart);
-    $tokens['eventday']      = pathauto_cleanstring(date('D', $eventstart));
+    $tokens['eventmm']        = date('m', $eventstart);
+    $tokens['eventmon']       = pathauto_cleanstring(date('M', $eventstart));
+    $tokens['eventdd']        = date('d', $eventstart);
+    $tokens['eventday']       = pathauto_cleanstring(date('D', $eventstart));
     $tokens['eventweek']      = date('W', $eventstart);
     return $tokens;
   }
