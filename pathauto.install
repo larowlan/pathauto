@@ -32,7 +32,6 @@ function pathauto_install() {
   variable_set('pathauto_indexaliases_bulkupdate', FALSE);
   variable_set('pathauto_max_component_length', '100');
   variable_set('pathauto_max_length', '100');
-  variable_set('pathauto_node_applytofeeds', FALSE);
   variable_set('pathauto_node_bulkupdate', FALSE);
   variable_set('pathauto_node_forum_pattern', '');
   variable_set('pathauto_node_image_pattern', '');
