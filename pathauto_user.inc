@@ -11,7 +11,7 @@ function user_pathauto($op) {
       $settings['module'] = 'user';
       $settings['groupheader'] = t('User path settings');
       $settings['patterndescr'] = t('Pattern for user account page paths');
-      $settings['patterndefault'] = t('users/[user]');
+      $settings['patterndefault'] = t('users/[user-raw]');
       $patterns = token_get_list('user');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
@@ -39,7 +39,7 @@ function blog_pathauto($op) {
       $settings['module'] = 'blog';
       $settings['groupheader'] = t('Blog path settings');
       $settings['patterndescr'] = t('Pattern for blog page paths');
-      $settings['patterndefault'] = t('blogs/[user]');
+      $settings['patterndefault'] = t('blogs/[user-raw]');
       $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders'][t('['. $pattern .']')] = t($description);

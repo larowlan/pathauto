@@ -82,11 +82,10 @@ function _pathauto_include() {
 function pathauto_admin_settings() {
   _pathauto_include();
 
-  // Restrict administration of this module
-  if (!user_access('administer pathauto')) {
-    $form["error"] = array('#type' => 'item',
-      '#title' => t('You are not authorized to access the pathauto settings.'));
-    return system_settings_form($form);
+  // Make sure they have token
+  if (!function_exists('token_get_list')) {
+    drupal_set_message(t('It appears that the <a href="@token_link">Token module</a> is not installed.  Please ensure that you have it installed so that Pathauto can work properly.  You may need to disable Pathauto and re-enable it to get Token enabled.', array('@token_link' => 'http://drupal.org/project/token')), 'error');
+    return;
   }
 
   // Default words to ignore
@@ -162,6 +161,21 @@ function pathauto_admin_settings() {
     '#title' => t('Strings to Remove'), '#default_value' => variable_get('pathauto_ignore_words', implode(",", $ignore_words)),
     '#description' => t('Words to strip out of the URL alias, separated by commas.  Do not place punctuation in here and do not use WYSIWYG editors on this field.')
   );
+
+
+  $form["punctuation"] = array('#type' => 'fieldset', '#weight' => $group_weight,
+    '#title' => t('Punctuation settings'), '#collapsible' => TRUE,
+    '#collapsed' => TRUE);
+  $group_weight++;
+
+  $punctuation = pathauto_punctuation_chars();
+  foreach ($punctuation as $name => $details) {
+    $form["punctuation"]["pathauto_punctuation_". $name ] = array('#type' => 'radios',
+      '#title' => $details['name'],
+      '#default_value' => variable_get("pathauto_punctuation_". $name, 0),
+      '#options' => array(t('Remove'), t('Replace by separator'), t('No action (do not replace)')),
+    );
+  }
 
   // Call the hook on all modules - an array of 'settings' objects is returned
   $all_settings = module_invoke_all('pathauto', 'settings');
@@ -262,43 +276,55 @@ function pathauto_admin_settings() {
 function pathauto_token_values($type, $object = NULL) {
 
   if (module_exists('taxonomy')) {
-    switch ($type) {
-      case 'node':
-        $vid = db_result(db_query("SELECT t.vid FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {vocabulary} v ON t.vid = v.vid WHERE r.nid = %d ORDER BY v.weight, t.weight, t.name LIMIT 1", $object->nid));
-        $category = db_fetch_object(db_query("SELECT t.tid, t.name FROM {term_data} t INNER JOIN {term_node} r ON r.tid = t.tid WHERE t.vid = %d AND r.nid = %d ORDER BY weight LIMIT 1", $vid, $object->nid));
-        $category->vid = $vid;
-      case 'taxonomy':
-        if (!isset($category)) {
-          $category = $object;
-        }
-        
-        $parents = taxonomy_get_parents_all($category->tid);
-        foreach ($parents as $parent) {
-          // Replace any / characters in individual terms which might create confusing URLs
+    if ($type == 'taxonomy' || $type == 'node' || $type == 'all') {
+      switch ($type) {
+        case 'node':
+          $vid = db_result(db_query("SELECT t.vid FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {vocabulary} v ON t.vid = v.vid WHERE r.nid = %d ORDER BY v.weight, t.weight, t.name LIMIT 1", $object->nid));
+          $category = db_fetch_object(db_query("SELECT t.tid, t.name FROM {term_data} t INNER JOIN {term_node} r ON r.tid = t.tid WHERE t.vid = %d AND r.nid = %d ORDER BY weight LIMIT 1", $vid, $object->nid));
+          $category->vid = $vid;
+          // In the realm of nodes these are terms, in the realm of Taxonomy, cats
+          $label = 'term';
+          
+        case 'taxonomy':
+        default:
+          if (!isset($category)) {
+            $category = $object;
+          }
+          if (!isset($label)) {
+            $label = 'cat';
+          }
           $separator = variable_get('pathauto_separator', '-');
-          $catpath = preg_replace('/\//', '', $parent->name) .'/'. $catpath;
-        }
-        $values['catpath'] = $catpath;
-        
-        if ($type == 'taxonomy') { 
-          $values['cat'] = $category->name;
-        }
-        
-        $values['catalias'] = drupal_get_path_alias('taxonomy/term/'.$category->tid);
-        if (!strncasecmp($values['catalias'], 'taxonomy', 8)) {
-          $values['catalias'] = $values['cat'];
-        }
-        
-        
-        break;
+          $parents = taxonomy_get_parents_all($category->tid);
+          $catpath = '';
+          $catpath_raw = '';
+          foreach ($parents as $parent) {
+            // Replace any / characters in individual terms which might create confusing URLs
+            $catpath = pathauto_cleanstring(check_plain(preg_replace('/\//', '', $parent->name))) .'/'. $catpath;
+            $catpath_raw = pathauto_cleanstring(preg_replace('/\//', '', $parent->name)) .'/'. $catpath_raw;
+          }
+          $values[$label .'path'] = $catpath;
+          $values[$label .'path-raw'] = $catpath_raw;
+          
+          // We only do this for taxonomy because token already provides the [term] value but has problem with [cat] TODO: fix that?
+          if ($type == 'taxonomy') { 
+            $values[$label] = check_plain($category->name);
+            $values[$label .'-raw'] = $category->name;
+          }
+          
+          $values[$label .'alias'] = drupal_get_path_alias('taxonomy/term/'.$category->tid);
+          if (!strncasecmp($values[$label .'alias'], 'taxonomy', 8)) {
+            $values[$label .'alias'] = $values[$label];
+          }
+          
+          // Provide some defaults if they aren't set.
+          if (!isset($values[$label .'path'])) {
+            $values[$label .'path'] = '';
+            $values[$label .'path-raw'] = '';
+            $values[$label .'alias'] = '';
+          }
+      }
     }
   }
-  // Provide some defaults if they aren't set.
-  if (!isset($values['catpath'])) {
-    $values['catpath'] = '';
-    $values['catalias'] = '';
-  }
-
   return $values;
 }
 
@@ -310,11 +336,13 @@ function pathauto_token_list($type = 'all') {
   if (module_exists('taxonomy')) {
     if ($type == 'taxonomy' || $type == 'all') {
       $tokens['taxonomy']['catpath'] = t("As [cat], but including its supercategories separated by /.");
+      $tokens['taxonomy']['catpath-raw'] = t("As [cat-raw], but including its supercategories separated by /. WARNING - raw user input.");
       $tokens['taxonomy']['catalias'] = t("URL alias for the category.");
     }
     if ($type == 'node' || $type == 'all') {
-      $tokens['node']['catpath'] = t("As [cat], but including its supercategories separated by /.");
-      $tokens['node']['catalias'] = t("URL alias for the term.");
+      $tokens['node']['termpath'] = t("As [term], but including its supercategories separated by /.");
+      $tokens['node']['termpath-raw'] = t("As [term-raw], but including its supercategories separated by /. WARNING - raw user input.");
+      $tokens['node']['termalias'] = t("URL alias for the term.");
     }
   }
   return $tokens;

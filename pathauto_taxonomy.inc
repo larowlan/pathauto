@@ -12,7 +12,7 @@ function taxonomy_pathauto($op) {
       $settings['module'] = 'taxonomy';
       $settings['groupheader'] = t('Category path settings');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
-      $settings['patterndefault'] = t('category/[vocab]/[catpath]');
+      $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');
       $patterns = token_get_list('taxonomy');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
