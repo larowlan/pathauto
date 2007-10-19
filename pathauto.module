@@ -6,7 +6,6 @@
  * Implementation of hook_help
  */  
 function pathauto_help($section) {
-  $output = '';
   switch ($section) {
     case 'admin/help#pathauto':
       $output = t("<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
@@ -20,10 +19,8 @@ function pathauto_help($section) {
                   column minus the length of any strings that might get added to the end of the URL. The length of 
                   strings that might get added to the end of your URLs depends on which modules you have enabled and 
                   on your Pathauto settings. The recommended and default value is 100.</p>");
-      break;
+      return $output;
   }
-
-  return $output;
 }
 
 /**
