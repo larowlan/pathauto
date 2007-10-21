@@ -73,7 +73,7 @@ function _taxonomy_pathauto_alias($category, $op) {
   $placeholders = pathauto_get_placeholders('taxonomy', $category);    
   
   $forum_vid = variable_get('forum_nav_vocabulary', '');
-  if ($forum_vid === $category->vid) {
+  if ($forum_vid === (int)$category->vid) {
     $src = 'forum/'. $category->tid;
     if ($forumalias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $forum_vid)) {
       $count++;
