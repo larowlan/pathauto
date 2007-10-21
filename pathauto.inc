@@ -91,7 +91,7 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     }
   }
 
-  // If something is already urlsafe then don't remove 
+  // If something is already urlsafe then don't remove slashes
   if ($clean_slash) {
     $output = str_replace('/', '', $output);
   }
@@ -111,10 +111,6 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     }
   
     $output = strtr($output, $translations);
-  
-    // Preserve alphanumerics, everything else becomes a separator.
-    $pattern = '/[^a-zA-Z0-9]+/ ';
-    $output = preg_replace($pattern, $separator, $output);
   }
 
   // Get rid of words that are on the ignore list
