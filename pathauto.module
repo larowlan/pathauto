@@ -378,13 +378,13 @@ function pathauto_admin_delete() {
   foreach ($objects as $internal_name => $label) {
     $count = db_result(db_query("SELECT count(1) FROM {url_alias} WHERE src LIKE '%s%%'", $internal_name));
     $form['delete'][$internal_name] = array('#type' => 'checkbox',
-                                            '#title' => t($label),
+                                            '#title' => $label, // This label is sent through t() in the hard coded function where it is defined
                                             '#default_value' => FALSE,
                                             '#description' => t('Delete aliases for all @label. Number of aliases which will be deleted: %count.', array('@label' => $label, '%count' => $count)));
   }
 
   // Warn them and give a button that shows we mean business
-  $form["warning"] = array('#value' => t('<p><strong>Note:</strong> there is no confirmation.  Be sure of your action before clicking the "Delete aliases now!" button.  You may want to make a backup of the database and/or the url_alias table prior to using this feature.</p>'));
+  $form["warning"] = array('#value' => t('<p><strong>Note:</strong> there is no confirmation.  Be sure of your action before clicking the "Delete aliases now!" button.<br />  You may want to make a backup of the database and/or the url_alias table prior to using this feature.</p>'));
   $form['buttons']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Delete aliases now!'),
@@ -405,7 +405,6 @@ function pathauto_admin_delete_submit($form_id, $form_values) {
       }
       $objects = _pathauto_objects_to_delete();
       if (array_key_exists($key, $objects)) {
-        drupal_set_message($key);
         db_query("DELETE FROM {url_alias} WHERE src LIKE '%s%%'", $key);
         drupal_set_message(t('All of your %type path aliases have been deleted.', array('%type' => $objects[$key])));
       }
