@@ -237,7 +237,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
   // If the alias already exists, generate a new variant
   $separator = variable_get('pathauto_separator', '-');
   if (_pathauto_alias_exists($alias, $src)) {
-    for ($i = 0; _pathauto_alias_exists($alias . $separator . $i, $src); $i++) {
+    for ($i = 0; _pathauto_alias_exists(drupal_substr($alias, 0, $maxlength - strlen($i)) . $separator . $i, $src); $i++) {
     }
     // Make room for the sequence number
     $alias = drupal_substr($alias, 0, $maxlength - strlen($i));
