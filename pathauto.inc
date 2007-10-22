@@ -203,6 +203,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
           break;
         // Replace old alias - remember the pid to update
         case 2:
+        case 3:
           $pid = $data->pid;
           $oldalias = $data->dst;
           break;
@@ -301,10 +302,22 @@ function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $oldalia
   // Skip replacing the current alias with an identical alias
   if ($oldalias != $dst) {
     path_set_alias($src, $dst, $pid, 1, 10);
+    if (variable_get('pathauto_update_action', 2) == 3 && function_exists('path_redirect_save')) {
+      if (isset($oldalias)) {
+        $save['path'] = $oldalias;
+        $save['redirect'] = $src;
+        $save['type'] = 301; //moved permanently
+        path_redirect_save($save);
+        $redirect = TRUE; 
+      }
+    }
     if ($verbose and user_access('create url aliases')) {
-      if ($pid) {
+      if ($redirect) {
+        drupal_set_message(t('Created new alias %dst for %src, replacing %oldalias. %oldalias now redirects to %dst', array('%dst' => $dst, '%src' => $src, '%oldalias' => $oldalias)));
+      }
+      elseif ($pid) {
         drupal_set_message(t('Created new alias %dst for %src, replacing %oldalias', array('%dst' => $dst, '%src' => $src, '%oldalias' => $oldalias)));
-      } 
+      }
       else {
         drupal_set_message(t('Created new alias %dst for %src', array('%dst' => $dst, '%src' => $src)));
       }
