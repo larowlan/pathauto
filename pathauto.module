@@ -167,10 +167,10 @@ function pathauto_admin_settings() {
 
   $punctuation = pathauto_punctuation_chars();
   foreach ($punctuation as $name => $details) {
-    $form["punctuation"]["pathauto_punctuation_". $name ] = array('#type' => 'radios',
+    $form["punctuation"]["pathauto_punctuation_". $name ] = array('#type' => 'select',
       '#title' => $details['name'],
       '#default_value' => variable_get("pathauto_punctuation_". $name, 0),
-      '#options' => array(t('Remove'), t('Replace by separator'), t('No action (do not replace)')),
+      '#options' => array('0' => t('Remove'), '1' => t('Replace by separator'), '2' => t('No action (do not replace)')),
     );
   }
 
@@ -265,6 +265,21 @@ function pathauto_admin_settings() {
   variable_set('pathauto_modulelist', $modulelist);
 
   return system_settings_form($form);
+}
+
+function pathauto_admin_settings_validate($form_id, $form_values) {
+  // Validate that the separator is not set to be removed per http://drupal.org/node/184119
+  // This isn't really all that bad so warn, but still allow them to save the value.
+  $separator = $form_values['pathauto_separator'];
+  $punctuation = pathauto_punctuation_chars();
+  foreach ($punctuation as $name => $details) {
+    if ($details['value'] == $separator) {
+      $action = $form_values['pathauto_punctuation_'. $name];
+      if ($action == 0) {
+        drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings.  This can cause problems with your patterns and especially with the catpath and termpath patterns.',array('@name' => $details['name'])), 'error');
+      }
+    }
+  }
 }
 
 /**

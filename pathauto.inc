@@ -96,7 +96,6 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     $output = str_replace('/', '', $output);
   }
 
-  
   // Optionally remove accents and transliterate to a subset of ASCII-96 characters.
   if (variable_get('pathauto_transliterate', FALSE)) { 
 
@@ -341,6 +340,7 @@ function pathauto_get_placeholders($type, $object) {
 function pathauto_clean_token_values($full) {
   foreach ($full->values as $key => $value) {
     
+    // If it's a "path" or "url friendly" token don't remove the "/" character
     if (substr($full->tokens[$key], -4, 4) === 'path' || substr($full->tokens[$key], -8, 8) === 'path-raw') {
       $full->values[$key] = pathauto_cleanstring($value, FALSE);
     }
