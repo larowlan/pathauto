@@ -132,9 +132,9 @@ function pathauto_admin_settings() {
     '#description' => t('Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server.  If bulk updates "time out" or result in a "white screen" then reduce the number.'));
 
   $actions = array(
-               t('Do nothing, leaving the old alias intact'),
-               t('Create a new alias in addition to the old alias'),
-               t('Create a new alias, replacing the old one'));
+               t('Do nothing. Leave the old alias intact.'),
+               t('Create a new alias. Leave the existing alias functioning.'),
+               t('Create a new alias. Delete the old alias.'));
   if (function_exists('path_redirect_save')) {
     $actions[] = t('Create a new alias. Redirect from old alias.');
   }
@@ -287,7 +287,7 @@ function pathauto_admin_settings_validate($form_id, $form_values) {
     if ($details['value'] == $separator) {
       $action = $form_values['pathauto_punctuation_'. $name];
       if ($action == 0) {
-        drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings.  This can cause problems with your patterns and especially with the catpath and termpath patterns.',array('@name' => $details['name'])), 'error');
+        drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings.  This can cause problems with your patterns and especially with the catpath and termpath patterns.', array('@name' => $details['name'])), 'error');
       }
     }
   }
@@ -333,7 +333,7 @@ function pathauto_token_values($type, $object = NULL) {
             $values[$label .'-raw'] = $category->name;
           }
           
-          $values[$label .'alias'] = drupal_get_path_alias('taxonomy/term/'.$category->tid);
+          $values[$label .'alias'] = drupal_get_path_alias('taxonomy/term/'. $category->tid);
           if (!strncasecmp($values[$label .'alias'], 'taxonomy', 8)) {
             $values[$label .'alias'] = $values[$label];
           }
@@ -481,7 +481,7 @@ function pathauto_form_alter($formid, &$form) {
         $output .= t(' To control the format of the generated aliases, see the <a href="@pathauto">Pathauto settings</a>.', array('@pathauto' => url('admin/settings/pathauto')));
       }
 
-      drupal_add_js(drupal_get_path('module', 'pathauto') . '/pathauto.js');
+      drupal_add_js(drupal_get_path('module', 'pathauto') .'/pathauto.js');
 
       $form['path']['pathauto_perform_alias'] = array('#type' => 'checkbox',
         '#title' => t('Automatic alias'),
