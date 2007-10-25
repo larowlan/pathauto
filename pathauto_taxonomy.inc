@@ -10,6 +10,7 @@ function taxonomy_pathauto($op) {
     case 'settings':
       $settings = array();
       $settings['module'] = 'taxonomy';
+      $settings['token_type'] = 'taxonomy';
       $settings['groupheader'] = t('Category path settings');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
       $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');

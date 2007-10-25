@@ -18,7 +18,10 @@ function pathauto_help($section) {
                   for feeds will have '/feed' added to the end. You should enter a value that is the length of the dst
                   column minus the length of any strings that might get added to the end of the URL. The length of 
                   strings that might get added to the end of your URLs depends on which modules you have enabled and 
-                  on your Pathauto settings. The recommended and default value is 100.</p>");
+                  on your Pathauto settings. The recommended and default value is 100.</p>
+                  <p><strong>Raw Tokens</strong> In Pathauto it is appropriate to use the -raw form of tokens.  Paths are sent through a filtering
+                  system which ensures that raw user content is filtered.  Failure to use -raw tokens can cause problems
+                  with the Pathauto punctuation filtering system.</p>");
       return $output;
   }
 }
@@ -132,9 +135,10 @@ function pathauto_admin_settings() {
     '#description' => t('Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server.  If bulk updates "time out" or result in a "white screen" then reduce the number.'));
 
   $actions = array(
-               t('Do nothing. Leave the old alias intact.'),
-               t('Create a new alias. Leave the existing alias functioning.'),
-               t('Create a new alias. Delete the old alias.'));
+    t('Do nothing. Leave the old alias intact.'),
+    t('Create a new alias. Leave the existing alias functioning.'),
+    t('Create a new alias. Delete the old alias.'));
+
   if (function_exists('path_redirect_save')) {
     $actions[] = t('Create a new alias. Redirect from old alias.');
   }
@@ -206,9 +210,18 @@ function pathauto_admin_settings() {
 
     // Prompt for the default pattern for this module
     $variable = 'pathauto_'. $module .'_pattern';
+    $description = '';
+    if (!count($_POST)) {
+      $error = _pathauto_check_pattern(variable_get($variable, $patterndefault), $settings->token_type);
+    }
+    if ($error) {
+      $form[$module]['#collapsed'] = FALSE;
+      $description = t('NOTE: This field contains potentially incorrect patterns.');
+    }
     $form[$module][$variable] = array('#type' => 'textfield',
       '#title' => $patterndescr,
       '#default_value' => variable_get($variable, $patterndefault),
+      '#description' => $description,
       '#size' => 65, '#maxlength' => 128);
 
     // If the module supports a set of specialized patterns, set
@@ -231,7 +244,7 @@ function pathauto_admin_settings() {
       $doc .= '<dd>'. $description .'</dd>';
     }
     $doc .= "</dl>\n";
-    $form[$module][$variable]["#description"] = $doc;
+    $form[$module][$variable]["#description"] .= $doc;
 
     // If the module supports bulk updates, offer the update action here
     if ($settings->bulkname) {
@@ -276,6 +289,51 @@ function pathauto_admin_settings() {
   variable_set('pathauto_modulelist', $modulelist);
 
   return system_settings_form($form);
+}
+
+/**
+ *  Helper function to see if they are using all -raw tokens available
+ *  Returns a status flag if there is an error or not
+ */
+function _pathauto_check_pattern($pattern, $type) {
+  // Hold items we've warned about so we only warn once per token
+  static $warned;
+  $return = FALSE;
+
+  // Build up a set of all tokens in a format that's easy to search
+  $all_tokens = array();
+  $tokens = token_get_list($type);
+  foreach ($tokens as $actual_tokens) {
+    foreach (array_keys($actual_tokens) as $token) {
+      $all_tokens[$token] = $token;
+    }
+  }
+
+  // Now, search the pattern and evaluate its contents.
+  $matches = array();
+  if (preg_match_all('/\[[a-zA-z_\-]+\]/i', $pattern, $matches)) {
+    // Loop over each found token.
+    foreach ($matches[0] as $id => $token) {
+      $token = str_replace('[', '', str_replace(']', '', $token));
+      // Check if the token is even valid in this context.
+      if (!array_key_exists($token, $all_tokens)) {
+        drupal_set_message(t('You are using the token [%token] which is not valid within the scope of tokens where you are using it.', array('%token' => $token)), 'error');
+        $return = TRUE;
+      }
+      // Check if there is a raw companion that they should be using.
+      elseif (!preg_match('/\-raw/i', $token)) {
+        $raw_token = $token .'-raw';
+        if (array_key_exists($raw_token, $all_tokens)) {
+          if (!isset($warned) || !array_key_exists($token, $warned)) {
+            drupal_set_message(t('You are using the token [%token] which has a -raw companion available [%raw_token].  For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing.  See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $raw_token, '@pathauto-help' => url('admin/help/pathauto'))), 'error');
+            $warned[$token] = $token;
+            $return = TRUE;
+          }
+        }
+      }
+    }
+  }
+  return $return;
 }
 
 function pathauto_admin_settings_validate($form_id, $form_values) {

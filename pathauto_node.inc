@@ -9,6 +9,7 @@ function node_pathauto($op) {
     case 'settings':
       $settings = array();
       $settings['module'] = 'node';
+      $settings['token_type'] = 'node';
       $settings['groupheader'] = t('Node path settings');
       $settings['patterndescr'] = t('Default path pattern (applies to all node types with blank patterns below)');
       $settings['patterndefault'] = t('content/[title-raw]');

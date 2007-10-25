@@ -9,6 +9,7 @@ function user_pathauto($op) {
     case 'settings':
       $settings = array();
       $settings['module'] = 'user';
+      $settings['token_type'] = 'user';
       $settings['groupheader'] = t('User path settings');
       $settings['patterndescr'] = t('Pattern for user account page paths');
       $settings['patterndefault'] = t('users/[user-raw]');
@@ -37,6 +38,7 @@ function blog_pathauto($op) {
     case 'settings':
       $settings = array();
       $settings['module'] = 'blog';
+      $settings['token_type'] = 'user';
       $settings['groupheader'] = t('Blog path settings');
       $settings['patterndescr'] = t('Pattern for blog page paths');
       $settings['patterndefault'] = t('blogs/[user-raw]');
@@ -61,6 +63,7 @@ function tracker_pathauto($op) {
     case 'settings':
       $settings = array();
       $settings['module'] = 'tracker';
+      $settings['token_type'] = 'user';
       $settings['groupheader'] = t('User-tracker path settings');
       $settings['patterndescr'] = t('Pattern for user-tracker page paths');
       $settings['patterndefault'] = t('users/[user]/track');
