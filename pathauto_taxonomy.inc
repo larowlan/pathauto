@@ -2,9 +2,8 @@
 // $Id$
 
 /*
- * Implementation of hook_pathauto()
+ * Implementation of hook_pathauto() for taxonomy module
  */
-
 function taxonomy_pathauto($op) {
   switch ($op) {
     case 'settings':
@@ -29,10 +28,13 @@ function taxonomy_pathauto($op) {
       $vocabularies = taxonomy_get_vocabularies();
       if (sizeof($vocabularies) > 0) {
         $settings['patternitems'] = array();
+        $forum_vid = variable_get('forum_nav_vocabulary', '');
         foreach ($vocabularies as $vocab) {
-          $vocabname = $vocab->name;
-          $fieldlabel = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabname));
-          $settings['patternitems'][$vocab->vid] = $fieldlabel;
+          if ($vocab->vid != $forum_vid) {
+            $vocabname = $vocab->name;
+            $fieldlabel = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabname));
+            $settings['patternitems'][$vocab->vid] = $fieldlabel;
+          }
         }
       }
       return (object) $settings;
@@ -46,8 +48,9 @@ function taxonomy_pathauto($op) {
  * 
  */ 
 function taxonomy_pathauto_bulkupdate() {
-  $query = "SELECT tid, vid, name, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', tid) = src OR CONCAT('forum/', tid) = src WHERE src IS NULL";
-  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
+  $forum_vid = variable_get('forum_nav_vocabulary', '');
+  $query = "SELECT tid, vid, name, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', tid) = src WHERE src IS NULL AND vid != %d";
+  $result = db_query_range($query, $forum_vid, 0, variable_get('pathauto_max_bulk_update', 50));
   
   $count = 0;
   $placeholders = array();
@@ -68,22 +71,73 @@ function taxonomy_pathauto_bulkupdate() {
  * 
  */
 function _taxonomy_pathauto_alias($category, $op) {
-
   $count = 0;
 
   $placeholders = pathauto_get_placeholders('taxonomy', $category);    
   
   $forum_vid = variable_get('forum_nav_vocabulary', '');
-  if ($forum_vid === (int)$category->vid) {
+  // If we're in a forum vocabulary, also create a forum container, forum, or forum topic alias.
+  if (module_exists('forum') && $forum_vid == (int)$category->vid) {
     $src = 'forum/'. $category->tid;
-    if ($forumalias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $forum_vid)) {
+    if ($alias = pathauto_create_alias('forum', $op, $placeholders, $src, $vid)) {
       $count++;
     }
   }
-
-  $src = 'taxonomy/term/'. $category->tid;
-  if ($alias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $category->vid)) {
-    $count++;
+  else {
+    $src = 'taxonomy/term/'. $category->tid;
+    if ($alias = pathauto_create_alias('taxonomy', $op, $placeholders, $src, $category->vid)) {
+      $count++;
+    }
   }
   return $count;
+}
+
+
+/*
+ * Implementation of hook_pathauto() for forum module
+ */
+function forum_pathauto($op) {
+  switch ($op) {
+    case 'settings':
+      $settings = array();
+      $settings['module'] = 'forum';
+      $settings['token_type'] = 'taxonomy';
+      $settings['groupheader'] = t('Forum path settings');
+      $settings['patterndescr'] = t('Pattern for forums and forum containers');
+      $settings['patterndefault'] = t('[vocab-raw]/[catpath-raw]');
+      $patterns = token_get_list('taxonomy');
+      foreach ($patterns as $type => $pattern_set) {
+        if ($type != 'global') {
+          foreach ($pattern_set as $pattern => $description) {
+            $settings['placeholders'][t('['. $pattern .']')] = t($description);
+          }
+        }
+      }
+      $settings['supportsfeeds'] = '0/feed';
+      $settings['bulkname'] = t('Bulk generate forum paths');
+      $settings['bulkdescr'] = t('Generate aliases for all existing forums and forum containers which do not already have aliases.');
+      return (object) $settings;
+    default:
+      break;
+  }
+}
+
+
+/**
+ *  Generate aliases for all forums and forum containers without aliases
+ */
+function forum_pathauto_bulkupdate() {
+  $forum_vid = variable_get('forum_nav_vocabulary', '');
+  $query = "SELECT tid, vid, name, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('forum/', tid) = src WHERE vid = %d AND src IS NULL";
+  $result = db_query_range($query, $forum_vid, 0, variable_get('pathauto_max_bulk_update', 50));
+
+  $count = 0;
+  $placeholders = array();
+  while ($category = db_fetch_object($result)) {
+    $count = _taxonomy_pathauto_alias($category, 'bulkupdate') + $count;
+  }
+
+  drupal_set_message(format_plural($count,
+    "Bulk update of forums and forum containers completed, one alias generated.",
+    "Bulk update of forums and forum containers completed, @count aliases generated."));
 }

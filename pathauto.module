@@ -571,6 +571,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           if ($category->name) {
             $count = _taxonomy_pathauto_alias($category, $op);
           }
+
           break;
         case 'delete':
           //If the category is deleted, remove the path aliases
