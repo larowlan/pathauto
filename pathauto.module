@@ -229,9 +229,18 @@ function pathauto_admin_settings() {
     if (isset($settings->patternitems)) {
       foreach ($settings->patternitems as $itemname => $itemlabel) {
         $variable = 'pathauto_'. $module .'_'. $itemname .'_pattern';
+        if (!count($_POST)) {
+          $error = _pathauto_check_pattern(variable_get($variable, $patterndefault), $settings->token_type);
+        }
+        if ($error) {
+          $form[$module]['#collapsed'] = FALSE;
+          $description = t('NOTE: This field contains potentially incorrect patterns.');
+        }
+
         $form[$module][$variable] = array('#type' => 'textfield',
           '#title' => $itemlabel,
           '#default_value' => variable_get($variable, ''),
+          '#description' => $description,
           '#size' => 65, '#maxlength' => 128);
       }
     }
