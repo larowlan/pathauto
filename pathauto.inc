@@ -189,6 +189,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
 
   // Special handling when updating an item which is already aliased.
   $pid = NULL;
+  $old_alias = NULL;
   if ($op == 'update' or $op == 'bulkupdate') {
     $result = db_query("SELECT pid, dst FROM {url_alias} WHERE src='%s'", $src);
     if ($data = db_fetch_object($result)) {
@@ -199,13 +200,13 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
           return '';
         // Add new alias in addition to old one
         case 1:
-          $oldalias = $data->dst;
+          $old_alias = $data->dst;
           break;
         // Replace old alias - remember the pid to update
         case 2:
         case 3:
           $pid = $data->pid;
-          $oldalias = $data->dst;
+          $old_alias = $data->dst;
           break;
         default:
           break;
@@ -242,7 +243,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $type = NULL) 
 
   // If $pid is NULL, a new alias is created - otherwise, the existing
   // alias for the designated src is replaced
-  _pathauto_set_alias($src, $alias, $pid, $verbose, $oldalias);
+  _pathauto_set_alias($src, $alias, $pid, $verbose, $old_alias);
 
   // Also create a related feed alias if requested, and if supported
   // by the module
@@ -286,11 +287,11 @@ function _pathauto_path_is_callback($path) {
  *   If the item is currently aliased, the pid for that item.
  * @param $verbose
  *   If the admin has enabled verbose, should be TRUE.  Else FALSE or NULL.
- * @param $oldalias
+ * @param $old_alias
  *   If the item is currently aliased, the existing alias for that item.
  * 
  */
-function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $oldalias = NULL) {
+function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $old_alias = NULL) {
   // Alert users that an existing callback cannot be overridden automatically
   if (_pathauto_path_is_callback($dst)) {
     if ($verbose and user_access('create url aliases')) {
@@ -300,11 +301,11 @@ function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $oldalia
   }
 
   // Skip replacing the current alias with an identical alias
-  if ($oldalias != $dst) {
+  if ($old_alias != $dst) {
     path_set_alias($src, $dst, $pid, 1, 10);
     if (variable_get('pathauto_update_action', 2) == 3 && function_exists('path_redirect_save')) {
-      if (isset($oldalias)) {
-        $save['path'] = $oldalias;
+      if (isset($old_alias)) {
+        $save['path'] = $old_alias;
         $save['redirect'] = $src;
         $save['type'] = 301; //moved permanently
         path_redirect_save($save);
@@ -313,10 +314,10 @@ function _pathauto_set_alias($src, $dst, $pid = NULL, $verbose = FALSE, $oldalia
     }
     if ($verbose and user_access('create url aliases')) {
       if ($redirect) {
-        drupal_set_message(t('Created new alias %dst for %src, replacing %oldalias. %oldalias now redirects to %dst', array('%dst' => $dst, '%src' => $src, '%oldalias' => $oldalias)));
+        drupal_set_message(t('Created new alias %dst for %src, replacing %old_alias. %old_alias now redirects to %dst', array('%dst' => $dst, '%src' => $src, '%old_alias' => $old_alias)));
       }
       elseif ($pid) {
-        drupal_set_message(t('Created new alias %dst for %src, replacing %oldalias', array('%dst' => $dst, '%src' => $src, '%oldalias' => $oldalias)));
+        drupal_set_message(t('Created new alias %dst for %src, replacing %old_alias', array('%dst' => $dst, '%src' => $src, '%old_alias' => $old_alias)));
       }
       else {
         drupal_set_message(t('Created new alias %dst for %src', array('%dst' => $dst, '%src' => $src)));
