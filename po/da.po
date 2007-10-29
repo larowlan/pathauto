@@ -1,0 +1,629 @@
+# translation of pathauto.da.po to Dansk
+# translation of pathauto.da.po to
+# $Id$
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  pathauto_node.inc,v 1.29.2.3 2007/02/05 18:31:41 greggles
+#  pathauto_user.inc,v 1.17 2006/11/11 23:17:58 greggles
+#  pathauto_taxonomy.inc,v 1.20.2.2 2007/01/17 16:53:41 greggles
+#  pathauto_menu.inc,v 1.6 2006/10/12 14:54:14 greggles
+#  pathauto_node_i18n.inc,v 1.3 2006/10/12 14:54:15 greggles
+#
+# Anders Lund <anders@alweb.dk>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: pathauto.da\n"
+"POT-Creation-Date: 2007-03-25 20:16+0200\n"
+"PO-Revision-Date: 2007-09-21 16:35+0200\n"
+"Last-Translator: Anders Lund <anders@alweb.dk>\n"
+"Language-Team: Dansk <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: pathauto_node.inc:23;132 pathauto_user.inc:16;39;63;88;130;153;176
+msgid "[user]"
+msgstr "[bruger]"
+
+#: pathauto_node.inc:39;219;236 pathauto_taxonomy.inc:17;62;109
+msgid "[vocab]"
+msgstr "[gruppe]"
+
+#: pathauto_node.inc:40 pathauto_taxonomy.inc:17
+msgid "The vocabulary that the page's first category belongs to."
+msgstr "Den kategori-gruppe denne sides første kategori tilhører."
+
+#: pathauto_node.inc:41;215;234 pathauto_taxonomy.inc:18;64;110
+msgid "[cat]"
+msgstr "[kat]"
+
+#: pathauto_node.inc:43;231;235 pathauto_taxonomy.inc:19;72
+msgid "[catpath]"
+msgstr "[katsti]"
+
+#: pathauto_node.inc:44 pathauto_taxonomy.inc:19
+msgid "As [cat], but including its supercategories."
+msgstr "som [kat], men inklusive stien."
+
+#: pathauto_menu.inc:18;53;56
+msgid "[menu]"
+msgstr "[menu]"
+
+#: pathauto_menu.inc:19
+msgid "The name of the menu the node belongs to."
+msgstr "Navnet på den menu indholdselementet tilhører."
+
+#: pathauto_menu.inc:20;60;63
+msgid "[menupath]"
+msgstr "[menusti]"
+
+#: pathauto_menu.inc:21
+msgid "The menu path (as reflected in the breadcrumb), not including Home or [menu]."
+msgstr "Menu stien, uden 'Home' eller [menu]"
+
+#: contrib/pathauto_node_i18n.inc:12;16
+msgid "[lang]"
+msgstr "[sprog]"
+
+#: contrib/pathauto_node_i18n.inc:12
+msgid "Language code of the document"
+msgstr "Dokumentets sprogkode"
+
+#: pathauto.module:19
+msgid ""
+"<p>Provides a mechanism for modules to automatically generate aliases for "
+"the content they manage.</p>\n"
+"                  <h2>Settings</h2>\n"
+"                  <p>The <strong>Maximum Alias Length</strong> and "
+"<strong>Maximum component length</strong> values\n"
+"                  default to 100 and have a limit of 128 from pathauto.  "
+"This length is limited by the length of the dst \n"
+"                  column of the url_alias database table. The default "
+"database schema for this column is 128. If you \n"
+"                  set a length that is equal to that of the one set in the "
+"dst column it will cause problems in situations \n"
+"                  where the system needs to append additional words to the "
+"aliased URL. For example... URLs generated\n"
+"                  for feeds will have '/feed' added to the end. You should "
+"enter a value that is the length of the dst\n"
+"                  column minus the length of any strings that might get "
+"added to the end of the URL. The length of \n"
+"                  strings that might get added to the end of your URLs "
+"depends on which modules you have enabled and \n"
+"                  on your Pathauto settings. The recommended and default "
+"value is 100.</p>"
+msgstr ""
+"<p>Tilbyder moduler en mekanisme til automatisk at generere aliaser for indhold de bestyrer.</p>\n"
+"<h2>Indstillinger</h2>\n"
+"<p>Den <strong>maksimale længde</strong> er som standard 100 og har en grænse på 128 fra autosti. Denne længde begrænses af dst kolonnen i URL alias database-tabellen.Standard-skemaet for denne kolonne er 128. Hvis du indstiller en værdi der ikke svarer til den i dst kolonnen vil der opstå problemer i situationer hvor systemet har brug for at tilføje ord til URL aliaset. For eksempel URLer genereret for RSS strømme vil få tilføjet '/feed'. Du bør vælge en værdi der svarer til dst kolonnen minus længden af en hvilkensomhelst tekst som kan blive tilføjet til URLen. Længden af tekster der kan blive tilføjet til URLer afhænger af hvilke moduler du har aktiveret og dine autosti indstillinger. Den anbefalede værdi er 100.</p>"
+
+#: pathauto.module:44
+msgid "You are not authorized to access the pathauto settings."
+msgstr "Du har ikke tilladelse til at tilgå indstillinger for autosti."
+
+#: pathauto.module:64
+msgid "General settings"
+msgstr "Generelle indstillinger"
+
+#: pathauto.module:69
+msgid "Verbose"
+msgstr "Udførlig rapport"
+
+#: pathauto.module:71
+msgid "Display alias changes (except during bulk updates)."
+msgstr "Vis ændringer af alias (undtagen ved masse-opdateringer)."
+
+#: pathauto.module:74
+msgid "Separator"
+msgstr "Adskillelses-tegn"
+
+#: pathauto.module:76
+msgid ""
+"Character used to separate words in titles. This will replace any spaces and "
+"punctuation characters."
+msgstr ""
+"Tegn der anvendes til at adskille ord i titler. Det vil erstate mellemrum og "
+"punktur-karakterer"
+
+#: pathauto.module:79
+msgid "Quotation marks"
+msgstr "Citiations-tegn"
+
+#: pathauto.module:81
+msgid "Remove"
+msgstr "Slet"
+
+#: pathauto.module:81
+msgid "Replace by separator"
+msgstr "Erstat med adskillelsestegn"
+
+#: pathauto.module:85
+msgid "Maximum alias length"
+msgstr "Maksimum alias længde"
+
+#: pathauto.module:87
+msgid ""
+"Maximum length of aliases to generate. 100 is recommended.  See <a href="
+"\"@pathauto-help\">Pathauto help</a> for details."
+msgstr ""
+"Maksimal længde for aliaser. Anbefalet værdi: 100. Se <a href="
+"\"@pathauto-help\">Autosti hjælp</a> for detaljer."
+
+#: pathauto.module:90
+msgid "Maximum component length"
+msgstr "Maksimal komponent længde"
+
+#: pathauto.module:92
+msgid ""
+"Maximum text length of any component in the alias (e.g., [title]). 100 is "
+"recommended. See <a href=\"@pathauto-help\">Pathauto help</a> for details."
+msgstr ""
+"Største længde for en komponent i et alias (f. eks. [titel]). Anbefalet værdi: 100. Se <a href="
+"\"@pathauto-help\">Autosti hjælp</a> for detaljer."
+
+#: pathauto.module:95
+msgid "Create index aliases"
+msgstr "Opret aliaser for indeks"
+
+#: pathauto.module:97
+msgid ""
+"When a pattern generates a hierarchical alias (i.e., any alias containing a "
+"slash), generate aliases for each step of the hierarchy which can be used to "
+"list content within that hierarchy. For example, if a node alias \"music/"
+"concert/beethoven\" is created, also create an alias \"music/concert\" which "
+"will list all concert nodes, and an alias \"music\" which will list all "
+"music nodes."
+msgstr "Når der genereres et hierakisk alias, dvs. et alias indeholdende en skråstreg, genereres et alias for hvert trin i hierakiet. For eksempel, for et alias \"musik/koncert/beethoven\" genereres også et alias \"musik/koncert\" som viser alt \"koncert\" indhold og et alias \"musik\" som viser alt \"musik\" indhold"
+
+#: pathauto.module:103
+msgid "Bulk generate index aliases"
+msgstr "Massegenerér indeks aliaser"
+
+#: pathauto.module:105
+msgid "Generate index aliases based on all pre-existing aliases."
+msgstr "Generer indeks aliaser for alle eksisterende aliaser"
+
+#: pathauto.module:108
+msgid "Update action"
+msgstr "Handling ved opdatering"
+
+#: pathauto.module:109
+msgid "Do nothing, leaving the old alias intact"
+msgstr "Ingen, bevar det eksisterende alias"
+
+#: pathauto.module:110
+msgid "Create a new alias in addition to the old alias"
+msgstr "Opret et nyt alias i tilgift til det eksisterende"
+
+#: pathauto.module:111
+msgid "Create a new alias, replacing the old one"
+msgstr "Opret nyt alias til erstatning for det eksisterende"
+
+#: pathauto.module:112
+msgid ""
+"What should pathauto do when updating an existing content item which already "
+"has an alias?"
+msgstr "Hvad skal autosti gøre når et eksisterende emne der allerede har et alias opdateres?"
+
+#: pathauto.module:115
+msgid "Strings to Remove"
+msgstr "Ord der skal slettes"
+
+#: pathauto.module:116
+msgid "Words to strip out of the URL alias, separated by commas"
+msgstr "Ord der skal fjernes fra URL aliaset, separeret af kommaer"
+
+#: pathauto.module:193
+msgid "Create feed aliases"
+msgstr "Opret aliaser for strømme"
+
+#: pathauto.module:195
+msgid "Also generate aliases for RSS feeds."
+msgstr "Generer aliaser for RSS strømme."
+
+#: pathauto.module:423
+msgid "Ignoring alias "
+msgstr "Ignorerer alias"
+
+#: pathauto.module:423
+msgid " due to existing path conflict"
+msgstr "på grund af konflikt med eksisterende sti"
+
+#: pathauto.module:433
+msgid "Created new alias %dst for %src, replacing %oldalias"
+msgstr "Oprettede nyt alias %dst for %src til erstatning for %oldalias"
+
+#: pathauto.module:436
+msgid "Created new alias %dst for %src"
+msgstr "Oprettede nyt alias %dst for %src"
+
+#: pathauto.module:471;486 pathauto.info:0
+msgid "Pathauto"
+msgstr "Autosti"
+
+#: pathauto.module:472
+msgid "Configure how pathauto generates clean URLs for your content."
+msgstr "Konfigurér hvordan autosti genererer rene URLer for dit indhold."
+
+#: pathauto.module:201
+msgid "Bulk update of index aliases completed, one alias generated."
+msgid_plural "Bulk update of index aliases completed, @count aliases generated."
+msgstr[0] "Masseopdatering af indeks aliaser afsluttet, et alias genereret."
+msgstr[1] "Masseopdatering af indeks aliaser afsluttet, @count aliaser genereret."
+
+#: pathauto.module:37
+msgid "administer pathauto"
+msgstr "administrer autosti"
+
+#: pathauto.module:0 pathauto.info:0
+msgid "pathauto"
+msgstr "autosti"
+
+#: pathauto.info:0
+msgid ""
+"Provides a mechanism for modules to automatically generate aliases for the "
+"content they manage."
+msgstr "Tilbyder en mekanisme for moduler til automatisk at generere aliaser for det indhold de bestyrer."
+
+#: pathauto_node.inc:13
+msgid "Node path settings"
+msgstr "Indstillinger for indholds-stier"
+
+#: pathauto_node.inc:14
+msgid "Default path pattern (applies to all node types with blank patterns below)"
+msgstr "Standard skabelon for stier (gælder for alle indholdstyper med blanke skabeloner nedenfor)"
+
+#: pathauto_node.inc:15;21;116
+msgid "[title]"
+msgstr "[titel]"
+
+#: pathauto_node.inc:17
+msgid "Bulk update node paths"
+msgstr "Masseopdater indholds-stier"
+
+#: pathauto_node.inc:19
+msgid "Generate aliases for all existing nodes which do not already have aliases."
+msgstr "Generer aliaser for alle eksisterende indholdselementer der ikke allerede har et alias."
+
+#: pathauto_node.inc:21
+msgid "The title of the node, with spaces and punctuation replaced by the separator."
+msgstr "Titlen for indholdselementet med mellemrum og punkturer erstattet af separator-karakteren."
+
+#: pathauto_node.inc:22;126
+msgid "[nid]"
+msgstr "[nid]"
+
+#: pathauto_node.inc:22
+msgid "The id number of the node."
+msgstr "indholdselementets ID nummer"
+
+#: pathauto_node.inc:23
+msgid "The name of the user who created the node."
+msgstr "Navnet på brugeren som oprettede indholdselementet."
+
+#: pathauto_node.inc:24;127
+msgid "[type]"
+msgstr "[type]"
+
+#: pathauto_node.inc:24
+msgid "The node type (e.g., \"page\", \"story\", etc.)."
+msgstr "Indholdselementets type (som \"side\", \"historie\" osv.)."
+
+#: pathauto_node.inc:25;117
+msgid "[yyyy]"
+msgstr "[åååå]"
+
+#: pathauto_node.inc:25
+msgid "The year the node was created."
+msgstr "Året for indholdselementets oprettelse."
+
+#: pathauto_node.inc:26;118
+msgid "[mm]"
+msgstr "[mm]"
+
+#: pathauto_node.inc:26
+msgid "The two-digit month (01-12) the node was created."
+msgstr "Måneden for indholdselementets oprettelse repræsenteret som to cifre (01 - 12)"
+
+#: pathauto_node.inc:27;119
+msgid "[mon]"
+msgstr "[mån]"
+
+#: pathauto_node.inc:27
+msgid "The three-letter month (jan-dec) the node was created."
+msgstr "Måneden for indholdselementets oprettelse representeret af en forkortelse på tre bogstaver (jan - dec)."
+
+#: pathauto_node.inc:28;120
+msgid "[dd]"
+msgstr "[dd]"
+
+#: pathauto_node.inc:28
+msgid "The two-digit day of the month (00-31) the node was created."
+msgstr "Datoen for indholdselementets oprettelse repræsenteret som to cifre (01 - 31)."
+
+#: pathauto_node.inc:29;121
+msgid "[day]"
+msgstr "[dag]"
+
+#: pathauto_node.inc:29
+msgid "The three-letter day of the week (sun-sat) that the node was created."
+msgstr "Dagen for indholdselementets oprettelse repræsenteret som en forkortelse på tre bogstaver (man - søn)."
+
+#: pathauto_node.inc:30;122
+msgid "[hour]"
+msgstr "[time]"
+
+#: pathauto_node.inc:30
+msgid "The two-digit hour (00-23) the node was created."
+msgstr "Timen for indholdselementets oprettelse som et to-cifret tal (00 - 24)."
+
+#: pathauto_node.inc:31;123
+msgid "[min]"
+msgstr "[min]"
+
+#: pathauto_node.inc:31
+msgid "The two-digit minute (00-59) the node was created."
+msgstr "Minuttet for indholdselementets oprettelse som et to-cifret tal (00 - 59)."
+
+#: pathauto_node.inc:32;124
+msgid "[sec]"
+msgstr "[sek]"
+
+#: pathauto_node.inc:32
+msgid "The two-digit second (00-59) the node was created."
+msgstr "Sekundet for indholdselementets oprettelse som et to-cifret tal (00 - 59)."
+
+#: pathauto_node.inc:33;125
+msgid "[week]"
+msgstr "[week]"
+
+#: pathauto_node.inc:33
+msgid "The week number (1-52) of the year the node was created."
+msgstr "Ugenummeret for indholdselementets oprettelse (1-52)."
+
+#: pathauto_node.inc:42
+msgid "The name of the lowest-weight category that the page belongs to."
+msgstr "Navmet på den letteste kategori siden tilhører."
+
+#: pathauto_node.inc:45;221;223;237
+msgid "[catalias]"
+msgstr "[katalias]"
+
+#: pathauto_node.inc:46
+msgid ""
+"The alias for the lowest-weight category that the page belongs to. This is "
+"useful for long category names. You must first set up aliases for your "
+"categories."
+msgstr "Alias for den letteste kategori siden tilhører. Dette er en fordel ved brug af lange kategori-navne. Du skal først oprette aliaser for dine kategorier."
+
+#: pathauto_node.inc:51;137;151
+msgid "[book]"
+msgstr "[bog]"
+
+#: pathauto_node.inc:52
+msgid "For book pages, the title of the top-level book."
+msgstr "For bogsider, titlen på bogen."
+
+#: pathauto_node.inc:53;148;152
+msgid "[bookpath]"
+msgstr "[bogsti]"
+
+#: pathauto_node.inc:54
+msgid "For book pages, the full hierarchy from the top-level book."
+msgstr "For bogsider, det fulde hieraki i bogen."
+
+#: pathauto_node.inc:63
+msgid "Pattern for all %nodetypename paths"
+msgstr "Skabelon for alle %nodetypename stier"
+
+#: pathauto_node.inc:101
+msgid ""
+"An alias will be automatically generated from the title and other node "
+"attributes, in addition to any alias manually provided above."
+msgstr "Et alias vil automatisk blive genereret ud fra titlen og andre indholds-attributer, i tilgift til ethvert alias angivet manuelt ovenfor."
+
+#: pathauto_node.inc:103
+msgid ""
+" To control the format of the generated aliases, see the <a href=\"admin/"
+"settings/pathauto\">pathauto settings</a>."
+msgstr ""
+"For at kontrollere formatet af de genererede aliaser, se <a href=\"admin/"
+"settings/pathauto\">indstillinger for autosti</a>."
+
+#: pathauto_node.inc:273
+msgid "Bulk update of nodes completed, one alias generated."
+msgid_plural "Bulk update of nodes completed, @count aliases generated."
+msgstr[0] "Masseopdatering af indholdselementer afsluttet, et alias genereret."
+msgstr[1] "Masseopdatering af emner afsluttet, @count aliaser genereret."
+
+#: contrib/pathauto_node_event.inc:12;22
+msgid "[eventyyyy]"
+msgstr "[arråååå]"
+
+#: contrib/pathauto_node_event.inc:12
+msgid "The year the event starts."
+msgstr "Året for arrangementets start."
+
+#: contrib/pathauto_node_event.inc:13;23
+msgid "[eventmm]"
+msgstr "[arrmm]"
+
+#: contrib/pathauto_node_event.inc:13
+msgid "The two-digit month (01-12) the event starts."
+msgstr "Måneden for arrangementets start som et to-cifret tal (01 - 12)."
+
+#: contrib/pathauto_node_event.inc:14;24
+msgid "[eventmon]"
+msgstr "[arrmån]"
+
+#: contrib/pathauto_node_event.inc:14
+msgid "The three-letter month (jan-dec) the event starts."
+msgstr "Måneden for arrangementets start som en forkortelse på tre bogstaver (jan - dec)."
+
+#: contrib/pathauto_node_event.inc:15;25
+msgid "[eventdd]"
+msgstr "[arrdd]"
+
+#: contrib/pathauto_node_event.inc:15
+msgid "The two-digit day of the month (00-31) the event starts."
+msgstr "Datoen for arrangementets start som et to-cifret tal (01 - 31)"
+
+#: contrib/pathauto_node_event.inc:16;26
+msgid "[eventday]"
+msgstr "[arrdag]"
+
+#: contrib/pathauto_node_event.inc:16
+msgid "The three-letter day of the week (sun-sat) the event starts."
+msgstr "Dagen for arrangementets start som en forkortelse på tre bogstaver (man - søn)."
+
+#: contrib/pathauto_node_event.inc:17;27
+msgid "[eventweek]"
+msgstr "[arruge]"
+
+#: contrib/pathauto_node_event.inc:17
+msgid "The week number (1-52) of the year the event starts."
+msgstr "*Ugenummeret for arrangementets start (1 - 52)."
+
+#: pathauto_taxonomy.inc:13
+msgid "Category path settings"
+msgstr "Indstillinger for kategori-stier"
+
+#: pathauto_taxonomy.inc:14
+msgid "Default path pattern (applies to all vocabularies with blank patterns below)"
+msgstr "Standard skabelon (gælder for alle kategori-grupper med blanke skabeloner nedenfor)"
+
+#: pathauto_taxonomy.inc:15
+msgid "[vocab]/[catpath]"
+msgstr "[gruppe]/[katsti]"
+
+#: pathauto_taxonomy.inc:18
+msgid "The name of the category."
+msgstr "Navnet på kategorien."
+
+#: pathauto_taxonomy.inc:20;65;111
+msgid "[tid]"
+msgstr "[kid]"
+
+#: pathauto_taxonomy.inc:20
+msgid "The id number of the category."
+msgstr "Kategoriens ID-nummer."
+
+#: pathauto_taxonomy.inc:26
+msgid "Bulk update category paths"
+msgstr "Masseopdater kategori-stier"
+
+#: pathauto_taxonomy.inc:27
+msgid ""
+"Generate aliases for all existing categories which do not already have "
+"aliases."
+msgstr "Generer aliaser for alle eksisterende kategorier som ikke allerede har et alias."
+
+#: pathauto_taxonomy.inc:34
+msgid "Pattern for all %vocab-name paths"
+msgstr "Skabelon for alle %vocab-name stier"
+
+#: pathauto_taxonomy.inc:145
+msgid "Bulk update of terms completed, one alias generated."
+msgid_plural "Bulk update of terms completed, @count aliases generated."
+msgstr[0] "Masseopdatering af kategorier afsluttet, et alias genereret."
+msgstr[1] "Masseopdatering af kategorier afsluttet, @count aliaser genereret."
+
+#: pathauto_user.inc:12
+msgid "User path settings"
+msgstr "Indstillinger for bruger stier"
+
+#: pathauto_user.inc:13
+msgid "Pattern for user account page paths"
+msgstr "Skabelon for brugerkonto stier"
+
+#: pathauto_user.inc:14
+msgid "user/[user]"
+msgstr "bruger/[bruger]"
+
+#: pathauto_user.inc:16;39;63
+msgid "The name of the user."
+msgstr "Brugerens navn."
+
+#: pathauto_user.inc:17;40;64;89;131;154;177
+msgid "[uid]"
+msgstr "[uid]"
+
+#: pathauto_user.inc:17;40;64
+msgid "The id number of the user."
+msgstr "Brugerens ID-nummer."
+
+#: pathauto_user.inc:19
+msgid "Bulk update user paths"
+msgstr "Masseopdater bruger stier"
+
+#: pathauto_user.inc:20
+msgid ""
+"Generate aliases for all existing user account pages which do not already "
+"have aliases."
+msgstr "Generer aliaser for alle eksisterende brugerkonti som ikke allerede har et alias."
+
+#: pathauto_user.inc:35
+msgid "Blog path settings"
+msgstr "Indstillinger for blog stier"
+
+#: pathauto_user.inc:36
+msgid "Pattern for blog page paths"
+msgstr "Skabelon for blog stier"
+
+#: pathauto_user.inc:37
+msgid "blog/[user]"
+msgstr "blog/[bruger]"
+
+#: pathauto_user.inc:43
+msgid "Bulk update blog paths"
+msgstr "Masseopdater blog stier"
+
+#: pathauto_user.inc:44
+msgid ""
+"Generate aliases for all existing blog pages which do not already have "
+"aliases."
+msgstr "Generer aliaser for alle eksisterende blog emner som ikke allerede har et alias."
+
+#: pathauto_user.inc:59
+msgid "User-tracker path settings"
+msgstr "Indstillinger for  bruger-sporer stier"
+
+#: pathauto_user.inc:60
+msgid "Pattern for user-tracker page paths"
+msgstr "Skabelon for bruger-sporer stier"
+
+#: pathauto_user.inc:61
+msgid "user/[user]/track"
+msgstr "bruger/[bruger]/spor"
+
+#: pathauto_user.inc:67
+msgid "Bulk update user-tracker paths"
+msgstr "Masseopdater bruger-sporer stier"
+
+#: pathauto_user.inc:68
+msgid ""
+"Generate aliases for all existing user-tracker pages which do not already "
+"have aliases."
+msgstr "Generer aliaser for alle eksisterende bruger-sporer sider som ikke allerede har et alias."
+
+#: pathauto_user.inc:139
+msgid "Bulk update of users completed, one alias generated."
+msgid_plural "Bulk update of users completed, @count aliases generated."
+msgstr[0] "Masseopdatering af brugere afsluttet, et alias genereret"
+msgstr[1] "Masseopdatering af brugere afsluttet, @count aliaser genereret."
+
+#: pathauto_user.inc:162
+msgid "Bulk update of user blogs completed, one alias generated."
+msgid_plural "Bulk update of user blogs completed, @count aliases generated."
+msgstr[0] "Masseopdatering af bruger-blogs afsluttet, et alias genereret."
+msgstr[1] "Masseopdatering af bruger-blogs afsluttet, @count aliaser genereret."
+
+#: pathauto_user.inc:185
+msgid "Bulk update of user tracker pages completed, one alias generated."
+msgid_plural "Bulk update of user tracker pages completed, @count aliases generated."
+msgstr[0] "Masseopdatering af bruger-sporer afsluttet, et alias genereret."
+msgstr[1] "Masseopdatering af bruger-sporer afsluttet, @count aliaser genereret."
+
