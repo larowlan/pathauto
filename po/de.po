@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Pathauto\n"
 "POT-Creation-Date: 2007-03-23 21:57+0100\n"
-"PO-Revision-Date: 2007-10-31 22:38+0100\n"
+"PO-Revision-Date: 2007-10-31 22:52+0100\n"
 "Last-Translator: Alexander Hass\n"
 "Language-Team: Alexander Hass\n"
 "MIME-Version: 1.0\n"
@@ -168,11 +168,11 @@ msgstr "Backslash \\"
 
 #: pathauto_node.inc:13
 msgid "Node path settings"
-msgstr "Node Pfadeinstellungen"
+msgstr "Pfadeinstellungen für Beiträge"
 
 #: pathauto_node.inc:14
 msgid "Default path pattern (applies to all node types with blank patterns below)"
-msgstr "Standard Pfad Vorlage (wird auf alle nachfolgenden Inhaltstypen mit leeren Vorlagen angewendet)"
+msgstr "Standard-Pfad-Vorlage (wird auf alle nachfolgenden Inhaltstypen mit leeren Vorlagen angewendet)"
 
 #: pathauto_node.inc:15
 msgid "content/[title-raw]"
@@ -202,7 +202,7 @@ msgstr "Kategoriepfad Einstellungen"
 
 #: pathauto_taxonomy.inc:14
 msgid "Default path pattern (applies to all vocabularies with blank patterns below)"
-msgstr "Standard Pfad Vorlage (trifft auf alle nachfolgenden Vokabulare mit leeren Vorlagen zu)"
+msgstr "Standard-Pfad-Vorlage (trifft auf alle nachfolgenden Vokabulare mit leeren Vorlagen zu)"
 
 #: pathauto_taxonomy.inc:15
 msgid "category/[vocab-raw]/[catpath-raw]"
@@ -222,11 +222,11 @@ msgstr "Vorlage für alle %vocab-name Pfade"
 
 #: pathauto_taxonomy.inc:105
 msgid "Forum path settings"
-msgstr "Forum Pfadeinstellungen"
+msgstr "Pfadeinstellungen für Foren"
 
 #: pathauto_taxonomy.inc:106
 msgid "Pattern for forums and forum containers"
-msgstr "Vorlage für Foren und Forumcontainer"
+msgstr "Vorlage für Foren und Forumordner"
 
 #: pathauto_taxonomy.inc:107
 msgid "[vocab-raw]/[catpath-raw]"
@@ -238,7 +238,7 @@ msgstr "Massenerstellung von Forumpfaden"
 
 #: pathauto_taxonomy.inc:118
 msgid "Generate aliases for all existing forums and forum containers which do not already have aliases."
-msgstr "Erstelle Aliase für alle vorhandenen Foren und Forumcontainer, welche derzeit keine Aliase haben."
+msgstr "Erstelle Aliase für alle vorhandenen Foren und Forumordner, welche derzeit keine Aliase haben."
 
 #: pathauto_taxonomy.inc:61
 msgid "Bulk generation of terms completed, one alias generated."
@@ -254,7 +254,7 @@ msgstr[1] "Massenaktualisierung von Foren und Forenordnern abgeschlossen, @count
 
 #: pathauto_user.inc:13
 msgid "User path settings"
-msgstr "Benutzerpfad Einstellungen"
+msgstr "Pfadeinstellungen für Benutzer"
 
 #: pathauto_user.inc:14
 msgid "Pattern for user account page paths"
@@ -274,11 +274,11 @@ msgstr "Erstelle Aliase für alle vorhandenen Benutzerkontenseiten, welche derze
 
 #: pathauto_user.inc:42
 msgid "Blog path settings"
-msgstr "Blog Pfadeinstellungen"
+msgstr "Pfadeinstellungen für Blog"
 
 #: pathauto_user.inc:43
 msgid "Pattern for blog page paths"
-msgstr "Vorlage für Blogpfade"
+msgstr "Vorlage für Blogseitenpfade"
 
 #: pathauto_user.inc:44
 msgid "blogs/[user-raw]"
@@ -294,11 +294,11 @@ msgstr "Erstelle Aliase für alle vorhandenen Blogseiten, welche derzeit keinen 
 
 #: pathauto_user.inc:67
 msgid "User-tracker path settings"
-msgstr "Benutzer-Tracker Pfadeinstellungen"
+msgstr "Pfadeinstellungen für Benutzer-Tracker"
 
 #: pathauto_user.inc:68
 msgid "Pattern for user-tracker page paths"
-msgstr "Vorlage für Benutzer-Tracker Seitenpfade"
+msgstr "Vorlage für Benutzer-Tracker-Seitenpfade"
 
 #: pathauto_user.inc:69
 msgid "users/[user]/track"
@@ -358,7 +358,7 @@ msgstr "Autopfad"
 
 #: pathauto.module:46
 msgid "Configure how pathauto generates clean URLs for your content."
-msgstr "Konfiguration von Pathauto, wie lesbaren URLs für Inhalte erstellt werden sollen."
+msgstr "Konfiguration von Autopfad, wie lesbaren URLs für Inhalte erstellt werden sollen."
 
 #: pathauto.module:54
 msgid "Delete aliases"
@@ -442,6 +442,7 @@ msgid "Create a new alias. Redirect from old alias."
 msgstr "Erstelle einen neuen Alias. Umleiten von dem alten Alias."
 
 #: pathauto.module:152
+#, fuzzy
 msgid "Update action"
 msgstr "Aktualisieren Aktion"
 
@@ -451,7 +452,7 @@ msgstr "Was soll Autopfad beim Aktualisierungen von vorhandenen Inhalten machen,
 
 #: pathauto.module:170
 msgid "Transliterate prior to creating alias"
-msgstr "Vor Erstellung des Aliases umcodieren"
+msgstr "Umcodieren, bevor der Alias erstellt wird"
 
 #: pathauto.module:177
 msgid "Strings to Remove"
@@ -529,9 +530,11 @@ msgstr "URL-Alias für den Begriff."
 msgid "Choose Aliases to Delete"
 msgstr "Zu löschenden Alias auswählen"
 
+# starting case?
 #: pathauto.module:469
+#, fuzzy
 msgid "all aliases"
-msgstr "Alle Aliase"
+msgstr "alle Aliase"
 
 #: pathauto.module:471
 msgid "Delete all aliases.  Number of aliases which will be deleted: %count."
@@ -592,8 +595,8 @@ msgstr "Automatischer Alias"
 #: pathauto.module:297
 msgid "Bulk generation of index aliases completed, one alias generated."
 msgid_plural "Bulk generation of index aliases completed, @count aliases generated."
-msgstr[0] "Massenerstellung von Index Aliasen abgeschlossen, ein Alias wurde erstellt."
-msgstr[1] "Massenerstellung von Index Aliasen abgeschlossen, @count Aliase wurden erstellt."
+msgstr[0] "Massenerstellung von Index-Aliasen abgeschlossen, ein Alias wurde erstellt."
+msgstr[1] "Massenerstellung von Index-Aliasen abgeschlossen, @count Aliase wurden erstellt."
 
 #: pathauto.module:33
 msgid "administer pathauto"
