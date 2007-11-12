@@ -64,7 +64,7 @@ function pathauto_menu($may_cache) {
 
 
 /**
- * Include all pathauto include files
+ * Include all pathauto include files.
  */
 function _pathauto_include() {
   $pathauto_path = drupal_get_path('module', 'pathauto');
@@ -76,8 +76,7 @@ function _pathauto_include() {
 
 
 /**
- * Callback for admin settings page
- * 
+ * Callback for admin settings page.
  */
 function pathauto_admin_settings() {
   _pathauto_include();
