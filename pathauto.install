@@ -55,7 +55,7 @@ function pathauto_install() {
   // Make the variable column wide enough for long cck names
   switch ($GLOBALS['db_type']) {
     case 'pgsql':
-      db_change_column($ret, 'variable', 'name', 'name', 'varchar(128)', array('not null' => TRUE, 'default' => "''"));
+      // See http://drupal.org/node/195044
       break;
     case 'mysql':
     case 'mysqli':
