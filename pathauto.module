@@ -228,7 +228,8 @@ function pathauto_admin_settings() {
       '#title' => $patterndescr,
       '#default_value' => variable_get($variable, $patterndefault),
       '#description' => $description,
-      '#size' => 65, '#maxlength' => 128);
+      '#size' => 65,
+      '#maxlength' => 1280);
 
     // If the module supports a set of specialized patterns, set
     // them up here
@@ -248,7 +249,8 @@ function pathauto_admin_settings() {
           '#title' => $itemlabel,
           '#default_value' => variable_get($variable, ''),
           '#description' => $description,
-          '#size' => 65, '#maxlength' => 128);
+          '#size' => 65,
+          '#maxlength' => 1280);
       }
     }
 
