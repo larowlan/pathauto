@@ -425,7 +425,7 @@ function pathauto_clean_token_values($full) {
 function pathauto_punctuation_chars() {
   $punctuation = array();
 
-  // Handle " ' , . - _ : ; | { { } ] + = * & % $ � # @ ! ~ ( ) ? < > \ � �
+  // Handle " ' , . - _ : ; | { { } ] + = * & % $ � # @ ! ~ ( ) ? < > \
   $punctuation['double_quotes']      = array('value' => '"', 'name' => t('Double quotes "'));
   $punctuation['quotes']             = array('value' => "'", 'name' => t("Single quotes (apostrophe) '"));
   $punctuation['backtick']           = array('value' => "`", 'name' => t("Back tick `"));
