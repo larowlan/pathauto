@@ -581,6 +581,10 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
           $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type);
         }
         break;
+      case 'delete':
+        path_set_alias('$node/'. $category->tid);
+        path_set_alias('$node/'. $category->tid .'/feed');
+        break;
       default:
         break;
     }
