@@ -55,7 +55,8 @@ function pathauto_install() {
   // Make the variable column wide enough for long cck names
   switch ($GLOBALS['db_type']) {
     case 'pgsql':
-      // See http://drupal.org/node/195044
+      // Using pgsql<8.x?  Help at http://drupal.org/node/195044
+      db_query("ALTER TABLE {variable} ALTER name TYPE varchar(128)");
       break;
     case 'mysql':
     case 'mysqli':
