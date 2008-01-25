@@ -292,7 +292,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
       _pathauto_set_alias("taxonomy/term/$entity_id/$feedappend", "$alias/feed", $module, $entity_id, $update_data['pid'], $verbose,$update_data['old_alias']);
     }
     else {
-    $update_data = _pathauto_existing_alias_data("$src/$feedappend");
+      $update_data = _pathauto_existing_alias_data("$src/$feedappend");
       _pathauto_set_alias("$src/$feedappend", "$alias/feed", $module, $entity_id, $update_data['pid'], $verbose, $update_data['old_alias']);
     }
   }
