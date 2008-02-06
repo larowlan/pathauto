@@ -353,7 +353,7 @@ function _pathauto_set_alias($src, $dst, $entity_type, $entity_id, $pid = NULL, 
 
   // Skip replacing the current alias with an identical alias
   if ($old_alias != $dst) {
-    path_set_alias($src, $dst, $pid, 1, 10);
+    path_set_alias($src, $dst, $pid);
     $new_pid = db_result(db_query("SELECT pid FROM {url_alias} WHERE src = '%s' and dst = '%s'", $src, $dst));
     if ($new_pid != $pid) {
       db_query("INSERT INTO {url_alias_extra} (pid, dst, entity_type, entity_id, created_by) VALUES (%d, '%s', '%s', %d, '%s')", $new_pid, $dst, $entity_type, $entity_id, 'Pathauto');
