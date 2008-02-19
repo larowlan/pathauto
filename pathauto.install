@@ -185,3 +185,13 @@ function pathauto_update_5() {
   }
   return $ret;
 }
+
+/**
+ *  Remove some variables that are no longer used
+ */
+function pathauto_update_6() {
+  // Delete some unused variables
+  db_query("DELETE FROM {variable} WHERE name LIKE 'pathauto_%_supportsfeeds'");
+  cache_clear_all('variables', 'cache');
+  return array();
+}
