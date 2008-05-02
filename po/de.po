@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Pathauto\n"
 "POT-Creation-Date: 2007-03-23 21:57+0100\n"
-"PO-Revision-Date: 2007-10-31 22:52+0100\n"
+"PO-Revision-Date: 2008-05-02 16:52+0100\n"
 "Last-Translator: Alexander Hass\n"
 "Language-Team: Alexander Hass\n"
 "MIME-Version: 1.0\n"
@@ -172,7 +172,7 @@ msgstr "Pfadeinstellungen für Beiträge"
 
 #: pathauto_node.inc:14
 msgid "Default path pattern (applies to all node types with blank patterns below)"
-msgstr "Standard-Pfad-Vorlage (wird auf alle nachfolgenden Inhaltstypen mit leeren Vorlagen angewendet)"
+msgstr "Standard-Pfad-Muster (wird auf alle nachfolgenden Inhaltstypen mit leeren Mustern angewendet)"
 
 #: pathauto_node.inc:15
 msgid "content/[title-raw]"
@@ -188,7 +188,7 @@ msgstr "Aliase für alle vorhanden Beiträge erstellen, die noch keinen Alias ha
 
 #: pathauto_node.inc:30
 msgid "Pattern for all @node_type paths"
-msgstr "Vorlage für alle @node_type Pfade"
+msgstr "Muster für alle @node_type Pfade"
 
 #: pathauto_node.inc:88
 msgid "Bulk generation of nodes completed, one alias generated."
@@ -202,7 +202,7 @@ msgstr "Kategoriepfad Einstellungen"
 
 #: pathauto_taxonomy.inc:14
 msgid "Default path pattern (applies to all vocabularies with blank patterns below)"
-msgstr "Standard-Pfad-Vorlage (trifft auf alle nachfolgenden Vokabulare mit leeren Vorlagen zu)"
+msgstr "Standard-Pfadmuster (trifft auf alle nachfolgenden Vokabulare mit leeren Mustern zu)"
 
 #: pathauto_taxonomy.inc:15
 msgid "category/[vocab-raw]/[catpath-raw]"
@@ -218,7 +218,7 @@ msgstr "Erstelle Aliase für alle vorhandenen Kategorien, welche derzeit noch ke
 
 #: pathauto_taxonomy.inc:35
 msgid "Pattern for all %vocab-name paths"
-msgstr "Vorlage für alle %vocab-name Pfade"
+msgstr "Muster für alle %vocab-name Pfade"
 
 #: pathauto_taxonomy.inc:105
 msgid "Forum path settings"
@@ -226,7 +226,7 @@ msgstr "Pfadeinstellungen für Foren"
 
 #: pathauto_taxonomy.inc:106
 msgid "Pattern for forums and forum containers"
-msgstr "Vorlage für Foren und Forumordner"
+msgstr "Muster für Foren und Forumordner"
 
 #: pathauto_taxonomy.inc:107
 msgid "[vocab-raw]/[catpath-raw]"
@@ -258,7 +258,7 @@ msgstr "Pfadeinstellungen für Benutzer"
 
 #: pathauto_user.inc:14
 msgid "Pattern for user account page paths"
-msgstr "Vorlage für Pfade von Benutzerkontenseiten"
+msgstr "Muster für Pfade von Benutzerkontenseiten"
 
 #: pathauto_user.inc:15
 msgid "users/[user-raw]"
@@ -278,7 +278,7 @@ msgstr "Pfadeinstellungen für Blog"
 
 #: pathauto_user.inc:43
 msgid "Pattern for blog page paths"
-msgstr "Vorlage für Blogseitenpfade"
+msgstr "Muster für Blogseitenpfade"
 
 #: pathauto_user.inc:44
 msgid "blogs/[user-raw]"
@@ -298,7 +298,7 @@ msgstr "Pfadeinstellungen für Benutzer-Tracker"
 
 #: pathauto_user.inc:68
 msgid "Pattern for user-tracker page paths"
-msgstr "Vorlage für Benutzer-Tracker-Seitenpfade"
+msgstr "Muster für Benutzer-Tracker-Seitenpfade"
 
 #: pathauto_user.inc:69
 msgid "users/[user]/track"
@@ -480,7 +480,7 @@ msgstr "Keine Aktion (keine Ersetzungen)"
 
 #: pathauto.module:222;241
 msgid "NOTE: This field contains potentially incorrect patterns."
-msgstr "HINWEIS: Dieses Feld enthält möglicherweise fehlerhafte Vorlagen."
+msgstr "HINWEIS: Dieses Feld enthält möglicherweise fehlerhafte Muster."
 
 #: pathauto.module:289
 msgid "Create feed aliases"
@@ -496,11 +496,11 @@ msgstr "Es wird der Token [%token] verwendet, welcher im genutzen Bereich der To
 
 #: pathauto.module:342
 msgid "You are using the token [%token] which has a -raw companion available [%raw_token].  For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing.  See the <a href=\"@pathauto-help\">Pathauto help</a> for more details."
-msgstr "Es wird der Token [%token] verwendet, für den es auch einen -raw Token [%raw_token] gibt. Für Autopfad-Vorlagen sollte die -raw Version von Tokens verwendet werden, wenn man sich über die Konsequenzen nicht im Klaren ist. Die <a href=\"@pathauto-help\">Autopfad-Hilfe</a> enthält hierzu weitere Details."
+msgstr "Es wird der Token [%token] verwendet, für den es auch einen -raw Token [%raw_token] gibt. Für Autopfad-Muster sollte die -raw Version von Tokens nur verwendet werden, wenn man sich über die Konsequenzen im Klaren ist. Die <a href=\"@pathauto-help\">Autopfad-Hilfe</a> enthält hierzu weitere Details."
 
 #: pathauto.module:362
 msgid "You have configured the @name to be the separator and to be removed when encountered in strings.  This can cause problems with your patterns and especially with the catpath and termpath patterns."
-msgstr "Das Trennzeichen @name wurde konfiguriert und wird bei Vorhandensein aus Zeichenketten entfernt. Dies kann mit eigenen Vorlagen und besonders mit Kategorie- und Begriffspfad-Vorlagen zu Problemen führen."
+msgstr "Das Trennzeichen @name wurde konfiguriert und wird bei Vorhandensein aus Zeichenketten entfernt. Dies kann mit eigenen Mustern und besonders mit Kategorie- und Begriffspfad-Mustern zu Problemen führen."
 
 #: pathauto.module:432
 msgid "As [cat], but including its supercategories separated by /."
