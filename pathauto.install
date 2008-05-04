@@ -67,40 +67,17 @@ function pathauto_install() {
   // Clear the cache to get these to take effect.
   cache_clear_all();
 
-  // Create a table so that we can track which items we keep 
-  // And eventually to improve join performance
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-        db_query("CREATE TABLE {url_alias_extra} (
-        pid int unsigned NOT NULL default 0,
-        dst varchar(128) NOT NULL default '',
-        entity_type varchar(20) default NULL,
-        entity_id int(10) unsigned default NULL,
-        created_by varchar(20) default NULL,
-        PRIMARY KEY (pid),
-        UNIQUE KEY dst (dst)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
-        break;
-    case 'pgsql':
-      db_query("CREATE TABLE {url_alias_extra} (
-        pid int_unsigned NOT NULL default 0,
-        dst varchar(128) NOT NULL default '',
-        entity_type varchar(20) default NULL,
-        entity_id int4 default NULL,
-        created_by varchar(20) default NULL,
-        PRIMARY KEY (pid),
-        UNIQUE (dst)
-      )");
-      break;
-  }
-  
 }
  
 /**
  * Implementation of hook_uninstall().
  */
 function pathauto_uninstall() {
+  // Delete the url_alias_extra if people have it
+  if (db_table_exists('url_alias_extra')) {
+    db_query("DROP TABLE {url_alias_extra}");
+  }
+
   // Delete all the pathauto variables and then clear the variable cache  
   db_query("DELETE FROM {variable} WHERE name LIKE 'pathauto_%'");
   cache_clear_all('variables', 'cache');
@@ -161,28 +138,8 @@ function pathauto_update_4() {
  * And eventually to improve join performance
  */
 function pathauto_update_5() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("CREATE TABLE {url_alias_extra} (
-          pid int unsigned NOT NULL default 0,
-          dst varchar(128) NOT NULL default '',
-          entity_type varchar(20) default NULL,
-          entity_id int(10) unsigned default NULL,
-          created_by varchar(20) default NULL,
-          PRIMARY KEY (pid)
-        ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
-      break;
-    case 'pgsql':
-    $ret[] = update_sql("CREATE TABLE {url_alias_extra} (
-        pid int_unsigned NOT NULL default 0,
-        dst varchar(128) NOT NULL default '',
-        entity_type varchar(20) default NULL,
-        entity_id int4 default NULL,
-        created_by varchar(20) default NULL,
-        PRIMARY KEY (pid)
-      )");
-  }
+  // Note: no longer done...see http://drupal.org/node/248031
+  $ret = array();
   return $ret;
 }
 
