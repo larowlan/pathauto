@@ -89,17 +89,17 @@ function pathauto_update_1() {
  * Copied from DRUPAL-6 sytem_update_6002 per http://drupal.org/node/66795
  */
 function pathauto_update_2() {
-  $ret = array();
+  $items = array();
   switch ($GLOBALS['db_type']) {
     case 'pgsql':
       db_change_column($ret, 'variable', 'name', 'name', 'varchar(128)', array('not null' => TRUE, 'default' => "''"));
       break;
     case 'mysql':
     case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {variable} CHANGE name name varchar(128) NOT NULL default ''");
+      $items[] = update_sql("ALTER TABLE {variable} CHANGE name name varchar(128) NOT NULL default ''");
       break;
   }
-  return $ret;
+  return $items;
 }
 
 /**
@@ -132,19 +132,20 @@ function pathauto_update_5() {
  * Remove some variables that are no longer used
  */
 function pathauto_update_6() {
+  $items = array();
   // Delete some unused variables
-  db_query("DELETE FROM {variable} WHERE name LIKE 'pathauto_%_supportsfeeds'");
+  $items[] = update_sql("DELETE FROM {variable} WHERE name LIKE 'pathauto_%_supportsfeeds'");
   cache_clear_all('variables', 'cache');
-  return array();
+  return $items;
 }
 
-/** 
- * Remove the url_alias_extra table which wasn't used 
- */ 
-function pathauto_update_7() { 
-  $ret = array(); 
-  if (db_table_exists('url_alias_extra')) { 
-    $ret[] = update_sql('DROP TABLE {url_alias_extra}'); 
-  } 
-  return $ret; 
+/**
+ * Remove the url_alias_extra table which wasn't used
+ */
+function pathauto_update_7() {
+  $items = array();
+  if (db_table_exists('url_alias_extra')) {
+    $items[] = update_sql('DROP TABLE {url_alias_extra}');
+  }
+  return $items;
 } 
