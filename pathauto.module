@@ -1,27 +1,26 @@
 <?php
 // $Id$
 
-
 /**
  * Implementation of hook_help
  */
 function pathauto_help($section) {
   switch ($section) {
     case 'admin/help#pathauto':
-      $output = t("<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
+      $output = t('<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
                   <h2>Settings</h2>
                   <p>The <strong>Maximum Alias Length</strong> and <strong>Maximum component length</strong> values
                   default to 100 and have a limit of 128 from pathauto. This length is limited by the length of the dst 
                   column of the url_alias database table. The default database schema for this column is 128. If you 
                   set a length that is equal to that of the one set in the dst column it will cause problems in situations 
                   where the system needs to append additional words to the aliased URL. For example... URLs generated
-                  for feeds will have '/feed' added to the end. You should enter a value that is the length of the dst
+                  for feeds will have "/feed" added to the end. You should enter a value that is the length of the dst
                   column minus the length of any strings that might get added to the end of the URL. The length of 
                   strings that might get added to the end of your URLs depends on which modules you have enabled and 
                   on your Pathauto settings. The recommended and default value is 100.</p>
                   <p><strong>Raw Tokens</strong> In Pathauto it is appropriate to use the -raw form of tokens. Paths are
                   sent through a filtering system which ensures that raw user content is filtered. Failure to use -raw
-                  tokens can cause problems with the Pathauto punctuation filtering system.</p>");
+                  tokens can cause problems with the Pathauto punctuation filtering system.</p>');
       return $output;
   }
 }
@@ -307,7 +306,6 @@ function pathauto_admin_settings() {
     $form[$module]['token_help']['help'] = array(
       '#value' => $doc,
     );
-
 
     // If the module supports bulk updates, offer the update action here
     if ($settings->bulkname) {
@@ -750,7 +748,6 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
       break;
   }
 }
-
 
 //==============================================================================
 // User related functions.
