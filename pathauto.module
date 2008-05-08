@@ -4,14 +4,14 @@
 
 /**
  * Implementation of hook_help
- */  
+ */
 function pathauto_help($section) {
   switch ($section) {
     case 'admin/help#pathauto':
       $output = t("<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
                   <h2>Settings</h2>
                   <p>The <strong>Maximum Alias Length</strong> and <strong>Maximum component length</strong> values
-                  default to 100 and have a limit of 128 from pathauto.  This length is limited by the length of the dst 
+                  default to 100 and have a limit of 128 from pathauto. This length is limited by the length of the dst 
                   column of the url_alias database table. The default database schema for this column is 128. If you 
                   set a length that is equal to that of the one set in the dst column it will cause problems in situations 
                   where the system needs to append additional words to the aliased URL. For example... URLs generated
@@ -19,9 +19,9 @@ function pathauto_help($section) {
                   column minus the length of any strings that might get added to the end of the URL. The length of 
                   strings that might get added to the end of your URLs depends on which modules you have enabled and 
                   on your Pathauto settings. The recommended and default value is 100.</p>
-                  <p><strong>Raw Tokens</strong> In Pathauto it is appropriate to use the -raw form of tokens.  Paths are sent through a filtering
-                  system which ensures that raw user content is filtered.  Failure to use -raw tokens can cause problems
-                  with the Pathauto punctuation filtering system.</p>");
+                  <p><strong>Raw Tokens</strong> In Pathauto it is appropriate to use the -raw form of tokens. Paths are
+                  sent through a filtering system which ensures that raw user content is filtered. Failure to use -raw
+                  tokens can cause problems with the Pathauto punctuation filtering system.</p>");
       return $output;
   }
 }
@@ -89,7 +89,7 @@ function pathauto_admin_settings() {
   // Default words to ignore
   $ignore_words = array(
     'a', 'an', 'as', 'at', 'before', 'but', 'by', 'for', 'from', 'is', 'in',
-    'into', 'like', 'of', 'off', 'on', 'onto', 'per', 'since', 'than', 'the', 
+    'into', 'like', 'of', 'off', 'on', 'onto', 'per', 'since', 'than', 'the',
     'this', 'that', 'to', 'up', 'via', 'with',
   );
 
@@ -126,7 +126,7 @@ function pathauto_admin_settings() {
     '#default_value' => variable_get('pathauto_case', 1),
     '#options' => array(t('Leave case the same as source token values.'), t('Change to lower case')),
   );
-    
+
   $form['general']['pathauto_max_length'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum alias length'),
@@ -393,7 +393,7 @@ function _pathauto_check_pattern($pattern, $type) {
         $raw_token = $token .'-raw';
         if (array_key_exists($raw_token, $all_tokens)) {
           if (!isset($warned) || !array_key_exists($token, $warned)) {
-            drupal_set_message(t('You are using the token [%token] which has a -raw companion available [%raw_token].  For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing.  See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $raw_token, '@pathauto-help' => url('admin/help/pathauto'))), 'error');
+            drupal_set_message(t('You are using the token [%token] which has a -raw companion available [%raw_token]. For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing. See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $raw_token, '@pathauto-help' => url('admin/help/pathauto'))), 'error');
             $warned[$token] = $token;
           }
           $return[] = $token;
@@ -421,7 +421,7 @@ function pathauto_admin_settings_validate($form_id, $form_values) {
     if ($details['value'] == $separator) {
       $action = $form_values['pathauto_punctuation_'. $name];
       if ($action == 0) {
-        drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings.  This can cause problems with your patterns and especially with the catpath and termpath patterns. You should probably set the action for @name to be "replace by separator"', array('@name' => $details['name'])), 'error');
+        drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings. This can cause problems with your patterns and especially with the catpath and termpath patterns. You should probably set the action for @name to be "replace by separator"', array('@name' => $details['name'])), 'error');
       }
     }
   }
@@ -442,7 +442,7 @@ function pathauto_token_values($type, $object = NULL) {
           // In the realm of nodes these are terms, in the realm of Taxonomy, cats
           $label = 'term';
 
-          // We're on a node and it's a book and it has a parent?  Get the book path alias
+          // We're on a node and it's a book and it has a parent? Get the book path alias
           if (module_exists('book')) {
             if ($object->type == 'book' && $object->parent) {
               $values['bookpathalias'] = drupal_get_path_alias('node/'. $object->parent);
@@ -451,7 +451,7 @@ function pathauto_token_values($type, $object = NULL) {
               $values['bookpathalias'] = '';
             }
           }
-          
+
         case 'taxonomy':
         default:
           if (!isset($category)) {
@@ -473,13 +473,13 @@ function pathauto_token_values($type, $object = NULL) {
             }
             $values[$label .'path'] = $catpath .'/'. check_plain($category->name);
             $values[$label .'path-raw'] = $catpath_raw .'/'. $category->name;
-            
+
             // We only do this for taxonomy because token already provides the [term] value but has problem with [cat] TODO: fix that?
             if ($type == 'taxonomy') { 
               $values[$label] = check_plain($category->name);
               $values[$label .'-raw'] = $category->name;
             }
-            
+
             $values[$label .'alias'] = drupal_get_path_alias('taxonomy/term/'. $category->tid);
             if (!strncasecmp($values[$label .'alias'], 'taxonomy', 8)) {
               $values[$label .'alias'] = $values[$label];
@@ -503,20 +503,20 @@ function pathauto_token_list($type = 'all') {
   $tokens = array();
   if (module_exists('taxonomy')) {
     if ($type == 'taxonomy' || $type == 'all') {
-      $tokens['taxonomy']['catpath'] = t("As [cat], but including its supercategories separated by /.");
-      $tokens['taxonomy']['catpath-raw'] = t("As [cat-raw], but including its supercategories separated by /. WARNING - raw user input.");
-      $tokens['taxonomy']['catalias'] = t("URL alias for the category.");
+      $tokens['taxonomy']['catpath'] = t('As [cat], but including its supercategories separated by /.');
+      $tokens['taxonomy']['catpath-raw'] = t('As [cat-raw], but including its supercategories separated by /. WARNING - raw user input.');
+      $tokens['taxonomy']['catalias'] = t('URL alias for the category.');
     }
     if ($type == 'node' || $type == 'all') {
-      $tokens['node']['termpath'] = t("As [term], but including its supercategories separated by /.");
-      $tokens['node']['termpath-raw'] = t("As [term-raw], but including its supercategories separated by /. WARNING - raw user input.");
-      $tokens['node']['termalias'] = t("URL alias for the term.");
+      $tokens['node']['termpath'] = t('As [term], but including its supercategories separated by /.');
+      $tokens['node']['termpath-raw'] = t('As [term-raw], but including its supercategories separated by /. WARNING - raw user input.');
+      $tokens['node']['termalias'] = t('URL alias for the term.');
     }
   }
   if (module_exists('book')) {
     if ($type == 'node' || $type == 'all') {
-      $tokens['node']['bookpathalias'] = t("URL alias for the parent book.");
-    }    
+      $tokens['node']['bookpathalias'] = t('URL alias for the parent book.');
+    }
   }
   return $tokens;
 }
@@ -577,7 +577,7 @@ function pathauto_admin_delete() {
 }
 
 /**
- *  Submit handler for the bulk delete form
+ * Submit handler for the bulk delete form
  */
 function pathauto_admin_delete_submit($form_id, $form_values) {
   foreach ($form_values as $key => $value) {
