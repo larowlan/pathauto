@@ -285,10 +285,10 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
   $separator = variable_get('pathauto_separator', '-');
   if (_pathauto_alias_exists($alias, $src)) {
     $original_alias = $alias;
-    for ($i = 0; _pathauto_alias_exists(drupal_substr($alias, 0, $maxlength - strlen($i)) . $separator . $i, $src); $i++) {
+    for ($i = 0; _pathauto_alias_exists(drupal_substr($alias, 0, $maxlength - drupal_strlen($i)) . $separator . $i, $src); $i++) {
     }
     // Make room for the sequence number
-    $alias = drupal_substr($alias, 0, $maxlength - strlen($i));
+    $alias = drupal_substr($alias, 0, $maxlength - drupal_strlen($i));
     $alias = $alias . $separator . $i;
     // If verbose is on, alert the user why this happened
     if ($verbose) {
@@ -303,7 +303,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
 
   // Also create a related feed alias if requested, and if supported
   // by the module
-  if (strlen(variable_get('pathauto_'. $module .'_applytofeeds', ''))) {
+  if (drupal_strlen(variable_get('pathauto_'. $module .'_applytofeeds', ''))) {
     $feedappend = variable_get('pathauto_'. $module .'_applytofeeds', '');
 
     // For forums and taxonomies, the src doesn't always form the base of the rss feed (ie. image galleries)
@@ -376,7 +376,7 @@ function _pathauto_set_alias($src, $dst, $entity_type, $entity_id, $pid = NULL, 
     path_set_alias($src, $dst, $pid);
 
     if (variable_get('pathauto_update_action', 2) == 3 && function_exists('path_redirect_save')) {
-      if (isset($old_alias) && strlen($old_alias)) {
+      if (isset($old_alias) && drupal_strlen($old_alias)) {
         $save['path'] = $old_alias;
         $save['redirect'] = $src;
         $save['type'] = 301; //moved permanently
@@ -430,7 +430,7 @@ function pathauto_get_placeholders($type, $object) {
 function pathauto_clean_token_values($full) {
   foreach ($full->values as $key => $value) {
     // If it's a "path" or "url friendly" token don't remove the "/" character
-    if (substr($full->tokens[$key], -4, 4) === 'path' || substr($full->tokens[$key], -8, 8) === 'path-raw' || substr($full->tokens[$key], -5, 5) === 'alias') {
+    if (drupal_substr($full->tokens[$key], -4, 4) === 'path' || drupal_substr($full->tokens[$key], -8, 8) === 'path-raw' || drupal_substr($full->tokens[$key], -5, 5) === 'alias') {
       $full->values[$key] = pathauto_cleanstring($value, FALSE);
     }
     else {
