@@ -45,8 +45,7 @@ function taxonomy_pathauto($op) {
 
 /**
  * Generate aliases for all categories without aliases
- * 
- */ 
+ */
 function taxonomy_pathauto_bulkupdate() {
   // From all node types, only attempt to update those with patterns
   $pattern_vids = array();
@@ -91,16 +90,14 @@ function taxonomy_pathauto_bulkupdate() {
 }
 
 /**
- * 
  * Function to create aliases for taxonomy objects
- * 
+ *
  * @param object $category a taxonomy object
- * 
  */
 function _taxonomy_pathauto_alias($category, $op) {
   $count = 0;
 
-  $placeholders = pathauto_get_placeholders('taxonomy', $category);    
+  $placeholders = pathauto_get_placeholders('taxonomy', $category);
 
   $forum_vid = variable_get('forum_nav_vocabulary', '');
   // If we're in a forum vocabulary, also create a forum container, forum, or forum topic alias.
@@ -118,7 +115,6 @@ function _taxonomy_pathauto_alias($category, $op) {
   }
   return $count;
 }
-
 
 /*
  * Implementation of hook_pathauto() for forum module
@@ -148,7 +144,6 @@ function forum_pathauto($op) {
       break;
   }
 }
-
 
 /**
  * Generate aliases for all forums and forum containers without aliases

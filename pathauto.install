@@ -120,7 +120,7 @@ function pathauto_update_4() {
 }
 
 /**
- * Create a table so that we can track which items we keep 
+ * Create a table so that we can track which items we keep
  * And eventually to improve join performance
  */
 function pathauto_update_5() {
@@ -148,4 +148,4 @@ function pathauto_update_7() {
     $ret[] = update_sql('DROP TABLE {url_alias_extra}');
   }
   return $ret;
-} 
+}

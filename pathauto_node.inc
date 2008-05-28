@@ -37,7 +37,7 @@ function node_pathauto($op) {
 }
 
 /**
- * Generate aliases for all nodes without aliases. 
+ * Generate aliases for all nodes without aliases.
  */
 function node_pathauto_bulkupdate() {
 

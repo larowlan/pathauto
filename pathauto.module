@@ -10,13 +10,13 @@ function pathauto_help($section) {
       $output = t('<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>
                   <h2>Settings</h2>
                   <p>The <strong>Maximum Alias Length</strong> and <strong>Maximum component length</strong> values
-                  default to 100 and have a limit of 128 from pathauto. This length is limited by the length of the dst 
-                  column of the url_alias database table. The default database schema for this column is 128. If you 
-                  set a length that is equal to that of the one set in the dst column it will cause problems in situations 
+                  default to 100 and have a limit of 128 from pathauto. This length is limited by the length of the dst
+                  column of the url_alias database table. The default database schema for this column is 128. If you
+                  set a length that is equal to that of the one set in the dst column it will cause problems in situations
                   where the system needs to append additional words to the aliased URL. For example... URLs generated
                   for feeds will have "/feed" added to the end. You should enter a value that is the length of the dst
-                  column minus the length of any strings that might get added to the end of the URL. The length of 
-                  strings that might get added to the end of your URLs depends on which modules you have enabled and 
+                  column minus the length of any strings that might get added to the end of the URL. The length of
+                  strings that might get added to the end of your URLs depends on which modules you have enabled and
                   on your Pathauto settings. The recommended and default value is 100.</p>
                   <p><strong>Raw Tokens</strong> In Pathauto it is appropriate to use the -raw form of tokens. Paths are
                   sent through a filtering system which ensures that raw user content is filtered. Failure to use -raw
@@ -48,18 +48,17 @@ function pathauto_menu($may_cache) {
       'type' => MENU_NORMAL_ITEM,
     );
     $items[] = array(
-      'path' => 'admin/build/path/delete_bulk', 
+      'path' => 'admin/build/path/delete_bulk',
       'title' => t('Delete aliases'),
-      'callback' => 'drupal_get_form', 
+      'callback' => 'drupal_get_form',
       'callback arguments' => array('pathauto_admin_delete'),
-      'access' => user_access('administer url aliases'), 
+      'access' => user_access('administer url aliases'),
       'type' => MENU_LOCAL_TASK,
     );
   }
 
   return $items;
 }
-
 
 /**
  * Include all pathauto include files.
@@ -71,7 +70,6 @@ function _pathauto_include() {
   require_once("$pathauto_path/pathauto_taxonomy.inc");
   require_once("$pathauto_path/pathauto_user.inc");
 }
-
 
 /**
  * Callback for admin settings page.
@@ -472,7 +470,7 @@ function pathauto_token_values($type, $object = NULL) {
             $values[$label .'path-raw'] = $catpath_raw .'/'. $category->name;
 
             // We only do this for taxonomy because token already provides the [term] value but has problem with [cat] TODO: fix that?
-            if ($type == 'taxonomy') { 
+            if ($type == 'taxonomy') {
               $values[$label] = check_plain($category->name);
               $values[$label .'-raw'] = $category->name;
             }
@@ -650,7 +648,7 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
 
 /**
  * Implementation of hook_form_alter().
- * 
+ *
  * This allows alias creators to override Pathauto and specify their
  * own aliases (Pathauto will be invisible to other users). Inserted
  * into the path module's fieldset in the node form.
