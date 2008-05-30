@@ -1,8 +1,15 @@
 <?php
 // $Id$
 
-/*
- * Implementation of hook_pathauto()
+/**
+ * @file
+ * Hook implementations for node module integration.
+ *
+ * @ingroup pathauto
+ */
+
+/**
+ * Implementation of hook_pathauto().
  */
 function node_pathauto($op) {
   switch ($op) {

@@ -2,7 +2,10 @@
 // $Id$
 
 /**
- * @file Provides install, updated, and uninstall functions for pathauto.
+ * @file
+ * Install, update, and uninstall functions for Pathauto.
+ *
+ * @ingroup pathauto
  */
 
 /**
@@ -75,8 +78,7 @@ function pathauto_uninstall() {
 }
 
 /**
- * Set the weight a little heavier to allow taxonomy to do its work
- *
+ * Set the weight a little heavier to allow taxonomy to do its work.
  */
 function pathauto_update_1() {
   $ret = array();
@@ -86,7 +88,8 @@ function pathauto_update_1() {
 
 /**
  * Increase the maximum length of variable names from 48 to 128.
- * Copied from DRUPAL-6 sytem_update_6002 per http://drupal.org/node/66795
+ *
+ * Copied from DRUPAL-6 system_update_6002 per http://drupal.org/node/66795
  */
 function pathauto_update_2() {
   $ret = array();
@@ -103,7 +106,7 @@ function pathauto_update_2() {
 }
 
 /**
- * Delete the pathauto_node_supportsfeeds
+ * Delete the pathauto_node_supportsfeeds.
  */
 function pathauto_update_3() {
   // Do nothing, this update was a mistake
@@ -111,7 +114,7 @@ function pathauto_update_3() {
 }
 
 /**
- * New style naming for the punctuation chars
+ * New style naming for the punctuation chars.
  */
 function pathauto_update_4() {
   variable_set('pathauto_punctuation_quotes', variable_get('pathauto_quotes', 0));
@@ -129,7 +132,7 @@ function pathauto_update_5() {
 }
 
 /**
- * Remove some variables that are no longer used
+ * Remove some variables that are no longer used.
  */
 function pathauto_update_6() {
   $ret = array();
@@ -140,7 +143,7 @@ function pathauto_update_6() {
 }
 
 /**
- * Remove the url_alias_extra table which wasn't used
+ * Remove the url_alias_extra table which wasn't used.
  */
 function pathauto_update_7() {
   $ret = array();
