@@ -67,7 +67,7 @@ function _pathauto_alias_exists($alias, $src) {
   if (db_table_exists('path_redirect')) {
     $redirect_rid = db_result(db_query_range("SELECT rid FROM {path_redirect} WHERE path = '%s'", $alias, 0, 1));
   }
-  if ($alias_pid || $redirect_rid) {
+  if ($alias_pid || (isset($redirect_rid) && $redirect_rid)) {
     return TRUE;
   }
   else {
@@ -186,7 +186,7 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
   $output = preg_replace("/\s+/", $separator, $output);
 
   // In preparation for pattern matching,
-  // escape the separator if and only if it is not alphanumeric)
+  // escape the separator if and only if it is not alphanumeric.
   if (isset($separator)) {
     if (preg_match('/^[^'. PREG_CLASS_ALNUM .']+$/uD', $separator)) {
       $seppattern = $separator;
@@ -240,15 +240,14 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
 
   // Retrieve and apply the pattern for this content type
   $pattern = '';
-  if ($type) {
-    $pattern = variable_get('pathauto_'. $module .'_'. $type .'_pattern', '');
+  if (!empty($type)) {
+    $pattern = trim(variable_get('pathauto_'. $module .'_'. $type .'_pattern', ''));
   }
-  if (!trim($pattern)) {
-    $pattern = variable_get('pathauto_'. $module .'_pattern', '');
+  if (!$pattern) {
+    $pattern = trim(variable_get('pathauto_'. $module .'_pattern', ''));
   }
-
   // No pattern? Do nothing (otherwise we may blow away existing aliases...)
-  if (!trim($pattern)) {
+  if (!$pattern) {
     return '';
   }
 
@@ -363,7 +362,7 @@ function _pathauto_path_is_callback($path) {
  * @param $pid
  *   If the item is currently aliased, the pid for that item.
  * @param $verbose
- *   If the admin has enabled verbose, should be TRUE.  Else FALSE or NULL.
+ *   If the admin has enabled verbose, should be TRUE. Else FALSE or NULL.
  * @param $old_alias
  *   If the item is currently aliased, the existing alias for that item.
  */
@@ -376,7 +375,7 @@ function _pathauto_set_alias($src, $dst, $entity_type, $entity_id, $pid = NULL, 
     return;
   }
   // Alert users if they are trying to create an alias that is the same as the internal path
-  else if ($src == $dst) {
+  if ($src == $dst) {
     if ($verbose and user_access('notify of path changes')) {
       drupal_set_message(t('Ignoring alias %dst because it is the same as the internal path.', array('%dst' => $dst)));
     }
@@ -466,7 +465,7 @@ function pathauto_clean_token_values($full) {
 function pathauto_punctuation_chars() {
   $punctuation = array();
 
-  // Handle " ' , . - _ : ; | { { } ] + = * & % $ � # @ ! ~ ( ) ? < > \
+  // Handle " ' , . - _ : ; | { { } ] + = * & % $ � # @ ! ~ ( ) ? < > \ � �
   $punctuation['double_quotes']      = array('value' => '"', 'name' => t('Double quotes "'));
   $punctuation['quotes']             = array('value' => "'", 'name' => t("Single quotes (apostrophe) '"));
   $punctuation['backtick']           = array('value' => '`', 'name' => t('Back tick `'));
