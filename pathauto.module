@@ -271,7 +271,7 @@ function pathauto_form_alter($formid, &$form) {
         '#title' => t('Automatic alias'),
         '#default_value' => TRUE,
         '#description' => $output,
-        '#weight' => 0
+        '#weight' => -1,
       );
     }
   }
