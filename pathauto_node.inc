@@ -46,7 +46,6 @@ function node_pathauto($op) {
  * Generate aliases for all nodes without aliases.
  */
 function node_pathauto_bulkupdate() {
-
   // From all node types, only attempt to update those with patterns
   $pattern_types = array();
   $type_where = '';

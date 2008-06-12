@@ -201,7 +201,6 @@ function pathauto_path_alias_types() {
   if (module_exists('forum')) {
     $objects['forum/%'] = t('forums');
   }
-
   return $objects;
 }
 
@@ -218,9 +217,9 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
       case 'insert':
       case 'update':
         // Get the specific pattern or the default
-        $pattern = variable_get('pathauto_node_'. $node->type .'_pattern', FALSE);
+        $pattern = trim(variable_get('pathauto_node_'. $node->type .'_pattern', FALSE));
         if (!$pattern) {
-          $pattern = variable_get('pathauto_node_pattern', FALSE);
+          $pattern = trim(variable_get('pathauto_node_pattern', FALSE));
         }
         // Only do work if there's a pattern
         if ($pattern) {
@@ -253,9 +252,9 @@ function pathauto_form_alter($formid, &$form) {
   // Only do this for node forms
   if (isset($form['#id']) && ($form['#id'] == 'node-form') && arg(0) == 'node') {
     // See if there is a pathauto pattern or default applicable
-    $pattern = variable_get('pathauto_node_'. $form['type']['#value'] .'_pattern', FALSE);
+    $pattern = trim(variable_get('pathauto_node_'. $form['type']['#value'] .'_pattern', FALSE));
     if (!$pattern) {
-      $pattern = variable_get('pathauto_node_pattern', FALSE);
+      $pattern = trim(variable_get('pathauto_node_pattern', FALSE));
     }
     // If there is a pattern AND the user is allowed to create aliases AND the path textbox is present on this form
     if ($pattern && user_access('create url aliases') && isset($form['path']['path'])) {
@@ -395,7 +394,6 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
       path_set_alias('blog/'. $user->uid .'/feed');
       path_set_alias('user/'. $user->uid .'/track');
       path_set_alias('user/'. $user->uid .'/track/feed');
-
       break;
     default:
       break;
@@ -592,12 +590,14 @@ function pathauto_admin_settings() {
         $description = $error;
       }
     }
-    $form[$module][$variable] = array('#type' => 'textfield',
+    $form[$module][$variable] = array(
+      '#type' => 'textfield',
       '#title' => $patterndescr,
       '#default_value' => variable_get($variable, $patterndefault),
       '#description' => $description,
       '#size' => 65,
-      '#maxlength' => 1280);
+      '#maxlength' => 1280,
+    );
 
     // If the module supports a set of specialized patterns, set
     // them up here
