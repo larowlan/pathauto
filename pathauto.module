@@ -257,13 +257,14 @@ function pathauto_form_alter($formid, &$form) {
       $pattern = trim(variable_get('pathauto_node_pattern', FALSE));
     }
     // If there is a pattern AND the user is allowed to create aliases AND the path textbox is present on this form
-    if ($pattern && user_access('create url aliases') && isset($form['path']['path'])) {
+    if (!empty($pattern) && user_access('create url aliases') && isset($form['path']['path'])) {
       $output = t('An alias will be generated for you. If you wish to create your own alias below, untick this option.');
       if (user_access('administer pathauto')) {
         $output .= t(' To control the format of the generated aliases, see the <a href="@pathauto">Pathauto settings</a>.', array('@pathauto' => url('admin/settings/pathauto')));
       }
 
       drupal_add_js(drupal_get_path('module', 'pathauto') .'/pathauto.js');
+      $form['path']['#collapsed'] = FALSE;
 
       $form['path']['pathauto_perform_alias'] = array(
         '#type' => 'checkbox',
@@ -773,7 +774,7 @@ function pathauto_admin_settings_validate($form_id, $form_values) {
 }
 
 /**
- * Menu callback: select certain alias types to delete.
+ * Menu callback; select certain alias types to delete.
  */
 function pathauto_admin_delete() {
   /* TODO:
