@@ -15,7 +15,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-06-23 23:49+0300\n"
+"POT-Creation-Date: 2008-06-24 01:43+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -384,6 +384,10 @@ msgstr ""
 msgid "Pathauto"
 msgstr ""
 
+#: pathauto.inc:437
+msgid "It appears that you have installed Pathauto, which depends on token, but token is either not installed or not installed properly."
+msgstr ""
+
 #: pathauto_node.inc:20
 msgid "Node path settings"
 msgstr ""
@@ -638,6 +642,14 @@ msgstr ""
 
 #: pathauto.module:49
 msgid "notify of path changes"
+msgstr ""
+
+#: pathauto.module:57
+msgid "Automated alias settings"
+msgstr ""
+
+#: pathauto.module:68
+msgid "Delete aliases"
 msgstr ""
 
 #: pathauto.module:0
