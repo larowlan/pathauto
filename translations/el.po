@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: el\n"
-"POT-Creation-Date: 2008-06-23 23:49+0300\n"
-"PO-Revision-Date: 2008-06-23 23:54+0300\n"
+"POT-Creation-Date: 2008-06-24 01:43+0200\n"
+"PO-Revision-Date: 2008-06-24 15:50+0300\n"
 "Last-Translator: Vasileios Lourdas <vasilis@lourdas.name>\n"
 "Language-Team: Greek <el@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -374,6 +374,10 @@ msgstr "Ανάποδη κάθετος \\"
 msgid "Pathauto"
 msgstr "Pathauto"
 
+#: pathauto.inc:437
+msgid "It appears that you have installed Pathauto, which depends on token, but token is either not installed or not installed properly."
+msgstr "Φαίνεται να έχετε εγκαταστήσει το Pathauto, που εξαρτάται από το token, αλλά το τελευταίο είτε δεν έχει εγκατασταθεί ή δεν έχει εγκατασταθεί σωστά."
+
 #: pathauto_node.inc:20
 msgid "Node path settings"
 msgstr "Ρυθμίσεις διαδρομής κόμβου"
@@ -656,6 +660,14 @@ msgstr "διαχείριση του pathauto"
 #: pathauto.module:49
 msgid "notify of path changes"
 msgstr "ενημέρωση για τις αλλαγές στις διαδρομές"
+
+#: pathauto.module:57
+msgid "Automated alias settings"
+msgstr "Ρυθμίσεις αυτοματοποιημένων ψευδώνυμων"
+
+#: pathauto.module:68
+msgid "Delete aliases"
+msgstr "Διαγραφή των ψευδώνυμων"
 
 #: pathauto.module:0
 msgid "pathauto"
