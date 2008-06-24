@@ -496,7 +496,7 @@ msgid "Maximum number of objects to alias in a bulk update"
 msgstr "Toplu güncellemede isim verilecek en fazla nesne sayısı"
 
 #: pathauto.module:487
-msgid "Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server. If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
+msgid "Maximum number of objects of a given type which should be aliased during a bulk update. The default is 50 and the recommended number depends on the speed of your server. If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
 msgstr "Toplu güncelleme sırasında verilen bir nesne türü için en fazla kaç tane nesnenin isimlendirileceğini belirler. Öntanımlı değer 50'dir ve önerilen rakam sunucunuzun hızına bağlıdır. Eğer toplu güncelleme \"zaman aşımı\"na uğrar veya \"beyaz ekran\" ile karşılaşırsanız, sayıyı azaltın."
 
 #: pathauto.module:491
