@@ -499,7 +499,7 @@ msgid "Maximum number of objects to alias in a bulk update"
 msgstr "Μέγιστος αριθμός αντικειμένων για τα οποία θα δημιουργηθούν ψευδώνυμα σε μια μαζική ενημέρωση"
 
 #: pathauto.module:487
-msgid "Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server. If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
+msgid "Maximum number of objects of a given type which should be aliased during a bulk update. The default is 50 and the recommended number depends on the speed of your server. If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
 msgstr "Μέγιστος αριθμός αντικειμένων ενός ορισμένου τύπου για τα οποία θα δημιουργηθούν ψευδώνυμα κατά τη διάρκεια μιας μαζικής ενημέρωσης. Ο εξ' ορισμού είναι 50 και ο συνιστώμενος αριθμός εξαρτάται από την ταχύτητα του διακομιστή σας. Αν οι μαζικές ενημερώσεις διακόπτονται ή οδηγούν σε \"λευκή οθόνη\", τότε ελαττώστε τον αριθμό."
 
 #: pathauto.module:491

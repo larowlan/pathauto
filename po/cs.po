@@ -433,7 +433,7 @@ msgid "Maximum number of objects to alias in a bulk update"
 msgstr "Maximum objektů, kterým budou vytvořeny aliasy během dávkové úpravy"
 
 #: pathauto.module:132
-msgid "Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server.  If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
+msgid "Maximum number of objects of a given type which should be aliased during a bulk update. The default is 50 and the recommended number depends on the speed of your server.  If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
 msgstr "Maximum objektů určitého typu, kterým budou vytvořeny aliasy běhěm dávkové úpravy. Výchozí hodnota je 50. Počet také závisí na výkonu serveru, kde drupal běží. Pokud se vyskytne chyba, nebo vyskočí \"bílá obrazovka\", zmenšete počet objektů."
 
 #: pathauto.module:135
