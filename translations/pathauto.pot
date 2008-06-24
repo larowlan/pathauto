@@ -3,7 +3,7 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  pathauto.admin.inc,v 1.10 2008/06/10 21:41:53 freso
+#  pathauto.admin.inc,v 1.10.2.1 2008/06/24 16:07:51 greggles
 #  pathauto.inc,v 1.45 2008/06/18 20:02:40 greggles
 #  pathauto.info,v 1.4 2007/10/28 21:06:13 greggles
 #  pathauto_node.inc,v 1.47 2008/06/10 21:41:53 freso
@@ -15,7 +15,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-06-24 01:43+0200\n"
+"POT-Creation-Date: 2008-06-24 18:52+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -81,7 +81,7 @@ msgid "Maximum number of objects to alias in a bulk update"
 msgstr ""
 
 #: pathauto.admin.inc:91
-msgid "Maximum number of objects of a given type which should be aliased during a a bulk update. The default is 50 and the recommended number depends on the speed of your server. If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
+msgid "Maximum number of objects of a given type which should be aliased during a bulk update. The default is 50 and the recommended number depends on the speed of your server. If bulk updates \"time out\" or result in a \"white screen\" then reduce the number."
 msgstr ""
 
 #: pathauto.admin.inc:95
