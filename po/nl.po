@@ -1,110 +1,584 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Vertaling pathauto in het Nederlands\n"
-"POT-Creation-Date: \n"
+"POT-Creation-Date: 2008-06-24 18:58+0200\n"
 "PO-Revision-Date: 2007-08-24 02:28+0100\n"
 "Last-Translator: Roy Scholten <roy@yoroy.com>\n"
 "Language-Team: Joost Geraets\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Country: NETHERLANDS\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Language: Dutch\n"
 
-#: pathauto_node.inc:23;132
-#: pathauto_user.inc:16;39;63;88;130;153;176
-msgid "[user]"
-msgstr "[user]"
+#: pathauto.inc:308
+msgid ""
+"The automatically generated alias %original_alias conflicted with an "
+"existing alias. Alias changed to %alias."
+msgstr ""
 
-#: pathauto_node.inc:39;219;236
-#: pathauto_taxonomy.inc:17;62;109
-msgid "[vocab]"
-msgstr "[vocab]"
+#: pathauto.inc:374
+#, fuzzy
+msgid "Ignoring alias %dst due to existing path conflict."
+msgstr " vanwege een conflict met een bestaand pad"
 
-#: pathauto_node.inc:40
-#: pathauto_taxonomy.inc:17
-msgid "The vocabulary that the page's first category belongs to."
-msgstr "De woordenlijst waar de eerste categorie van de pagina bij hoort."
+#: pathauto.inc:381
+msgid "Ignoring alias %dst because it is the same as the internal path."
+msgstr ""
 
-#: pathauto_node.inc:41;215;234
-#: pathauto_taxonomy.inc:18;64;110
-msgid "[cat]"
-msgstr "[cat]"
+#: pathauto.inc:401
+#, fuzzy
+msgid ""
+"Created new alias %dst for %src, replacing %old_alias. %old_alias now "
+"redirects to %dst"
+msgstr "Een nieuwe alias %dst gemaakt voor %src, vervangt %oldalias"
 
-#: pathauto_node.inc:43;231;235
-#: pathauto_taxonomy.inc:19;72
-msgid "[catpath]"
-msgstr "[catpath]"
+#: pathauto.inc:404
+#, fuzzy
+msgid "Created new alias %dst for %src, replacing %old_alias"
+msgstr "Een nieuwe alias %dst gemaakt voor %src, vervangt %oldalias"
 
-#: pathauto_node.inc:44
-#: pathauto_taxonomy.inc:19
-msgid "As [cat], but including its supercategories."
-msgstr "Als [cat], maar inclusief de supercategorieën"
+#: pathauto.inc:407
+msgid "Created new alias %dst for %src"
+msgstr "Nieuwe alias %dst gemaakt voor %src"
 
-#: pathauto_menu.inc:18;53;56
-msgid "[menu]"
-msgstr "[menu]"
+#: pathauto.inc:430
+msgid ""
+"It appears that you have installed Pathauto, which depends on token, but "
+"token is either not installed or not installed properly."
+msgstr ""
 
-#: pathauto_menu.inc:19
-msgid "The name of the menu the node belongs to."
-msgstr "De naam van het menu waar de node bij hoort."
+#: pathauto.inc:470
+msgid "Double quotes \""
+msgstr ""
 
-#: pathauto_menu.inc:20;60;63
-msgid "[menupath]"
-msgstr "[menupath]"
+#: pathauto.inc:471
+msgid "Single quotes (apostrophe) '"
+msgstr ""
 
-#: pathauto_menu.inc:21
-msgid "The menu path (as reflected in the breadcrumb), not including Home or [menu]."
-msgstr "Het menupad (zoals dat in het kruimelpad staat) zonder Start of [menu]."
+#: pathauto.inc:472
+msgid "Back tick `"
+msgstr ""
 
-#: contrib/pathauto_node_i18n.inc:12;16
-msgid "[lang]"
-msgstr "[lang]"
+#: pathauto.inc:473
+msgid "Comma ,"
+msgstr ""
 
-#: contrib/pathauto_node_i18n.inc:12
-msgid "Language code of the document"
-msgstr "Taalcode van het document"
+#: pathauto.inc:474
+msgid "Period ."
+msgstr ""
+
+#: pathauto.inc:475
+msgid "Hyphen -"
+msgstr ""
+
+#: pathauto.inc:476
+msgid "Underscore _"
+msgstr ""
+
+#: pathauto.inc:477
+msgid "Colon :"
+msgstr ""
+
+#: pathauto.inc:478
+msgid "Semicolon ;"
+msgstr ""
+
+#: pathauto.inc:479
+msgid "Pipe |"
+msgstr ""
+
+#: pathauto.inc:480
+msgid "Left curly bracket {"
+msgstr ""
+
+#: pathauto.inc:481
+msgid "Left square bracket ["
+msgstr ""
+
+#: pathauto.inc:482
+msgid "Right curly bracket }"
+msgstr ""
+
+#: pathauto.inc:483
+msgid "Right square bracket ]"
+msgstr ""
+
+#: pathauto.inc:484
+msgid "Plus +"
+msgstr ""
+
+#: pathauto.inc:485
+msgid "Equal ="
+msgstr ""
+
+#: pathauto.inc:486
+msgid "Asterisk *"
+msgstr ""
+
+#: pathauto.inc:487
+msgid "Ampersand &"
+msgstr ""
+
+#: pathauto.inc:488
+msgid "Percent %"
+msgstr ""
+
+#: pathauto.inc:489
+msgid "Caret ^"
+msgstr ""
+
+#: pathauto.inc:490
+msgid "Dollar $"
+msgstr ""
+
+#: pathauto.inc:491
+msgid "Hash #"
+msgstr ""
+
+#: pathauto.inc:492
+msgid "At @"
+msgstr ""
+
+#: pathauto.inc:493
+msgid "Exclamation !"
+msgstr ""
+
+#: pathauto.inc:494
+msgid "Tilde ~"
+msgstr ""
+
+#: pathauto.inc:495
+msgid "Left parenthesis ("
+msgstr ""
+
+#: pathauto.inc:496
+msgid "right parenthesis )"
+msgstr ""
+
+#: pathauto.inc:497
+#, fuzzy
+msgid "Question mark ?"
+msgstr "Aanhalingstekens"
+
+#: pathauto.inc:498
+msgid "Less than <"
+msgstr ""
+
+#: pathauto.inc:499
+msgid "Greater than >"
+msgstr ""
+
+#: pathauto.inc:500
+msgid "Back slash \\"
+msgstr ""
+
+#: pathauto.inc:430 pathauto.module:60 pathauto.info:0
+msgid "Pathauto"
+msgstr "Pathauto"
+
+#: pathauto_node.inc:20
+msgid "Node path settings"
+msgstr "Node-pad instellingen"
+
+# pad patroon
+# -> padpatroon
+# (hebben we nog iets beters voor 'patroon'?)
+# J: nog niet...
+# Yo: lastige inderdaad: regels, sjabloon… nee, niet beter.
+#: pathauto_node.inc:21
+msgid ""
+"Default path pattern (applies to all node types with blank patterns below)"
+msgstr ""
+"Standaard patroon voor paden (van toepassing op alle node types met blanco "
+"patronen hieronder)"
+
+#: pathauto_node.inc:22
+msgid "content/[title-raw]"
+msgstr ""
+
+#: pathauto_node.inc:23
+#, fuzzy
+msgid "Bulk generate aliases for nodes that are not aliased"
+msgstr "Genereer aliassen voor alle bestaande nodes die nog geen alias hebben."
+
+#: pathauto_node.inc:24
+msgid ""
+"Generate aliases for all existing nodes which do not already have aliases."
+msgstr "Genereer aliassen voor alle bestaande nodes die nog geen alias hebben."
+
+#: pathauto_node.inc:36
+#, fuzzy
+msgid "Pattern for all @node_type paths"
+msgstr "Patroon voor alle %nodetypename paden"
+
+#: pathauto_node.inc:93
+#, fuzzy
+msgid "Bulk generation of nodes completed, one alias generated."
+msgid_plural "Bulk generation of nodes completed, @count aliases generated."
+msgstr[0] "Bulk bijwerken van nodes gereed. Eén alias gegenereerd."
+msgstr[1] "Bulk bijwerken van nodes gereed. @count aliassen gegenereerd."
+
+#: pathauto_taxonomy.inc:20
+msgid "Category path settings"
+msgstr "Padinstellingen van de categorie "
+
+#: pathauto_taxonomy.inc:21
+msgid ""
+"Default path pattern (applies to all vocabularies with blank patterns below)"
+msgstr ""
+"Standaard patroon voor een pad (van toepassing op alle woordenlijsten met "
+"blanco patronen hieronder)"
+
+#: pathauto_taxonomy.inc:22
+#, fuzzy
+msgid "category/[vocab-raw]/[catpath-raw]"
+msgstr "[vocab]/[catpath]"
+
+#: pathauto_taxonomy.inc:32
+#, fuzzy
+msgid "Bulk generate aliases for categories that are not aliased"
+msgstr ""
+"Genereer aliassen voor alle bestaande categorieën die nog geen aliassen "
+"hebben."
+
+#: pathauto_taxonomy.inc:33
+msgid ""
+"Generate aliases for all existing categories which do not already have "
+"aliases."
+msgstr ""
+"Genereer aliassen voor alle bestaande categorieën die nog geen aliassen "
+"hebben."
+
+#: pathauto_taxonomy.inc:42
+msgid "Pattern for all %vocab-name paths"
+msgstr "Patroon voor alle %vocab-name paden"
+
+#: pathauto_taxonomy.inc:134
+#, fuzzy
+msgid "Forum path settings"
+msgstr "Node-pad instellingen"
+
+#: pathauto_taxonomy.inc:135
+#, fuzzy
+msgid "Pattern for forums and forum containers"
+msgstr "Patroon van de paden die verwijzen naar de gebruikerspagina"
+
+#: pathauto_taxonomy.inc:136
+#, fuzzy
+msgid "[vocab-raw]/[catpath-raw]"
+msgstr "[vocab]/[catpath]"
+
+#: pathauto_taxonomy.inc:146
+#, fuzzy
+msgid "Bulk generate forum paths"
+msgstr "Bulk bijwerken van node-paden"
+
+#: pathauto_taxonomy.inc:147
+#, fuzzy
+msgid ""
+"Generate aliases for all existing forums and forum containers which do not "
+"already have aliases."
+msgstr ""
+"Genereer aliassen voor alle bestaande gebruikersaccount pagina's die nog "
+"geen aliassen hebben."
+
+#: pathauto_taxonomy.inc:92
+#, fuzzy
+msgid "Bulk generation of terms completed, one alias generated."
+msgid_plural "Bulk generation of terms completed, @count aliases generated."
+msgstr[0] "Bulk bijwerken van termen gereed. Eén alias gegenereerd,"
+msgstr[1] "Bulk bijwerken van termen gereed. @count aliassen gegenereerd."
+
+#: pathauto_taxonomy.inc:168
+#, fuzzy
+msgid ""
+"Bulk update of forums and forum containers completed, one alias generated."
+msgid_plural ""
+"Bulk update of forums and forum containers completed, @count aliases "
+"generated."
+msgstr[0] "Bulk bijwerken van gebruikers gereed. Eén alias gegenereerd."
+msgstr[1] "Bulk bijwerken van gebruikers gereed. @count aliassen gegenereerd."
+
+#: pathauto_user.inc:20
+msgid "User path settings"
+msgstr "Padinstellingen van de gebruiker"
+
+#: pathauto_user.inc:21
+msgid "Pattern for user account page paths"
+msgstr "Patroon van de paden die verwijzen naar de gebruikerspagina"
+
+#: pathauto_user.inc:22
+#, fuzzy
+msgid "users/[user-raw]"
+msgstr "gebruiker/[user]"
+
+#: pathauto_user.inc:32
+#, fuzzy
+msgid "Bulk generate aliases for users that are not aliased"
+msgstr "Genereer ook aliassen voor RSS-feeds."
+
+#: pathauto_user.inc:33
+msgid ""
+"Generate aliases for all existing user account pages which do not already "
+"have aliases."
+msgstr ""
+"Genereer aliassen voor alle bestaande gebruikersaccount pagina's die nog "
+"geen aliassen hebben."
+
+#: pathauto_user.inc:49
+msgid "Blog path settings"
+msgstr "Blogpad instellingen"
+
+#: pathauto_user.inc:50
+msgid "Pattern for blog page paths"
+msgstr "Patroon van het pad dat verwijst naar de blogpagina"
+
+#: pathauto_user.inc:51
+#, fuzzy
+msgid "blogs/[user-raw]"
+msgstr "blog/[user]"
+
+#: pathauto_user.inc:57
+#, fuzzy
+msgid "Bulk generate aliases for blogs that are not aliased"
+msgstr "Genereer ook aliassen voor RSS-feeds."
+
+#: pathauto_user.inc:58
+msgid ""
+"Generate aliases for all existing blog pages which do not already have "
+"aliases."
+msgstr ""
+"Genereer aliassen voor alle bestaande blogpagina's die nog geen aliassen "
+"hebben."
+
+#: pathauto_user.inc:74
+msgid "User-tracker path settings"
+msgstr "User-tracker padinstellingen"
+
+#: pathauto_user.inc:75
+msgid "Pattern for user-tracker page paths"
+msgstr "Patroon voor user-tracker paginapaden"
+
+#: pathauto_user.inc:76
+#, fuzzy
+msgid "users/[user-raw]/track"
+msgstr "gebruiker/[user]/track"
+
+#: pathauto_user.inc:82
+#, fuzzy
+msgid "Bulk generate aliases for user-tracker paths that are not aliased"
+msgstr ""
+"Genereer aliassen voor alle bestaande user-tracker pagina's welke nog geen "
+"aliassen hebben."
+
+#: pathauto_user.inc:83
+msgid ""
+"Generate aliases for all existing user-tracker pages which do not already "
+"have aliases."
+msgstr ""
+"Genereer aliassen voor alle bestaande user-tracker pagina's welke nog geen "
+"aliassen hebben."
+
+#: pathauto_user.inc:107
+#, fuzzy
+msgid "Bulk generation of users completed, one alias generated."
+msgid_plural "Bulk generation of users completed, @count aliases generated."
+msgstr[0] "Bulk bijwerken van gebruikers gereed. Eén alias gegenereerd."
+msgstr[1] "Bulk bijwerken van gebruikers gereed. @count aliassen gegenereerd."
+
+#: pathauto_user.inc:129
+#, fuzzy
+msgid "Bulk generation of user blogs completed, one alias generated."
+msgid_plural ""
+"Bulk generation of user blogs completed, @count aliases generated."
+msgstr[0] ""
+"Bulk bijwerken van blogs van gebruikers gereed. Eén alias gegenereerd."
+msgstr[1] ""
+"Bulk bijwerken van blogs van gebruikers gereed. @count aliassen gegenereerd."
+
+#: pathauto_user.inc:153
+#, fuzzy
+msgid "Bulk generation of user tracker pages completed, one alias generated."
+msgid_plural ""
+"Bulk generation of user tracker pages completed, @count aliases generated."
+msgstr[0] ""
+"Bulk bijwerken van user-tracker pagina's gereed. Eén alias gegenereerd."
+msgstr[1] ""
+"Bulk bijwerken van user-tracker pagina's gereed. @count aliassen gegenereerd."
 
 # Sutha: heb de tekst herschreven om begrijpelijker te maken.
 # J: In het Engels lijkt het er toch echt op dat meerdere 'strings' aan de URL kunnen worden toegevoegd. In jouw aanpassing gaat het nog maar om één tekenreeks... Wat te doen?
 # Toegevoegd aan het einde  (tevens de \n
 # standaardwaarde).
 # Sutha: aangepast.
-#: pathauto.module:19
+#: pathauto.module:27
+#, fuzzy
 msgid ""
-"<p>Provides a mechanism for modules to automatically generate aliases for the content they manage.</p>\n"
+"<p>Provides a mechanism for modules to automatically generate aliases for "
+"the content they manage.</p>\n"
 "                  <h2>Settings</h2>\n"
-"                  <p>The <strong>Maximum Alias Length</strong> and <strong>Maximum component length</strong> values\n"
-"                  default to 100 and have a limit of 128 from pathauto.  This length is limited by the length of the dst \n"
-"                  column of the url_alias database table. The default database schema for this column is 128. If you \n"
-"                  set a length that is equal to that of the one set in the dst column it will cause problems in situations \n"
-"                  where the system needs to append additional words to the aliased URL. For example... URLs generated\n"
-"                  for feeds will have '/feed' added to the end. You should enter a value that is the length of the dst\n"
-"                  column minus the length of any strings that might get added to the end of the URL. The length of \n"
-"                  strings that might get added to the end of your URLs depends on which modules you have enabled and \n"
-"                  on your Pathauto settings. The recommended and default value is 100.</p>"
+"                  <p>The <strong>Maximum Alias Length</strong> and "
+"<strong>Maximum component length</strong> values\n"
+"                  default to 100 and have a limit of 128 from pathauto. This "
+"length is limited by the length of the dst\n"
+"                  column of the url_alias database table. The default "
+"database schema for this column is 128. If you\n"
+"                  set a length that is equal to that of the one set in the "
+"dst column it will cause problems in situations\n"
+"                  where the system needs to append additional words to the "
+"aliased URL. For example... URLs generated\n"
+"                  for feeds will have \"/feed\" added to the end. You should "
+"enter a value that is the length of the dst\n"
+"                  column minus the length of any strings that might get "
+"added to the end of the URL. The length of\n"
+"                  strings that might get added to the end of your URLs "
+"depends on which modules you have enabled and\n"
+"                  on your Pathauto settings. The recommended and default "
+"value is 100.</p>\n"
+"                  <p><strong>Raw Tokens</strong> In Pathauto it is "
+"appropriate to use the -raw form of tokens. Paths are\n"
+"                  sent through a filtering system which ensures that raw "
+"user content is filtered. Failure to use -raw\n"
+"                  tokens can cause problems with the Pathauto punctuation "
+"filtering system.</p>"
 msgstr ""
-"<p>Hiermee kunnen modules automatisch aliassen genereren voor de inhoud die ze beheren.</p>\n"
+"<p>Hiermee kunnen modules automatisch aliassen genereren voor de inhoud die "
+"ze beheren.</p>\n"
 "<h2>Instellingen</h2>\n"
-"<p>De waarden voor de <strong>maximale aliaslengte</strong> en <strong>maximale lengte van \n"
-"een onderdeel </strong> zijn standaard 100 en zijn maximaal 128. Deze lengte is gelimiteerd door \n"
-"de lengte van de dst-kolom van de url_alias database tabel. Het standaard databaseschema voor \n"
-"deze kolom is 128. Als u een lengte instelt die gelijk is aan die van de waarde die is ingesteld voor de \n"
-"dst-kolom, dan zullen er problemen optreden in die situaties waarin het systeem woorden toevoegt \n"
-"aan een URL met een alias. Bijvoorbeeld: aan URLs voor feeds wordt '/feed' aan het einde \n"
-"toegevoegd. U kunt het beste een berekende waarde invoeren: de lengte van de dst-kolom (128) \n"
-"minus de lengte van een tekenreeks die aan het einde van een URL wordt toegevoegd. De lengte van \n"
-"de tekenreeks die aan het einde van de URL kan worden toegevoegd is afhankelijk van de modules \n"
-"die u hebt geactiveerd en van de Pathauto-instellingen. De aanbevolen waarde is 100 (tevens de \n"
+"<p>De waarden voor de <strong>maximale aliaslengte</strong> en "
+"<strong>maximale lengte van \n"
+"een onderdeel </strong> zijn standaard 100 en zijn maximaal 128. Deze lengte "
+"is gelimiteerd door \n"
+"de lengte van de dst-kolom van de url_alias database tabel. Het standaard "
+"databaseschema voor \n"
+"deze kolom is 128. Als u een lengte instelt die gelijk is aan die van de "
+"waarde die is ingesteld voor de \n"
+"dst-kolom, dan zullen er problemen optreden in die situaties waarin het "
+"systeem woorden toevoegt \n"
+"aan een URL met een alias. Bijvoorbeeld: aan URLs voor feeds wordt '/feed' "
+"aan het einde \n"
+"toegevoegd. U kunt het beste een berekende waarde invoeren: de lengte van de "
+"dst-kolom (128) \n"
+"minus de lengte van een tekenreeks die aan het einde van een URL wordt "
+"toegevoegd. De lengte van \n"
+"de tekenreeks die aan het einde van de URL kan worden toegevoegd is "
+"afhankelijk van de modules \n"
+"die u hebt geactiveerd en van de Pathauto-instellingen. De aanbevolen waarde "
+"is 100 (tevens de \n"
 "standaardwaarde).</p>"
 
-#: pathauto.module:44
-msgid "You are not authorized to access the pathauto settings."
-msgstr "U heeft geen toegang tot de instellingen van Pathauto."
+#: pathauto.module:61
+msgid "Configure how pathauto generates clean URLs for your content."
+msgstr "Stel in hoe Pathauto nette URLs genereert voor de pagina's."
 
-#: pathauto.module:64
+#: pathauto.module:69
+#, fuzzy
+msgid "Delete aliases"
+msgstr "Maak feed-aliassen"
+
+#: pathauto.module:167
+#, fuzzy
+msgid "As [cat], but including its supercategories separated by /."
+msgstr "Als [cat], maar inclusief de supercategorieën"
+
+#: pathauto.module:168
+#, fuzzy
+msgid ""
+"As [cat-raw], but including its supercategories separated by /. WARNING - "
+"raw user input."
+msgstr "Als [cat], maar inclusief de supercategorieën"
+
+#: pathauto.module:169
+#, fuzzy
+msgid "URL alias for the category."
+msgstr "De naam van de categorie."
+
+#: pathauto.module:172
+#, fuzzy
+msgid "As [term], but including its supercategories separated by /."
+msgstr "Als [cat], maar inclusief de supercategorieën"
+
+#: pathauto.module:173
+#, fuzzy
+msgid ""
+"As [term-raw], but including its supercategories separated by /. WARNING - "
+"raw user input."
+msgstr "Als [cat], maar inclusief de supercategorieën"
+
+#: pathauto.module:174
+msgid "URL alias for the term."
+msgstr ""
+
+#: pathauto.module:179
+msgid "URL alias for the parent book."
+msgstr ""
+
+#: pathauto.module:191
+#, fuzzy
+msgid "users"
+msgstr "[user]"
+
+#: pathauto.module:191
+msgid "content"
+msgstr ""
+
+#: pathauto.module:193
+msgid "user blogs"
+msgstr ""
+
+#: pathauto.module:196
+msgid "vocabularies and terms"
+msgstr ""
+
+#: pathauto.module:199
+#, fuzzy
+msgid "user trackers"
+msgstr "gebruiker/[user]/track"
+
+#: pathauto.module:202
+msgid "forums"
+msgstr ""
+
+#: pathauto.module:261
+msgid ""
+"An alias will be generated for you. If you wish to create your own alias "
+"below, untick this option."
+msgstr ""
+
+#: pathauto.module:263
+#, fuzzy
+msgid ""
+" To control the format of the generated aliases, see the <a href=\"@pathauto"
+"\">Pathauto settings</a>."
+msgstr ""
+" Om het format van de gegenereerde aliassen te controleren, zie de <a href="
+"\"admin/settings/pathauto\">Pathauto instellingen</a>."
+
+#: pathauto.module:271
+msgid "Automatic alias"
+msgstr ""
+
+# misschien te vertalen met:
+# -> Bijwerken
+# Tijdens test te bepalen
+# J: Prima, goed voorstel.
+#: pathauto.module:286
+#, fuzzy
+msgid "Update path alias"
+msgstr "Actie bijwerken"
+
+#: pathauto.module:418
+msgid ""
+"It appears that the <a href=\"@token_link\">Token module</a> is not "
+"installed. Please ensure that you have it installed so that Pathauto can "
+"work properly. You may need to disable Pathauto and re-enable it to get "
+"Token enabled."
+msgstr ""
+
+#: pathauto.module:434
 msgid "General settings"
 msgstr "Algemene instellingen"
 
@@ -116,499 +590,549 @@ msgstr "Algemene instellingen"
 # KDE: "veel informatie geven"
 # J: Yep, is namelijke een losse keuze die aangevinkt kan worden. Het wordt tijd voor een test...
 # Yo: Breedsprakig is inderdaad de meest letterlijke. Misschien gewoon "Uitgebreid".
-#: pathauto.module:69
+#: pathauto.module:442
 msgid "Verbose"
 msgstr "Verbose"
 
-#: pathauto.module:71
+#: pathauto.module:444
 msgid "Display alias changes (except during bulk updates)."
 msgstr "Aliasveranderingen weergeven (uitgezonderd tijdens bulk bijwerken)."
 
-#: pathauto.module:74
+#: pathauto.module:449
 msgid "Separator"
 msgstr "Scheidingsteken"
 
-#: pathauto.module:76
-msgid "Character used to separate words in titles. This will replace any spaces and punctuation characters."
-msgstr "Het teken dat wordt gebruik om alle spaties en leestekens in de titel te vervangen."
+#: pathauto.module:453
+#, fuzzy
+msgid ""
+"Character used to separate words in titles. This will replace any spaces and "
+"punctuation characters. Using a space or + character can cause unexpected "
+"results."
+msgstr ""
+"Het teken dat wordt gebruik om alle spaties en leestekens in de titel te "
+"vervangen."
 
-#: pathauto.module:79
-msgid "Quotation marks"
-msgstr "Aanhalingstekens"
+#: pathauto.module:458
+msgid "Character case"
+msgstr ""
 
-#: pathauto.module:81
-msgid "Remove"
-msgstr "Verwijderen"
+#: pathauto.module:460
+msgid "Leave case the same as source token values."
+msgstr ""
 
-#: pathauto.module:81
-msgid "Replace by separator"
-msgstr "Vervangen door het scheidingsteken"
+#: pathauto.module:460
+msgid "Change to lower case"
+msgstr ""
 
-#: pathauto.module:85
+#: pathauto.module:465
 msgid "Maximum alias length"
 msgstr "Maximale alias-lengte"
 
-#: pathauto.module:87
-msgid "Maximum length of aliases to generate. 100 is recommended.  See <a href=\"@pathauto-help\">Pathauto help</a> for details."
-msgstr "Maximale lengte van te genereren aliassen. 100 wordt aanbevolen. Zie <a href=\"@pathauto-help\">Pathauto help</a> voor details."
+#: pathauto.module:469
+#, fuzzy
+msgid ""
+"Maximum length of aliases to generate. 100 is recommended. See <a href="
+"\"@pathauto-help\">Pathauto help</a> for details."
+msgstr ""
+"Maximale lengte van te genereren aliassen. 100 wordt aanbevolen. Zie <a href="
+"\"@pathauto-help\">Pathauto help</a> voor details."
 
-#: pathauto.module:90
+#: pathauto.module:474
 msgid "Maximum component length"
 msgstr "Maximale lengte van het onderdeel"
 
-#: pathauto.module:92
-msgid "Maximum text length of any component in the alias (e.g., [title]). 100 is recommended. See <a href=\"@pathauto-help\">Pathauto help</a> for details."
-msgstr "Maximale tekstlengte van ieder onderdeel in de alias (bijv., [title]). 100 wordt aanbevolen. Zie <a href=\"@pathauto-help\">Pathauto help</a> voor details."
+#: pathauto.module:478
+msgid ""
+"Maximum text length of any component in the alias (e.g., [title]). 100 is "
+"recommended. See <a href=\"@pathauto-help\">Pathauto help</a> for details."
+msgstr ""
+"Maximale tekstlengte van ieder onderdeel in de alias (bijv., [title]). 100 "
+"wordt aanbevolen. Zie <a href=\"@pathauto-help\">Pathauto help</a> voor "
+"details."
 
-# Er stonden 2 spaties tussen.
-#: pathauto.module:95
-msgid "Create index aliases"
-msgstr "Maak indexaliassen"
+#: pathauto.module:483
+msgid "Maximum number of objects to alias in a bulk update"
+msgstr ""
 
-#: pathauto.module:97
-msgid "When a pattern generates a hierarchical alias (i.e., any alias containing a slash), generate aliases for each step of the hierarchy which can be used to list content within that hierarchy. For example, if a node alias \"music/concert/beethoven\" is created, also create an alias \"music/concert\" which will list all concert nodes, and an alias \"music\" which will list all music nodes."
-msgstr "Wanneer een patroon een hiërarchische alias genereert (bijv., iedere alias die een slash bevat), genereer dan aliassen voor iedere deel van de hiërarchie dat kan worden gebruik om inhoud te tonen binnen die hiërarchie. Bijvoorbeeld, als een node-alias \"muziek/concert/beethoven\" is gevormd, maak dan ook een alias \"muziek/concert\" die alle concert-nodes laat zien, en een alias \"muziek\" die alle muziek-nodes toont."
+#: pathauto.module:487
+msgid ""
+"Maximum number of objects of a given type which should be aliased during a "
+"bulk update. The default is 50 and the recommended number depends on the "
+"speed of your server. If bulk updates \"time out\" or result in a \"white "
+"screen\" then reduce the number."
+msgstr ""
 
-#: pathauto.module:103
-msgid "Bulk generate index aliases"
-msgstr "Bulkopdracht om indexaliassen te genereren"
+#: pathauto.module:491
+#, fuzzy
+msgid "Do nothing. Leave the old alias intact."
+msgstr "Doe niets, verander de oude alias niet"
 
-#: pathauto.module:105
-msgid "Generate index aliases based on all pre-existing aliases."
-msgstr "Genereer indexaliassen gebaseerd op alle bestaande aliassen."
+#: pathauto.module:492
+#, fuzzy
+msgid "Create a new alias. Leave the existing alias functioning."
+msgstr "Maak een nieuwe alias die de oude vervangt"
+
+#: pathauto.module:493
+#, fuzzy
+msgid "Create a new alias. Delete the old alias."
+msgstr "Maak een nieuwe alias en laat de oude alias bestaan."
+
+#: pathauto.module:496
+#, fuzzy
+msgid "Create a new alias. Redirect from old alias."
+msgstr "Maak een nieuwe alias en laat de oude alias bestaan."
 
 # misschien te vertalen met:
 # -> Bijwerken
 # Tijdens test te bepalen
 # J: Prima, goed voorstel.
-#: pathauto.module:108
+#: pathauto.module:506
 msgid "Update action"
 msgstr "Actie bijwerken"
 
-#: pathauto.module:109
-msgid "Do nothing, leaving the old alias intact"
-msgstr "Doe niets, verander de oude alias niet"
+#: pathauto.module:509
+msgid ""
+"What should pathauto do when updating an existing content item which already "
+"has an alias?"
+msgstr ""
+"Wat moet Pathauto doen bij het bijwerken van bestaande inhoud die al een "
+"alias heeft?"
 
-#: pathauto.module:110
-msgid "Create a new alias in addition to the old alias"
-msgstr "Maak een nieuwe alias en laat de oude alias bestaan."
+#: pathauto.module:514
+msgid ""
+"When a pattern includes certain characters (such as those with accents) "
+"should Pathauto attempt to transliterate them into the ASCII-96 alphabet? "
+"Transliteration is determined by the i18n-ascii.txt file in the Pathauto "
+"directory. <strong>This option is disabled on your site because you do not "
+"have an i18n-ascii.txt file in the Pathauto directory.</strong>"
+msgstr ""
 
-#: pathauto.module:111
-msgid "Create a new alias, replacing the old one"
-msgstr "Maak een nieuwe alias die de oude vervangt"
+#: pathauto.module:517
+msgid ""
+"When a pattern includes certain characters (such as those with accents) "
+"should Pathauto attempt to transliterate them into the ASCII-96 alphabet? "
+"Transliteration is determined by the i18n-ascii.txt file in the Pathauto "
+"directory."
+msgstr ""
 
-#: pathauto.module:112
-msgid "What should pathauto do when updating an existing content item which already has an alias?"
-msgstr "Wat moet Pathauto doen bij het bijwerken van bestaande inhoud die al een alias heeft?"
+#: pathauto.module:525
+msgid "Transliterate prior to creating alias"
+msgstr ""
 
-#: pathauto.module:115
+#: pathauto.module:532
+msgid "Reduce strings to letters and numbers from ASCII-96"
+msgstr ""
+
+#: pathauto.module:534
+msgid ""
+"Filters the new alias to only letters and numbers found in the ASCII-96 set."
+msgstr ""
+
+#: pathauto.module:539
 msgid "Strings to Remove"
 msgstr "Tekenreeksen om te verwijderen"
 
-#: pathauto.module:116
-msgid "Words to strip out of the URL alias, separated by commas"
-msgstr "Woorden om uit de URL van de alias weg te laten. De woorden met komma's scheiden."
+#: pathauto.module:540
+msgid ""
+"Words to strip out of the URL alias, separated by commas. Do not place "
+"punctuation in here and do not use WYSIWYG editors on this field."
+msgstr ""
 
-#: pathauto.module:193
-msgid "Create feed aliases"
+#: pathauto.module:546
+#, fuzzy
+msgid "Punctuation settings"
+msgstr "Algemene instellingen"
+
+#: pathauto.module:557
+msgid "Remove"
+msgstr "Verwijderen"
+
+#: pathauto.module:557
+msgid "Replace by separator"
+msgstr "Vervangen door het scheidingsteken"
+
+#: pathauto.module:557
+msgid "No action (do not replace)"
+msgstr ""
+
+#: pathauto.module:635
+#, fuzzy
+msgid "Replacement patterns"
+msgstr "Vervangen door het scheidingsteken"
+
+#: pathauto.module:639
+msgid "Use -raw replacements for text to avoid problems with HTML entities."
+msgstr ""
+
+#: pathauto.module:672
+msgid "Internal feed alias text (leave blank to disable)"
+msgstr ""
+
+#: pathauto.module:676
+msgid ""
+"The text to use for aliases for RSS feeds. Examples are \"feed\" and \"0/feed"
+"\"."
+msgstr ""
+
+#: pathauto.module:731
+msgid ""
+"You are using the token [%token] which is not valid within the scope of "
+"tokens where you are using it."
+msgstr ""
+
+#: pathauto.module:739
+msgid ""
+"You are using the token [%token] which has a -raw companion available [%"
+"raw_token]. For Pathauto patterns you should use the -raw version of tokens "
+"unless you really know what you are doing. See the <a href=\"@pathauto-help"
+"\">Pathauto help</a> for more details."
+msgstr ""
+
+#: pathauto.module:749
+msgid "NOTE: This field contains potentially incorrect patterns. "
+msgstr ""
+
+#: pathauto.module:751
+msgid "%problems"
+msgstr ""
+
+#: pathauto.module:770
+msgid ""
+"You have configured the @name to be the separator and to be removed when "
+"encountered in strings. This can cause problems with your patterns and "
+"especially with the catpath and termpath patterns. You should probably set "
+"the action for @name to be \"replace by separator\""
+msgstr ""
+
+#: pathauto.module:795
+msgid "Choose Aliases to Delete"
+msgstr ""
+
+#: pathauto.module:804
+#, fuzzy
+msgid "all aliases"
 msgstr "Maak feed-aliassen"
 
-#: pathauto.module:195
-msgid "Also generate aliases for RSS feeds."
-msgstr "Genereer ook aliassen voor RSS-feeds."
+#: pathauto.module:806
+msgid "Delete all aliases. Number of aliases which will be deleted: %count."
+msgstr ""
 
-#: pathauto.module:423
-msgid "Ignoring alias "
-msgstr "Alias wordt genegeerd"
+#: pathauto.module:817
+msgid ""
+"Delete aliases for all @label. Number of aliases which will be deleted: %"
+"count."
+msgstr ""
 
-#: pathauto.module:423
-msgid " due to existing path conflict"
-msgstr " vanwege een conflict met een bestaand pad"
+#: pathauto.module:822
+msgid ""
+"<p><strong>Note:</strong> there is no confirmation. Be sure of your action "
+"before clicking the \"Delete aliases now!\" button.<br />You may want to "
+"make a backup of the database and/or the url_alias table prior to using this "
+"feature.</p>"
+msgstr ""
 
-#: pathauto.module:433
-msgid "Created new alias %dst for %src, replacing %oldalias"
-msgstr "Een nieuwe alias %dst gemaakt voor %src, vervangt %oldalias"
+#: pathauto.module:825
+msgid "Delete aliases now!"
+msgstr ""
 
-#: pathauto.module:436
-msgid "Created new alias %dst for %src"
-msgstr "Nieuwe alias %dst gemaakt voor %src"
+#: pathauto.module:839
+msgid "All of your path aliases have been deleted."
+msgstr ""
 
-#: pathauto.module:471;486
-#: pathauto.info:0
-msgid "Pathauto"
-msgstr "Pathauto"
+#: pathauto.module:844
+msgid "All of your %type path aliases have been deleted."
+msgstr ""
 
-#: pathauto.module:472
-msgid "Configure how pathauto generates clean URLs for your content."
-msgstr "Stel in hoe Pathauto nette URLs genereert voor de pagina's."
-
-#: pathauto.module:201
-msgid "Bulk update of index aliases completed, one alias generated."
-msgid_plural "Bulk update of index aliases completed, @count aliases generated."
+#: pathauto.module:683
+#, fuzzy
+msgid "Bulk generation of index aliases completed, one alias generated."
+msgid_plural ""
+"Bulk generation of index aliases completed, @count aliases generated."
 msgstr[0] "Bulk bijwerken van indexaliassen gereed. Eén alias gegenereerd."
-msgstr[1] "Bulk bijwerken van indexaliassen gereed. @count aliassen gegenereerd."
+msgstr[1] ""
+"Bulk bijwerken van indexaliassen gereed. @count aliassen gegenereerd."
 
-#: pathauto.module:37
+#: pathauto.module:750
+msgid "Problem token: "
+msgid_plural "Problem tokens: "
+msgstr[0] ""
+msgstr[1] ""
+
+#: pathauto.module:49
 msgid "administer pathauto"
 msgstr "Pathauto beheren"
 
+#: pathauto.module:49
+msgid "notify of path changes"
+msgstr ""
+
 #: pathauto.module:0
-#: pathauto.info:0
 msgid "pathauto"
 msgstr "Pathauto"
 
 #: pathauto.info:0
-msgid "Provides a mechanism for modules to automatically generate aliases for the content they manage."
-msgstr "Hiermee kunnen modules automatisch aliassen genereren voor de inhoud die ze beheren."
+msgid ""
+"Provides a mechanism for modules to automatically generate aliases for the "
+"content they manage."
+msgstr ""
+"Hiermee kunnen modules automatisch aliassen genereren voor de inhoud die ze "
+"beheren."
 
-#: pathauto_node.inc:13
-msgid "Node path settings"
-msgstr "Node-pad instellingen"
+#~ msgid "[vocab]"
+#~ msgstr "[vocab]"
 
-# pad patroon
-# -> padpatroon
-# (hebben we nog iets beters voor 'patroon'?)
-# J: nog niet...
-# Yo: lastige inderdaad: regels, sjabloon… nee, niet beter.
-#: pathauto_node.inc:14
-msgid "Default path pattern (applies to all node types with blank patterns below)"
-msgstr "Standaard patroon voor paden (van toepassing op alle node types met blanco patronen hieronder)"
+#~ msgid "The vocabulary that the page's first category belongs to."
+#~ msgstr "De woordenlijst waar de eerste categorie van de pagina bij hoort."
 
-#: pathauto_node.inc:15;21;116
-msgid "[title]"
-msgstr "[title]"
+#~ msgid "[cat]"
+#~ msgstr "[cat]"
 
-#: pathauto_node.inc:17
-msgid "Bulk update node paths"
-msgstr "Bulk bijwerken van node-paden"
+#~ msgid "[catpath]"
+#~ msgstr "[catpath]"
 
-#: pathauto_node.inc:19
-msgid "Generate aliases for all existing nodes which do not already have aliases."
-msgstr "Genereer aliassen voor alle bestaande nodes die nog geen alias hebben."
+#~ msgid "[menu]"
+#~ msgstr "[menu]"
 
-#: pathauto_node.inc:21
-msgid "The title of the node, with spaces and punctuation replaced by the separator."
-msgstr "De titel van de node, waarvan de spaties en leestekens zijn vervangen door het scheidingsteken."
+#~ msgid "The name of the menu the node belongs to."
+#~ msgstr "De naam van het menu waar de node bij hoort."
 
-#: pathauto_node.inc:22;126
-msgid "[nid]"
-msgstr "[nid]"
+#~ msgid "[menupath]"
+#~ msgstr "[menupath]"
 
-#: pathauto_node.inc:22
-msgid "The id number of the node."
-msgstr "Het id-nummer van de node."
+#~ msgid ""
+#~ "The menu path (as reflected in the breadcrumb), not including Home or "
+#~ "[menu]."
+#~ msgstr ""
+#~ "Het menupad (zoals dat in het kruimelpad staat) zonder Start of [menu]."
 
-#: pathauto_node.inc:23
-msgid "The name of the user who created the node."
-msgstr "De naam van de gebruiker die de node heeft gemaakt."
+#~ msgid "[lang]"
+#~ msgstr "[lang]"
 
-#: pathauto_node.inc:24;127
-msgid "[type]"
-msgstr "[type]"
+#~ msgid "Language code of the document"
+#~ msgstr "Taalcode van het document"
 
-#: pathauto_node.inc:24
-msgid "The node type (e.g., \"page\", \"story\", etc.)."
-msgstr "Het node type (bijv. \"page\", \"story\", enz.)."
+#~ msgid "You are not authorized to access the pathauto settings."
+#~ msgstr "U heeft geen toegang tot de instellingen van Pathauto."
 
-#: pathauto_node.inc:25;117
-msgid "[yyyy]"
-msgstr "[yyyy]"
+# Er stonden 2 spaties tussen.
+#~ msgid "Create index aliases"
+#~ msgstr "Maak indexaliassen"
 
-#: pathauto_node.inc:25
-msgid "The year the node was created."
-msgstr "Het jaar waarin de node is gemaakt."
+#~ msgid ""
+#~ "When a pattern generates a hierarchical alias (i.e., any alias containing "
+#~ "a slash), generate aliases for each step of the hierarchy which can be "
+#~ "used to list content within that hierarchy. For example, if a node alias "
+#~ "\"music/concert/beethoven\" is created, also create an alias \"music/"
+#~ "concert\" which will list all concert nodes, and an alias \"music\" which "
+#~ "will list all music nodes."
+#~ msgstr ""
+#~ "Wanneer een patroon een hiërarchische alias genereert (bijv., iedere "
+#~ "alias die een slash bevat), genereer dan aliassen voor iedere deel van de "
+#~ "hiërarchie dat kan worden gebruik om inhoud te tonen binnen die "
+#~ "hiërarchie. Bijvoorbeeld, als een node-alias \"muziek/concert/beethoven\" "
+#~ "is gevormd, maak dan ook een alias \"muziek/concert\" die alle concert-"
+#~ "nodes laat zien, en een alias \"muziek\" die alle muziek-nodes toont."
 
-#: pathauto_node.inc:26;118
-msgid "[mm]"
-msgstr "[mm]"
+#~ msgid "Bulk generate index aliases"
+#~ msgstr "Bulkopdracht om indexaliassen te genereren"
 
-#: pathauto_node.inc:26
-msgid "The two-digit month (01-12) the node was created."
-msgstr "De maand (in twee cijfers: 01-12) waarin de node is gemaakt."
+#~ msgid "Generate index aliases based on all pre-existing aliases."
+#~ msgstr "Genereer indexaliassen gebaseerd op alle bestaande aliassen."
 
-#: pathauto_node.inc:27;119
-msgid "[mon]"
-msgstr "[mon]"
+#~ msgid "Words to strip out of the URL alias, separated by commas"
+#~ msgstr ""
+#~ "Woorden om uit de URL van de alias weg te laten. De woorden met komma's "
+#~ "scheiden."
 
-#: pathauto_node.inc:27
-msgid "The three-letter month (jan-dec) the node was created."
-msgstr "De drie letters van de maand (jan-dec) waarin de node is gemaakt."
+#~ msgid "Ignoring alias "
+#~ msgstr "Alias wordt genegeerd"
 
-#: pathauto_node.inc:28;120
-msgid "[dd]"
-msgstr "[dd]"
+#~ msgid "[title]"
+#~ msgstr "[title]"
 
-#: pathauto_node.inc:28
-msgid "The two-digit day of the month (00-31) the node was created."
-msgstr "De dag (in twee cijfers: 00-31) waarop de node is gemaakt."
+#~ msgid ""
+#~ "The title of the node, with spaces and punctuation replaced by the "
+#~ "separator."
+#~ msgstr ""
+#~ "De titel van de node, waarvan de spaties en leestekens zijn vervangen "
+#~ "door het scheidingsteken."
 
-#: pathauto_node.inc:29;121
-msgid "[day]"
-msgstr "[day]"
+#~ msgid "[nid]"
+#~ msgstr "[nid]"
 
-#: pathauto_node.inc:29
-msgid "The three-letter day of the week (sun-sat) that the node was created."
-msgstr "De drie letters van de dag van de week (maa-zon) waarop de node is gemaakt."
+#~ msgid "The id number of the node."
+#~ msgstr "Het id-nummer van de node."
 
-#: pathauto_node.inc:30;122
-msgid "[hour]"
-msgstr "[hour]"
+#~ msgid "The name of the user who created the node."
+#~ msgstr "De naam van de gebruiker die de node heeft gemaakt."
 
-#: pathauto_node.inc:30
-msgid "The two-digit hour (00-23) the node was created."
-msgstr "Het uur (in twee cijfers: 00-23) waarop de node is gemaakt."
+#~ msgid "[type]"
+#~ msgstr "[type]"
 
-#: pathauto_node.inc:31;123
-msgid "[min]"
-msgstr "[min]"
+#~ msgid "The node type (e.g., \"page\", \"story\", etc.)."
+#~ msgstr "Het node type (bijv. \"page\", \"story\", enz.)."
 
-#: pathauto_node.inc:31
-msgid "The two-digit minute (00-59) the node was created."
-msgstr "De minuut (in twee cijfers: 00-59) waarop de node is gemaakt."
+#~ msgid "[yyyy]"
+#~ msgstr "[yyyy]"
 
-#: pathauto_node.inc:32;124
-msgid "[sec]"
-msgstr "[sec]"
+#~ msgid "The year the node was created."
+#~ msgstr "Het jaar waarin de node is gemaakt."
 
-#: pathauto_node.inc:32
-msgid "The two-digit second (00-59) the node was created."
-msgstr "De seconde (in twee cijfers: 00-59) waarop de node is gemaakt."
+#~ msgid "[mm]"
+#~ msgstr "[mm]"
 
-#: pathauto_node.inc:33;125
-msgid "[week]"
-msgstr "[week]"
+#~ msgid "The two-digit month (01-12) the node was created."
+#~ msgstr "De maand (in twee cijfers: 01-12) waarin de node is gemaakt."
 
-#: pathauto_node.inc:33
-msgid "The week number (1-52) of the year the node was created."
-msgstr "Het weeknummer (1-52) van het jaar waarin de node is gemaakt."
+#~ msgid "[mon]"
+#~ msgstr "[mon]"
 
-#: pathauto_node.inc:42
-msgid "The name of the lowest-weight category that the page belongs to."
-msgstr "De naam van de categorie met het laagste gewicht waar de pagina bij hoort."
+#~ msgid "The three-letter month (jan-dec) the node was created."
+#~ msgstr "De drie letters van de maand (jan-dec) waarin de node is gemaakt."
 
-#: pathauto_node.inc:45;221;223;237
-msgid "[catalias]"
-msgstr "[catalias]"
+#~ msgid "[dd]"
+#~ msgstr "[dd]"
 
-#: pathauto_node.inc:46
-msgid "The alias for the lowest-weight category that the page belongs to. This is useful for long category names. You must first set up aliases for your categories."
-msgstr "De alias voor de categorie met het laagste gewicht waar de pagina bij hoort. Dit is nuttig voor lange categorie-namen. U moet eerst aliassen maken voor de categorieën."
+#~ msgid "The two-digit day of the month (00-31) the node was created."
+#~ msgstr "De dag (in twee cijfers: 00-31) waarop de node is gemaakt."
 
-#: pathauto_node.inc:51;137;151
-msgid "[book]"
-msgstr "[book]"
+#~ msgid "[day]"
+#~ msgstr "[day]"
 
-#: pathauto_node.inc:52
-msgid "For book pages, the title of the top-level book."
-msgstr "Voor boekpagina's, de titel van het boek op het hoogste niveau."
+#~ msgid ""
+#~ "The three-letter day of the week (sun-sat) that the node was created."
+#~ msgstr ""
+#~ "De drie letters van de dag van de week (maa-zon) waarop de node is "
+#~ "gemaakt."
 
-#: pathauto_node.inc:53;148;152
-msgid "[bookpath]"
-msgstr "[bookpath]"
+#~ msgid "[hour]"
+#~ msgstr "[hour]"
 
-#: pathauto_node.inc:54
-msgid "For book pages, the full hierarchy from the top-level book."
-msgstr "Voor boekpagina's, de volledige hiërachie van het boek op het hoogste niveau."
+#~ msgid "The two-digit hour (00-23) the node was created."
+#~ msgstr "Het uur (in twee cijfers: 00-23) waarop de node is gemaakt."
 
-#: pathauto_node.inc:63
-msgid "Pattern for all %nodetypename paths"
-msgstr "Patroon voor alle %nodetypename paden"
+#~ msgid "[min]"
+#~ msgstr "[min]"
+
+#~ msgid "The two-digit minute (00-59) the node was created."
+#~ msgstr "De minuut (in twee cijfers: 00-59) waarop de node is gemaakt."
+
+#~ msgid "[sec]"
+#~ msgstr "[sec]"
+
+#~ msgid "The two-digit second (00-59) the node was created."
+#~ msgstr "De seconde (in twee cijfers: 00-59) waarop de node is gemaakt."
+
+#~ msgid "[week]"
+#~ msgstr "[week]"
+
+#~ msgid "The week number (1-52) of the year the node was created."
+#~ msgstr "Het weeknummer (1-52) van het jaar waarin de node is gemaakt."
+
+#~ msgid "The name of the lowest-weight category that the page belongs to."
+#~ msgstr ""
+#~ "De naam van de categorie met het laagste gewicht waar de pagina bij hoort."
+
+#~ msgid "[catalias]"
+#~ msgstr "[catalias]"
+
+#~ msgid ""
+#~ "The alias for the lowest-weight category that the page belongs to. This "
+#~ "is useful for long category names. You must first set up aliases for your "
+#~ "categories."
+#~ msgstr ""
+#~ "De alias voor de categorie met het laagste gewicht waar de pagina bij "
+#~ "hoort. Dit is nuttig voor lange categorie-namen. U moet eerst aliassen "
+#~ "maken voor de categorieën."
+
+#~ msgid "[book]"
+#~ msgstr "[book]"
+
+#~ msgid "For book pages, the title of the top-level book."
+#~ msgstr "Voor boekpagina's, de titel van het boek op het hoogste niveau."
+
+#~ msgid "[bookpath]"
+#~ msgstr "[bookpath]"
+
+#~ msgid "For book pages, the full hierarchy from the top-level book."
+#~ msgstr ""
+#~ "Voor boekpagina's, de volledige hiërachie van het boek op het hoogste "
+#~ "niveau."
 
 # Kan wat nederlandscher lijkt me:
 # Er zal automatisch een alias worden gegenereerd op basis van de titel en andere node eigenschappen, (dit) in aanvulling op iedere hierboven handmatig ingestelde alias.
 # (dit) Tussen haakjes gezet want nogal oubollig, maar de hele zin is eigenlijk een beetje paard-achter-de-wagen, en dus misschien  eigenlijk:
 # Aanvullend op iedere hierboven handmatig ingestelde alias zal er automatisch een alias worden gegenereerd op basis van de titel en andere node eigenschappen.
-#: pathauto_node.inc:101
-msgid "An alias will be automatically generated from the title and other node attributes, in addition to any alias manually provided above."
-msgstr "Een alias zal automatisch worden gegenereerd op basis van de titel en andere node eigenschappen, aanvullend op iedere alias die hierboven handmatig is ingesteld."
+#~ msgid ""
+#~ "An alias will be automatically generated from the title and other node "
+#~ "attributes, in addition to any alias manually provided above."
+#~ msgstr ""
+#~ "Een alias zal automatisch worden gegenereerd op basis van de titel en "
+#~ "andere node eigenschappen, aanvullend op iedere alias die hierboven "
+#~ "handmatig is ingesteld."
 
-#: pathauto_node.inc:103
-msgid " To control the format of the generated aliases, see the <a href=\"admin/settings/pathauto\">pathauto settings</a>."
-msgstr " Om het format van de gegenereerde aliassen te controleren, zie de <a href=\"admin/settings/pathauto\">Pathauto instellingen</a>."
+#~ msgid "[eventyyyy]"
+#~ msgstr "[eventyyyy]"
 
-#: pathauto_node.inc:273
-msgid "Bulk update of nodes completed, one alias generated."
-msgid_plural "Bulk update of nodes completed, @count aliases generated."
-msgstr[0] "Bulk bijwerken van nodes gereed. Eén alias gegenereerd."
-msgstr[1] "Bulk bijwerken van nodes gereed. @count aliassen gegenereerd."
+#~ msgid "The year the event starts."
+#~ msgstr "Het jaar waarin de gebeurtenis start."
 
-#: contrib/pathauto_node_event.inc:12;22
-msgid "[eventyyyy]"
-msgstr "[eventyyyy]"
+#~ msgid "[eventmm]"
+#~ msgstr "[eventmm]"
 
-#: contrib/pathauto_node_event.inc:12
-msgid "The year the event starts."
-msgstr "Het jaar waarin de gebeurtenis start."
+#~ msgid "The two-digit month (01-12) the event starts."
+#~ msgstr "De maand (in twee cijfers: 01-12) waarin de gebeurtenis start."
 
-#: contrib/pathauto_node_event.inc:13;23
-msgid "[eventmm]"
-msgstr "[eventmm]"
+#~ msgid "[eventmon]"
+#~ msgstr "[eventmon]"
 
-#: contrib/pathauto_node_event.inc:13
-msgid "The two-digit month (01-12) the event starts."
-msgstr "De maand (in twee cijfers: 01-12) waarin de gebeurtenis start."
+#~ msgid "The three-letter month (jan-dec) the event starts."
+#~ msgstr "De drie letters van de maand (jan-dec) waarin de gebeurtenis start."
 
-#: contrib/pathauto_node_event.inc:14;24
-msgid "[eventmon]"
-msgstr "[eventmon]"
+#~ msgid "[eventdd]"
+#~ msgstr "[eventdd]"
 
-#: contrib/pathauto_node_event.inc:14
-msgid "The three-letter month (jan-dec) the event starts."
-msgstr "De drie letters van de maand (jan-dec) waarin de gebeurtenis start."
+#~ msgid "The two-digit day of the month (00-31) the event starts."
+#~ msgstr ""
+#~ "De dag van de maand (in twee cijfers: 00-31) waarop de gebeurtenis start."
 
-#: contrib/pathauto_node_event.inc:15;25
-msgid "[eventdd]"
-msgstr "[eventdd]"
+#~ msgid "[eventday]"
+#~ msgstr "[eventday]"
 
-#: contrib/pathauto_node_event.inc:15
-msgid "The two-digit day of the month (00-31) the event starts."
-msgstr "De dag van de maand (in twee cijfers: 00-31) waarop de gebeurtenis start."
+#~ msgid "The three-letter day of the week (sun-sat) the event starts."
+#~ msgstr ""
+#~ "De drie letters van de dag van de week (maa-zon) waarop de gebeurtenis "
+#~ "start."
 
-#: contrib/pathauto_node_event.inc:16;26
-msgid "[eventday]"
-msgstr "[eventday]"
+#~ msgid "[eventweek]"
+#~ msgstr "[eventweek]"
 
-#: contrib/pathauto_node_event.inc:16
-msgid "The three-letter day of the week (sun-sat) the event starts."
-msgstr "De drie letters van de dag van de week (maa-zon) waarop de gebeurtenis start."
+#~ msgid "The week number (1-52) of the year the event starts."
+#~ msgstr "Het weeknummer (1-52) van het jaar waarin de gebeurtenis start."
 
-#: contrib/pathauto_node_event.inc:17;27
-msgid "[eventweek]"
-msgstr "[eventweek]"
+#~ msgid "[tid]"
+#~ msgstr "[tid]"
 
-#: contrib/pathauto_node_event.inc:17
-msgid "The week number (1-52) of the year the event starts."
-msgstr "Het weeknummer (1-52) van het jaar waarin de gebeurtenis start."
+#~ msgid "The id number of the category."
+#~ msgstr "Het id-nummer van de categorie."
 
-#: pathauto_taxonomy.inc:13
-msgid "Category path settings"
-msgstr "Padinstellingen van de categorie "
+#~ msgid "Bulk update category paths"
+#~ msgstr "Bulk bijwerken van de paden van categorieën"
 
-#: pathauto_taxonomy.inc:14
-msgid "Default path pattern (applies to all vocabularies with blank patterns below)"
-msgstr "Standaard patroon voor een pad (van toepassing op alle woordenlijsten met blanco patronen hieronder)"
+#~ msgid "The name of the user."
+#~ msgstr "De naam van de gebruiker."
 
-#: pathauto_taxonomy.inc:15
-msgid "[vocab]/[catpath]"
-msgstr "[vocab]/[catpath]"
+#~ msgid "[uid]"
+#~ msgstr "[uid]"
 
-#: pathauto_taxonomy.inc:18
-msgid "The name of the category."
-msgstr "De naam van de categorie."
+#~ msgid "The id number of the user."
+#~ msgstr "Het id-nummer van de gebruiker."
 
-#: pathauto_taxonomy.inc:20;65;111
-msgid "[tid]"
-msgstr "[tid]"
+#~ msgid "Bulk update user paths"
+#~ msgstr "Bulk bijwerken gebruikerspaden"
 
-#: pathauto_taxonomy.inc:20
-msgid "The id number of the category."
-msgstr "Het id-nummer van de categorie."
+#~ msgid "Bulk update blog paths"
+#~ msgstr "Bulk bijwerken blogpaden"
 
-#: pathauto_taxonomy.inc:26
-msgid "Bulk update category paths"
-msgstr "Bulk bijwerken van de paden van categorieën"
-
-#: pathauto_taxonomy.inc:27
-msgid "Generate aliases for all existing categories which do not already have aliases."
-msgstr "Genereer aliassen voor alle bestaande categorieën die nog geen aliassen hebben."
-
-#: pathauto_taxonomy.inc:34
-msgid "Pattern for all %vocab-name paths"
-msgstr "Patroon voor alle %vocab-name paden"
-
-#: pathauto_taxonomy.inc:145
-msgid "Bulk update of terms completed, one alias generated."
-msgid_plural "Bulk update of terms completed, @count aliases generated."
-msgstr[0] "Bulk bijwerken van termen gereed. Eén alias gegenereerd,"
-msgstr[1] "Bulk bijwerken van termen gereed. @count aliassen gegenereerd."
-
-#: pathauto_user.inc:12
-msgid "User path settings"
-msgstr "Padinstellingen van de gebruiker"
-
-#: pathauto_user.inc:13
-msgid "Pattern for user account page paths"
-msgstr "Patroon van de paden die verwijzen naar de gebruikerspagina"
-
-#: pathauto_user.inc:14
-msgid "user/[user]"
-msgstr "gebruiker/[user]"
-
-#: pathauto_user.inc:16;39;63
-msgid "The name of the user."
-msgstr "De naam van de gebruiker."
-
-#: pathauto_user.inc:17;40;64;89;131;154;177
-msgid "[uid]"
-msgstr "[uid]"
-
-#: pathauto_user.inc:17;40;64
-msgid "The id number of the user."
-msgstr "Het id-nummer van de gebruiker."
-
-#: pathauto_user.inc:19
-msgid "Bulk update user paths"
-msgstr "Bulk bijwerken gebruikerspaden"
-
-#: pathauto_user.inc:20
-msgid "Generate aliases for all existing user account pages which do not already have aliases."
-msgstr "Genereer aliassen voor alle bestaande gebruikersaccount pagina's die nog geen aliassen hebben."
-
-#: pathauto_user.inc:35
-msgid "Blog path settings"
-msgstr "Blogpad instellingen"
-
-#: pathauto_user.inc:36
-msgid "Pattern for blog page paths"
-msgstr "Patroon van het pad dat verwijst naar de blogpagina"
-
-#: pathauto_user.inc:37
-msgid "blog/[user]"
-msgstr "blog/[user]"
-
-#: pathauto_user.inc:43
-msgid "Bulk update blog paths"
-msgstr "Bulk bijwerken blogpaden"
-
-#: pathauto_user.inc:44
-msgid "Generate aliases for all existing blog pages which do not already have aliases."
-msgstr "Genereer aliassen voor alle bestaande blogpagina's die nog geen aliassen hebben."
-
-#: pathauto_user.inc:59
-msgid "User-tracker path settings"
-msgstr "User-tracker padinstellingen"
-
-#: pathauto_user.inc:60
-msgid "Pattern for user-tracker page paths"
-msgstr "Patroon voor user-tracker paginapaden"
-
-#: pathauto_user.inc:61
-msgid "user/[user]/track"
-msgstr "gebruiker/[user]/track"
-
-#: pathauto_user.inc:67
-msgid "Bulk update user-tracker paths"
-msgstr "Bulk bijwerken user-tracker paden"
-
-#: pathauto_user.inc:68
-msgid "Generate aliases for all existing user-tracker pages which do not already have aliases."
-msgstr "Genereer aliassen voor alle bestaande user-tracker pagina's welke nog geen aliassen hebben."
-
-#: pathauto_user.inc:139
-msgid "Bulk update of users completed, one alias generated."
-msgid_plural "Bulk update of users completed, @count aliases generated."
-msgstr[0] "Bulk bijwerken van gebruikers gereed. Eén alias gegenereerd."
-msgstr[1] "Bulk bijwerken van gebruikers gereed. @count aliassen gegenereerd."
-
-#: pathauto_user.inc:162
-msgid "Bulk update of user blogs completed, one alias generated."
-msgid_plural "Bulk update of user blogs completed, @count aliases generated."
-msgstr[0] "Bulk bijwerken van blogs van gebruikers gereed. Eén alias gegenereerd."
-msgstr[1] "Bulk bijwerken van blogs van gebruikers gereed. @count aliassen gegenereerd."
-
-#: pathauto_user.inc:185
-msgid "Bulk update of user tracker pages completed, one alias generated."
-msgid_plural "Bulk update of user tracker pagina's completed, @count aliases generated."
-msgstr[0] "Bulk bijwerken van user-tracker pagina's gereed. Eén alias gegenereerd."
-msgstr[1] "Bulk bijwerken van user-tracker pagina's gereed. @count aliassen gegenereerd."
-
+#~ msgid "Bulk update user-tracker paths"
+#~ msgstr "Bulk bijwerken user-tracker paden"
