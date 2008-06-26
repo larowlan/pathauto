@@ -239,7 +239,7 @@ msgstr "Opciones para categorías"
 msgid "Default path pattern (applies to all vocabularies with blank patterns below)"
 msgstr "Esquema predefinido (se aplica a todos los vocabularios que no tengan alias definidos más abajo)"
 
-#� modules/pathauto/pathauto_taxonomy.inc:15
+#: modules/pathauto/pathauto_taxonomy.inc:15
 msgid "[vocab]/[catpath]"
 msgstr "[vocab]/[catpath]"
 
@@ -381,7 +381,7 @@ msgstr ""
 "<h2>Opciones</h2>\n"
 "<p>los valores Longitud máxima del alias y longitud máxima del componente vienen predefinidos como 100\n"
 " y en\n"
-" este módulo tienen un límite de 128. La limitación se debe a la dst colymng de la tab�a url_alias de la\n"
+" este módulo tienen un límite de 128. La limitación se debe a la dst colymng de la taba url_alias de la\n"
 "base de datos. El esquema (schema) predefinido de la base de datos para esta columna es de 128. Si quiere\n"
 " definir una longitud igual a la establecida en la dst columna, eso le va a causar problemas en aquellas situaciones\n"
 " en las que el sistema necesita añadir palabras extra para crear el alias de URL. Por ejemplo, las URLs creadas\n"
@@ -447,7 +447,7 @@ msgstr "Crear índice de alias de URL"
 
 #: modules/pathauto/pathauto.module:97
 msgid "When a pattern generates a hierarchical alias (i.e., any alias containing a slash), generate aliases for each step of the hierarchy which can be used to list content within that hierarchy. For example, if a node alias \"music/concert/beethoven\" is created, also create an alias \"music/concert\" which will list all concert nodes, and an alias \"music\" which will list all music nodes."
-msgstr "Cuando un esquema da lugar a un alias de URL jerarquizado (es decir, uno que contiene barras inverti�as), crear alias para cada paso de la jerarquía, que se puede usar para listar el contenido de esa jerarquía; por ejemplo: Si se crea un alias \"musica/conciertos/beethoven\", tambien se creará otro \"musica/conciertos\", que listará todos los nodos de conciertos, y un tercer alias \"musica\", en el que se listarán todos los nodos de música."
+msgstr "Cuando un esquema da lugar a un alias de URL jerarquizado (es decir, uno que contiene barras invertias), crear alias para cada paso de la jerarquía, que se puede usar para listar el contenido de esa jerarquía; por ejemplo: Si se crea un alias \"musica/conciertos/beethoven\", tambien se creará otro \"musica/conciertos\", que listará todos los nodos de conciertos, y un tercer alias \"musica\", en el que se listarán todos los nodos de música."
 
 #: modules/pathauto/pathauto.module:103
 msgid "Bulk generate index aliases"
@@ -478,7 +478,7 @@ msgid "What should pathauto do when updating an existing content item which alre
 msgstr "Qué debe hacer el módulo cuando se actualice el contenido de un envío que ya tenga un alias de URL."
 
 #: modules/pathauto/pathauto.module:115
-msgid "St�ings to Remove"
+msgid "Strings to Remove"
 msgstr "Textos que se deben eliminar al crear los alias de URL"
 
 #: modules/pathauto/pathauto.module:116
