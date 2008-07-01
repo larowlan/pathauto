@@ -65,7 +65,7 @@ msgstr ""
 
 #: pathauto.admin.inc:64
 msgid "Change to lower case"
-msgstr ""
+msgstr "Maak kleine letters"
 
 #: pathauto.admin.inc:69
 msgid "Maximum alias length"
@@ -95,7 +95,7 @@ msgstr ""
 
 #: pathauto.admin.inc:87
 msgid "Maximum number of objects to alias in a bulk update"
-msgstr ""
+msgstr "Maximaal aantal items die worden 'gealiased' tijdens een 'bulk' update"
 
 #: pathauto.admin.inc:91
 msgid ""
@@ -160,11 +160,11 @@ msgstr ""
 
 #: pathauto.admin.inc:129
 msgid "Transliterate prior to creating alias"
-msgstr ""
+msgstr "Voer Transliteratie uit alvorens een alias te generen"
 
 #: pathauto.admin.inc:136
 msgid "Reduce strings to letters and numbers from ASCII-96"
-msgstr ""
+msgstr "Wijzig strings naar letters en cijfers van ASCII-96"
 
 #: pathauto.admin.inc:138
 msgid ""
@@ -184,7 +184,7 @@ msgstr ""
 #: pathauto.admin.inc:150
 #, fuzzy
 msgid "Punctuation settings"
-msgstr "Algemene instellingen"
+msgstr "Instellingen voor leestekens"
 
 #: pathauto.admin.inc:161
 msgid "Remove"
@@ -196,20 +196,20 @@ msgstr "Vervangen door het scheidingsteken"
 
 #: pathauto.admin.inc:161
 msgid "No action (do not replace)"
-msgstr ""
+msgstr "Geen actie (niet vervangen)"
 
 #: pathauto.admin.inc:239
 #, fuzzy
 msgid "Replacement patterns"
-msgstr "Vervangen door het scheidingsteken"
+msgstr "Mogelijke patronen voor vervanging"
 
 #: pathauto.admin.inc:243
 msgid "Use -raw replacements for text to avoid problems with HTML entities."
-msgstr ""
+msgstr "Gebruik -raw vervangingen voor tekst om problemen met HTML entiteiten te voorkomen."
 
 #: pathauto.admin.inc:276
 msgid "Internal feed alias text (leave blank to disable)"
-msgstr ""
+msgstr "Interne tekst voor feed alias (laat dit veld leeg om deze optie uit te schakelen)"
 
 #: pathauto.admin.inc:280
 msgid ""
@@ -518,17 +518,17 @@ msgstr ""
 #: pathauto_node.inc:47
 #, fuzzy
 msgid "Pattern for all @node_type paths in @language"
-msgstr "Patroon voor alle %nodetypename paden"
+msgstr "Patroon voor alle @node_type paden in @language"
 
 #: pathauto_node.inc:50
 #, fuzzy
 msgid "Pattern for all language neutral @node_type paths"
-msgstr "Patroon voor alle %nodetypename paden"
+msgstr "Patroon voor alle taalonafhankelijke @node_type paden"
 
 #: pathauto_node.inc:55
 #, fuzzy
 msgid "Pattern for all @node_type paths"
-msgstr "Patroon voor alle %nodetypename paden"
+msgstr "Patroon voor alle @node_type paden"
 
 #: pathauto_node.inc:121
 #, fuzzy
