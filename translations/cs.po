@@ -157,7 +157,7 @@ msgstr ""
 "Když vzorek obsahuje nějaké znaky (např. s interpunkcí), Pathauto se může "
 "pokusit je pželožit do ASCII-96? Překlad je podmíněn souborem i18n-ascii.txt "
 "v adresáři s Pathauto. <strong>Tato možnost je vypnuta na vašem webu, "
-"jelikož se soubor i18n-ascii.txt nenachází v Pathauto adresáři.</stron>"
+"jelikož se soubor i18n-ascii.txt nenachází v Pathauto adresáři.</strong>"
 
 #: pathauto.admin.inc:121
 #, fuzzy
