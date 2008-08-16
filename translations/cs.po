@@ -1,3 +1,5 @@
+# $Id$
+#
 # Czech translation of pathauto (6.x-1.x-dev)
 # Copyright (c) 2008 by the Czech translation team
 # Generated from files:
@@ -11,7 +13,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pathauto (6.x-1.x-dev)\n"
+"Project-Id-Version: Pathauto (6.x-1.x-dev)\n"
 "POT-Creation-Date: 2008-08-16 09:39+0200\n"
 "PO-Revision-Date: 2008-08-16 09:39+0200\n"
 "Language-Team: Czech\n"
@@ -938,4 +940,3 @@ msgstr "Vymazat cesty"
 #: pathauto.module:0
 msgid "pathauto"
 msgstr "pathauto"
-
