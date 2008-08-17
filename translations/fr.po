@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr_pathauto.new_\n"
 "POT-Creation-Date: 2008-06-24 18:52+0200\n"
-"PO-Revision-Date: 2008-08-16 23:40-0400\n"
+"PO-Revision-Date: 2008-08-17 00:19-0400\n"
 "Last-Translator: Françoise L. aka floown <ihavamail@gmail.com>\n"
 "Language-Team: français <ihavamail@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr ""
 
 #: pathauto.admin.inc:38
 msgid "General settings"
-msgstr "Paramètres généraux"
+msgstr "Réglages généraux"
 
 #: pathauto.admin.inc:46
 msgid "Verbose"
@@ -166,7 +166,7 @@ msgstr "Mots à omettre dans les URL, séparés d'une virgule. Ne placez pas de 
 
 #: pathauto.admin.inc:150
 msgid "Punctuation settings"
-msgstr "Paramètres de ponctuation"
+msgstr "Réglages concernant la ponctuation"
 
 #: pathauto.admin.inc:161
 msgid "Remove"
@@ -443,14 +443,12 @@ msgstr ""
 
 #: pathauto_node.inc:20
 msgid "Node path settings"
-msgstr "Réglages pour les chemins de nods"
+msgstr "Réglages des chemins de noeuds"
 
 #: pathauto_node.inc:21
 msgid ""
 "Default path pattern (applies to all node types with blank patterns below)"
-msgstr ""
-"Modèle de chemin par défaut (appliqué à tous les types de node avec un "
-"modèle vide)"
+msgstr "Modèle de chemin par défaut (appliqué à tous les types de contenus dont le modèle est vide ci-dessous)"
 
 #: pathauto_node.inc:22
 msgid "content/[title-raw]"
@@ -564,7 +562,7 @@ msgstr "Réglages des chemins des pages utilisateurs"
 
 #: pathauto_user.inc:21
 msgid "Pattern for user account page paths"
-msgstr "Modèle pour les comptes utilisateurs"
+msgstr "Modèle pour les pages de comptes utilisateurs"
 
 #: pathauto_user.inc:22
 msgid "users/[user-raw]"
@@ -676,7 +674,7 @@ msgid ""
 msgstr ""
 "<p>Offre un mécanisme permettant aux modules de générer automatiquement un alias lié au contenu qu'ils gèrent.</p>\n"
 "<h2>Réglages</h2>\n"
-"<p>Les valeurs des paramètres <strong>Longueur maximale d'un alias</strong> et <strong>Longueur maximale d'un composant</strong> sont définies par défaut à 100 jusqu'à une une limite de 128 par Pathauto. Cette limite provient de la taille de la colonne \"dst\" de la table \"url_alias\" dans la base de donnée. Si vous entrez la valeur maximale, ceci causera des problèmes lorsque le système doit ajouter des mots supplémentaires à l'alias d'URL. Par exemple, le suffixe \"/feed\" est ajouté aux alias des fils RSS. Vous devez donc choisir une valeur correspondant à la longueur de \"dst\" moins celle de tout suffixe potentiel. Ces suffixes dépendent des modules activés et de vos réglages de Pathauto. La valeur recommandée et offerte par défaut est 100.</p><p><strong>Remplacements bruts</strong> Dans Pathauto, il est approprié d'utiliser les remplacements bruts, c'est-à-dire ceux ayant le suffixe -raw. Le système s'assure que les contenus des utilisateurs soient filtrés adéquatement. Le système de filtrage de la ponctuation de Pathauto pourrait causer des problèmes si les remplacements de la forme -raw ne sont pas utilisés.</p>"
+"<p>Pathauto définit les valeurs des paramètres <strong>Longueur maximale d'un alias</strong> et <strong>Longueur maximale d'un composant</strong> à 100 par défaut, avec une limite maximale de 128. Cette limite provient de la taille de la colonne \"dst\" de la table \"url_alias\" dans la base de donnée. Si vous entrez la valeur maximale, ceci causera des problèmes lorsque le système doit ajouter des mots supplémentaires à l'alias d'URL. Par exemple, le suffixe \"/feed\" est ajouté aux alias des fils RSS. Vous devez donc choisir une valeur correspondant à la longueur de \"dst\" moins celle de tout suffixe potentiel. Ces suffixes dépendent des modules activés et de vos réglages de Pathauto. La valeur recommandée et offerte par défaut est 100.</p><p><strong>Modèles de remplacement bruts</strong>&nbsp;: Dans Pathauto, il est approprié d'utiliser les modèles de remplacement bruts, c'est-à-dire ceux ayant le suffixe -raw. Le système s'occupera de filtrer adéquatement les contenus saisis par les utilisateurs. Le système de filtrage de la ponctuation de Pathauto pourrait causer des problèmes si les remplacements de la forme -raw ne sont pas utilisés.</p>"
 
 #: pathauto.module:164
 msgid "As [cat], but including its supercategories separated by /."
