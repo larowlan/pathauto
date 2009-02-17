@@ -1,5 +1,5 @@
 # Hungarian translation of pathauto (6.x-1.1)
-# Copyright (c) 2008 by the Hungarian translation team
+# Copyright (c) 2009 by the Hungarian translation team
 # Generated from files:
 #  pathauto.module,v 1.118 2008/06/20 20:01:01 greggles
 #  pathauto.admin.inc,v 1.10.2.1 2008/06/24 16:07:51 greggles
@@ -12,9 +12,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: pathauto (6.x-1.1)\n"
-"POT-Creation-Date: 2008-11-19 09:52-0600\n"
-"PO-Revision-Date: 2008-11-09 12:59-0600\n"
-"Language-Team: Hungarian\n"
+"POT-Creation-Date: 2009-02-16 18:11-0600\n"
+"PO-Revision-Date: 2009-02-13 13:52-0600\n"
+"Last-Translator: Balogh Zoltán\n"
+"Language-Team: Hungarian http://forditas.mindworks.hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -26,13 +27,9 @@ msgstr "tartalom"
 
 #: pathauto.admin.inc:161
 msgid "Remove"
-msgstr "Törlés"
+msgstr "Eltávolítás"
 
-#: pathauto_node.inc:79
-msgid "Language neutral"
-msgstr "Nyelvfüggetlen"
-
-#: pathauto_node.inc:37,37
+#: pathauto_node.inc:79,37
 msgid "Language neutral"
 msgstr "Nyelvfüggetlen"
 
@@ -524,11 +521,7 @@ msgstr "Nagyobb, mint jel >"
 msgid "Back slash \\"
 msgstr "Visszaperjel \\"
 
-#: pathauto.info:0
-msgid "Pathauto"
-msgstr "Pathauto"
-
-#: pathauto.inc:437,437
+#: pathauto.info:0; pathauto.inc:437
 msgid "Pathauto"
 msgstr "Pathauto"
 
@@ -863,11 +856,7 @@ msgstr ""
 "Mint a [cat-raw], de beleértve annak / jellel elválasztott "
 "szülőkategóriáit is. FIGYELEM - nyers felhasználói bevitel."
 
-#: pathauto.module:171
-msgid "URL alias for the term."
-msgstr "Webcím álnév a kifejezésnek."
-
-#: pathauto.module:166,166
+#: pathauto.module:171,166
 msgid "URL alias for the term."
 msgstr "Webcím álnév a kifejezésnek."
 
