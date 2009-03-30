@@ -81,7 +81,7 @@ function pathauto_menu($may_cache) {
  * Include all Pathauto include files.
  */
 function _pathauto_include() {
-  $pathauto_path = drupal_get_path('module', 'pathauto');
+  $pathauto_path = './'. drupal_get_path('module', 'pathauto');
   require_once("$pathauto_path/pathauto.inc");
   require_once("$pathauto_path/pathauto_node.inc");
   require_once("$pathauto_path/pathauto_taxonomy.inc");
