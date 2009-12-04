@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Pathauto 6.x\n"
 "POT-Creation-Date: 2009-12-04 08:01+0100\n"
-"PO-Revision-Date: 2009-12-04 09:49+0100\n"
+"PO-Revision-Date: 2009-12-04 10:20+0100\n"
 "Last-Translator: Magnus Gunnarsson <seals@passagen.se>\n"
 "Language-Team: drupalsverige.se\n"
 "MIME-Version: 1.0\n"
@@ -480,7 +480,7 @@ msgstr "[vocab-raw]/[catpath-raw]"
 
 #: pathauto_taxonomy.inc:146
 msgid "Bulk generate forum paths"
-msgstr "Massgenerera forumsökvägar"
+msgstr "Massgenerera forumsökvägar för alla forum som inte redan har ett alias."
 
 #: pathauto_taxonomy.inc:147
 msgid "Generate aliases for all existing forums and forum containers which do not already have aliases."
