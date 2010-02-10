@@ -190,6 +190,33 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
   // Always replace whitespace with the separator.
   $output = preg_replace('/\s+/', $separator, $output);
 
+  // Trim duplicates and remove trailing and leading separators.
+  $output = _pathauto_clean_separators($output, $separator);
+
+  // Enforce the maximum component length
+  $maxlength = min(variable_get('pathauto_max_component_length', 100), 128);
+  $output = drupal_substr($output, 0, $maxlength);
+
+  return $output;
+}
+
+/**
+ * Clean path separators from a given string.
+ *
+ * Trims duplicates and strips leading and trailing separators.
+ *
+ * @param $string
+ *   The string to clean path separators from.
+ * @param $separator
+ *   The path separator to use when cleaning.
+ * @return
+ *   The cleaned version of the string.
+ *
+ * @see pathauto_cleanstring()
+ * @see pathauto_clean_alias()
+ */
+function _pathauto_clean_separators($string, $separator = NULL) {
+  $output = $string;
   // In preparation for pattern matching,
   // escape the separator if and only if it is not alphanumeric.
   if (isset($separator)) {
@@ -213,10 +240,31 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
       $output = drupal_strtolower($output);
     }
   }
+  return $output;
+}
 
-  // Enforce the maximum component length
-  $maxlength = min(variable_get('pathauto_max_component_length', 100), 128);
-  $output = drupal_substr($output, 0, $maxlength);
+/**
+ * Clean up an alias.
+ *
+ * This strips leading and trailing separators from the alias, and invokes
+ * hook_pathauto_clean_alias() for other modules to have their chance.
+ *
+ * @param $alias
+ *   A path alias to clean.
+ * @param $clean_slash
+ *   Whether to clean slashes from the alias..
+ * @return
+ *   The cleaned alias.
+ */
+function pathauto_clean_alias($alias) {
+  $output = $alias;
+  $separator = variable_get('pathauto_separator', '-');
+
+  // Trim duplicates and remove trailing and leading separators.
+  $output = _pathauto_clean_separators($output, $separator);
+
+  // Give other modules a chance to clean this alias.
+  module_invoke_all('pathauto_clean_alias', $output);
 
   return $output;
 }
@@ -301,6 +349,10 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
   // Trim any leading or trailing slashes
   $alias = preg_replace('/^\/|\/+$/', '', $alias);
 
+  // Clean the alias.
+  $alias = pathauto_clean_alias($alias);
+
+  // Enforce the maximum length.
   $maxlength = min(variable_get('pathauto_max_length', 100), 128);
   $alias = drupal_substr($alias, 0, $maxlength);
 
