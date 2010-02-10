@@ -303,6 +303,9 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
       // alias checkbox is checked.
       drupal_add_js(drupal_get_path('module', 'pathauto') .'/pathauto.js');
 
+      // Override path.module's vertical tabs summary.
+      $form['path']['#attached']['js']['vertical-tabs'] = drupal_get_path('module', 'pathauto') . '/pathauto.js';
+
       $form['path']['pathauto_perform_alias'] = array(
         '#type' => 'checkbox',
         '#title' => t('Automatic alias'),

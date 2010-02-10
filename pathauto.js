@@ -20,4 +20,21 @@ if (Drupal.jsEnabled) {
       }
     });
   });
+
+  Drupal.verticalTabs = Drupal.verticalTabs || {};
+
+  Drupal.verticalTabs.path = function() {
+    var path = $('#edit-path').val();
+    var automatic = $('#edit-pathauto-perform-alias').attr('checked');
+
+    if (automatic) {
+      return Drupal.t('Automatic alias');
+    }
+    if (path) {
+      return Drupal.t('Alias: @alias', { '@alias': path });
+    }
+    else {
+      return Drupal.t('No alias');
+    }
+  }
 }
