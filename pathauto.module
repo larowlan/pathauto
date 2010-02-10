@@ -137,7 +137,9 @@ function pathauto_token_values($type, $object = NULL) {
             }
             $values[$label .'path'] = $catpath . check_plain($category->name);
             $values[$label .'path-raw'] = $catpath_raw . $category->name;
-            $values[$label .'alias'] = drupal_get_path_alias('taxonomy/term/'. $category->tid);
+
+            $term = taxonomy_get_term($category->tid);
+            $values[$label .'alias'] = drupal_get_path_alias(taxonomy_term_path($term));
             if (!strncasecmp($values[$label .'alias'], 'taxonomy', 8)) {
               $values[$label .'alias'] = check_plain($category->name);
             }
