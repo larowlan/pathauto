@@ -209,7 +209,7 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     $output = preg_replace("/$seppattern+/", "$separator", $output);
 
     // Optionally convert to lower case.
-    if (variable_get('pathauto_case', PATHAUTO_CASE_LOWER)) {
+    if (variable_get('pathauto_case', 1)) {
       $output = drupal_strtolower($output);
     }
   }
