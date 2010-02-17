@@ -198,51 +198,49 @@ function pathauto_path_alias_types() {
  * Implementation of hook_nodeapi().
  */
 function pathauto_nodeapi(&$node, $op, $teaser, $page) {
-  if (module_exists('path')) {
-    switch ($op) {
-      case 'presave':
-        // About to be saved (before insert/update)
-        if (!empty($node->pathauto_perform_alias) && isset($node->old_alias)
-            && $node->path == '' && $node->old_alias != '') {
-          /**
-           * There was an old alias, but when pathauto_perform_alias was checked
-           * the javascript disabled the textbox which led to an empty value being
-           * submitted. Restoring the old path-value here prevents the Path module
-           * from deleting any old alias before Pathauto gets control.
-           */
-          $node->path = $node->old_alias;
-        }
-        break;
-      case 'insert':
-      case 'update':
-        _pathauto_include();
-        // Get the specific pattern or the default
-        if (variable_get('language_content_type_'. $node->type, 0)) {
-          $pattern = trim(variable_get('pathauto_node_'. $node->type .'_'. $node->language .'_pattern', FALSE));
-        }
+  switch ($op) {
+    case 'presave':
+      // About to be saved (before insert/update)
+      if (!empty($node->pathauto_perform_alias) && isset($node->old_alias)
+          && $node->path == '' && $node->old_alias != '') {
+        /**
+         * There was an old alias, but when pathauto_perform_alias was checked
+         * the javascript disabled the textbox which led to an empty value being
+         * submitted. Restoring the old path-value here prevents the Path module
+         * from deleting any old alias before Pathauto gets control.
+         */
+        $node->path = $node->old_alias;
+      }
+      break;
+    case 'insert':
+    case 'update':
+      _pathauto_include();
+      // Get the specific pattern or the default
+      if (variable_get('language_content_type_'. $node->type, 0)) {
+        $pattern = trim(variable_get('pathauto_node_'. $node->type .'_'. $node->language .'_pattern', FALSE));
+      }
+      if (empty($pattern)) {
+        $pattern = trim(variable_get('pathauto_node_'. $node->type .'_pattern', FALSE));
         if (empty($pattern)) {
-          $pattern = trim(variable_get('pathauto_node_'. $node->type .'_pattern', FALSE));
-          if (empty($pattern)) {
-            $pattern = trim(variable_get('pathauto_node_pattern', FALSE));
-          }
+          $pattern = trim(variable_get('pathauto_node_pattern', FALSE));
         }
-        // Only do work if there's a pattern
-        if ($pattern) {
-          // Only create an alias if the checkbox was not provided or if the checkbox was provided and is checked
-          if (!isset($node->pathauto_perform_alias) || $node->pathauto_perform_alias) {
-            $placeholders = pathauto_get_placeholders('node', $node);
-            $src = "node/$node->nid";
-            $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
-          }
+      }
+      // Only do work if there's a pattern
+      if ($pattern) {
+        // Only create an alias if the checkbox was not provided or if the checkbox was provided and is checked
+        if (!isset($node->pathauto_perform_alias) || $node->pathauto_perform_alias) {
+          $placeholders = pathauto_get_placeholders('node', $node);
+          $src = "node/$node->nid";
+          $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
         }
-        break;
-      case 'delete':
-        path_set_alias('node/'. $node->nid);
-        path_set_alias('node/'. $node->nid .'/feed');
-        break;
-      default:
-        break;
-    }
+      }
+      break;
+    case 'delete':
+      path_set_alias('node/'. $node->nid);
+      path_set_alias('node/'. $node->nid .'/feed');
+      break;
+    default:
+      break;
   }
 }
 
