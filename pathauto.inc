@@ -347,7 +347,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
 
   // Shorten to a logical place based on the last separator.
   $separator = variable_get('pathauto_separator', '-');
-  $maxlength = min(variable_get('pathauto_max_length', 100), 128);
+  $maxlength = min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength());
 
   // Make sure we're not ending the alias in the middle of a word.
   $alias = _pathauto_truncate_chars($alias, $maxlength, $separator);
@@ -589,4 +589,19 @@ function _pathauto_truncate_chars($string, $length, $separator) {
     }
   }
   return $string;
+}
+
+/**
+ * Fetch the maximum length of the {url_alias}.dst field from the schema.
+ *
+ * @return
+ *   An integer of the maximum url alias length allowed by the database.
+ */
+function _pathauto_get_schema_alias_maxlength() {
+  static $maxlength;
+  if (!isset($maxlength)) {
+    $schema = drupal_get_schema('url_alias');
+    $maxlength = $schema['fields']['dst']['length'];
+  }
+  return $maxlength;
 }
