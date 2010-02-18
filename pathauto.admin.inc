@@ -140,8 +140,10 @@ function pathauto_admin_settings() {
 
   $form['general']['pathauto_ignore_words'] = array(
     '#type' => 'textarea',
-    '#title' => t('Strings to Remove'), '#default_value' => variable_get('pathauto_ignore_words', implode(',', $ignore_words)),
+    '#title' => t('Strings to Remove'),
+    '#default_value' => variable_get('pathauto_ignore_words', implode(',', $ignore_words)),
     '#description' => t('Words to strip out of the URL alias, separated by commas. Do not place punctuation in here and do not use WYSIWYG editors on this field.'),
+    '#wysiwyg' => FALSE,
   );
 
   $form['punctuation'] = array(
