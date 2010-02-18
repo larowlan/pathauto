@@ -125,8 +125,8 @@ function pathauto_token_values($type, $object = NULL) {
               $catpath = pathauto_cleanstring(check_plain($parent->name)) .'/'. $catpath;
               $catpath_raw = pathauto_cleanstring($parent->name) .'/'. $catpath_raw;
             }
-            $values[$label .'path'] = $catpath . check_plain($category->name);
-            $values[$label .'path-raw'] = $catpath_raw . $category->name;
+            $values[$label .'path'] = $catpath . pathauto_cleanstring(check_plain($category->name));
+            $values[$label .'path-raw'] = $catpath_raw . pathauto_cleanstring($category->name);
 
             $term = taxonomy_get_term($category->tid);
             $values[$label .'alias'] = drupal_get_path_alias(taxonomy_term_path($term));
