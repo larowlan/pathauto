@@ -11,7 +11,7 @@
 /**
  * Implements hook_token_list().
  */
-function pathauto_token_list($type = 'all') {
+function _pathauto_token_list($type = 'all') {
   $tokens = array();
   if (module_exists('taxonomy')) {
     if ($type == 'taxonomy' || $type == 'all') {
@@ -36,7 +36,7 @@ function pathauto_token_list($type = 'all') {
 /**
  * Implements hook_token_values().
  */
-function pathauto_token_values($type, $object = NULL) {
+function _pathauto_token_values($type, $object = NULL) {
   $values = array();
   if (module_exists('taxonomy')) {
     if ($type == 'taxonomy' || $type == 'node' || $type == 'all') {

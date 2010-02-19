@@ -72,10 +72,25 @@ function pathauto_menu() {
  */
 function _pathauto_include() {
   module_load_include('inc', 'pathauto');
-  module_load_include('inc', 'pathauto', 'pathauto.tokens');
   module_load_include('inc', 'pathauto', 'pathauto_node');
   module_load_include('inc', 'pathauto', 'pathauto_taxonomy');
   module_load_include('inc', 'pathauto', 'pathauto_user');
+}
+
+/**
+ * Implements hook_token_list().
+ */
+function pathauto_token_list($type = 'all') {
+  module_load_include('inc', 'pathauto', 'pathauto.tokens');
+  return _pathauto_token_list($type, $object);
+}
+
+/**
+ * Implements hook_token_values().
+ */
+function pathauto_token_values($type, $object = NULL) {
+  module_load_include('inc', 'pathauto', 'pathauto.tokens');
+  return _pathauto_token_values($type, $object);
 }
 
 /**
