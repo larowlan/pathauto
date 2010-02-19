@@ -37,6 +37,7 @@ function pathauto_token_list($type = 'all') {
  * Implements hook_token_values().
  */
 function pathauto_token_values($type, $object = NULL) {
+  $values = array();
   if (module_exists('taxonomy')) {
     if ($type == 'taxonomy' || $type == 'node' || $type == 'all') {
       _pathauto_include();
@@ -45,15 +46,8 @@ function pathauto_token_values($type, $object = NULL) {
           // Get the bookpathalias token
           $values['bookpathalias'] = '';
           // We're on a node and it's a book and it has a parent? Get the book path alias.
-          if (module_exists('book') && !empty($object->book['menu_name'])) {
-            for ($i = 1; $i < 10; $i++) {
-              $second_child = $i + 2;
-              if (!$object->book["p$second_child"]) {
-                $parent_node = db_result(db_query('SELECT link_path FROM {menu_links} WHERE mlid = %d', $object->book["p$i"]));
-                break;
-              }
-            }
-            $values['bookpathalias'] = drupal_get_path_alias($parent_node);
+          if (module_exists('book') && !empty($object->book['plid']) && $parent = book_link_load($object->book['plid'])) {
+            $values['bookpathalias'] = drupal_get_path_alias($parent['href']);
           }
 
           // Get taxonomy related data.
@@ -96,7 +90,7 @@ function pathauto_token_values($type, $object = NULL) {
             $values[$label .'alias'] = '';
           }
       }
-      return $values;
     }
   }
+  return $values;
 }
