@@ -231,6 +231,8 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
  *   actual values to be substituted into the pattern (e.g., $node->title).
  * @param $src
  *   The "real" URI of the content to be aliased (e.g., "node/$node->nid").
+ * @param $entity_id
+ *   The entity ID (node ID, user ID, etc.).
  * @param $type
  *   For modules which provided pattern items in hook_pathauto(),
  *   the relevant identifier for the specific item to be aliased
@@ -372,6 +374,10 @@ function _pathauto_path_is_callback($path) {
  *   The internal path.
  * @param $dst
  *   The visible externally used path.
+ * @param $entity_type
+ *   The entity type (node, user, etc.).
+ * @param $entity_id
+ *   The entity ID (node ID, user ID, etc.).
  * @param $pid
  *   If the item is currently aliased, the pid for that item.
  * @param $verbose
