@@ -426,7 +426,7 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
             $new_user->roles = isset($edit['roles']) ? $edit['roles'] : array();
             $new_user->roles[DRUPAL_AUTHENTICATED_RID] = 'authenticated user'; // Add this back
           }
-          if (user_access('create blog entries', $new_user)) {
+          if (node_access('create', 'blog', $new_user)) {
             $src = 'blog/'. $user->uid;
             $alias = pathauto_create_alias('blog', $op, $placeholders, $src, $user->uid);
           }
