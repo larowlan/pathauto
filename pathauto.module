@@ -82,7 +82,7 @@ function _pathauto_include() {
  */
 function pathauto_token_list($type = 'all') {
   module_load_include('inc', 'pathauto', 'pathauto.tokens');
-  return _pathauto_token_list($type, $object);
+  return _pathauto_token_list($type);
 }
 
 /**
