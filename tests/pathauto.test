@@ -17,8 +17,32 @@ function pathauto_simpletest_alter(&$groups) {
     unset($groups['Pathauto']);
   }
 }
+/**
+ * Unit tests for Pathauto functions.
+ */
+class PathautoUnitTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Pathauto unit tests',
+      'description' => 'Unit tests for Pathauto functions.',
+      'group' => 'Pathauto',
+    );
+  }
 
- /**
+  function setUp() {
+    parent::setUp('path', 'token', 'pathauto');
+    module_load_include('inc', 'pathauto');
+  }
+
+  /**
+   * Test _pathauto_get_schema_alias_maxlength().
+   */
+  function testGetSchemaAliasMaxLength() {
+    $this->assertIdentical(_pathauto_get_schema_alias_maxlength(), 128);
+  }
+}
+
+/**
  * Helper test class with some added functions for testing.
  */
 class PathautoTestHelper extends DrupalWebTestCase {

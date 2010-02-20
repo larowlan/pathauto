@@ -237,6 +237,8 @@ function pathauto_clean_alias($alias) {
  *   actual values to be substituted into the pattern (e.g., $node->title).
  * @param $src
  *   The "real" URI of the content to be aliased (e.g., "node/$node->nid").
+ * @param $entity_id
+ *   The entity ID (node ID, user ID, etc.).
  * @param $type
  *   For modules which provided pattern items in hook_pathauto(),
  *   the relevant identifier for the specific item to be aliased
@@ -307,7 +309,7 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
   $alias = pathauto_clean_alias($alias);
 
   // Enforce the maximum length.
-  $maxlength = min(variable_get('pathauto_max_length', 100), 128);
+  $maxlength = min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength());
   $alias = drupal_substr($alias, 0, $maxlength);
 
   // If the alias already exists, generate a new, hopefully unique, variant
@@ -379,6 +381,10 @@ function _pathauto_path_is_callback($path) {
  *   The internal path.
  * @param $dst
  *   The visible externally used path.
+ * @param $entity_type
+ *   The entity type (node, user, etc.).
+ * @param $entity_id
+ *   The entity ID (node ID, user ID, etc.).
  * @param $pid
  *   If the item is currently aliased, the pid for that item.
  * @param $verbose
@@ -521,4 +527,19 @@ function pathauto_punctuation_chars() {
   $punctuation['back_slash']         = array('value' => '\\', 'name' => t('Back slash \\'));
 
   return $punctuation;
+}
+
+/**
+ * Fetch the maximum length of the {url_alias}.dst field from the schema.
+ *
+ * @return
+ *   An integer of the maximum url alias length allowed by the database.
+ */
+function _pathauto_get_schema_alias_maxlength() {
+  static $maxlength;
+  if (!isset($maxlength)) {
+    $schema = drupal_get_schema('url_alias');
+    $maxlength = $schema['fields']['dst']['length'];
+  }
+  return $maxlength;
 }
