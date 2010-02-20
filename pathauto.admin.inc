@@ -156,11 +156,19 @@ function pathauto_admin_settings() {
 
   $punctuation = pathauto_punctuation_chars();
   foreach ($punctuation as $name => $details) {
-    $form['punctuation']['pathauto_punctuation_'. $name ] = array(
+    $details['default'] = 0;
+    if ($details['value'] == variable_get('pathauto_separator', '-')) {
+      $details['default'] = 1;
+    }
+    $form['punctuation']['pathauto_punctuation_'. $name] = array(
       '#type' => 'select',
       '#title' => $details['name'],
-      '#default_value' => variable_get('pathauto_punctuation_'. $name, 0),
-      '#options' => array('0' => t('Remove'), '1' => t('Replace by separator'), '2' => t('No action (do not replace)')),
+      '#default_value' => variable_get('pathauto_punctuation_'. $name, $details['default']),
+      '#options' => array(
+        '0' => t('Remove'),
+        '1' => t('Replace by separator'),
+        '2' => t('No action (do not replace)'),
+      ),
     );
   }
 
