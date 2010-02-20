@@ -19,29 +19,34 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function pathauto_help($path, $arg) {
   switch ($path) {
     case 'admin/help#pathauto':
       module_load_include('inc', 'pathauto');
-      $output = '<p>'. t('Provides a mechanism for modules to automatically generate aliases for the content they manage.') .'</p>';
-      $output .= '<h2>'. t('Settings') .'</h2>';
-      $output .= '<p>'. t('The <strong>maximum alias length</strong> and <strong>maximum component length</strong> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "dst" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "dst" column it will cause problems in situations where the system needs to append additional words to the aliased URL. For example, URLs generated for feeds will have "/feed" added to the end. You should enter a value that is the length of the "dst" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => _pathauto_get_schema_alias_maxlength())) .'</p>';
-      $output .= '<p>'. t('<strong>Raw tokens</strong>: In Pathauto it is appropriate to use the -raw form of tokens. Paths are sent through a filtering system which ensures that raw user content is filtered. Failure to use -raw tokens can cause problems with the Pathauto punctuation filtering system.') .'</p>';
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provides a mechanism for modules to automatically generate aliases for the content they manage.') . '</p>';
+      $output .= '<h3>' . t('Settings') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Maximum alias and component length') . '</dt>';
+      $output .= '<dd>' . t('The <em>maximum alias length</em> and <em>maximum component length</em> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "alias" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "alias" column it will cause problems in situations where the system needs to append additional words to the aliased URL. For example, URLs generated for feeds will have "/feed" added to the end. You should enter a value that is the length of the "alias" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => _pathauto_get_schema_alias_maxlength())) . '</dd>';
+      $output .= '<dt>' . t('Raw tokens') . '</dt>';
+      $output .= '<dd>' . t('In Pathauto it is appropriate to use the -raw form of tokens. Paths are sent through a filtering system which ensures that raw user content is filtered. Failure to use -raw tokens can cause problems with the Pathauto punctuation filtering system.') . '</dd>';
+      $output .= '</dl>';
       return $output;
   }
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  */
 function pathauto_perm() {
   return array('administer pathauto', 'notify of path changes');
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function pathauto_menu() {
   $items['admin/build/path/pathauto'] = array(
@@ -94,7 +99,7 @@ function pathauto_token_values($type, $object = NULL) {
 }
 
 /**
- * Implementation of hook_path_alias_types().
+ * Implements hook_path_alias_types().
  *
  * Used primarily by the bulk delete form.
  */
@@ -119,7 +124,7 @@ function pathauto_path_alias_types() {
 // Some node related functions.
 
 /**
- * Implementation of hook_nodeapi().
+ * Implements hook_nodeapi().
  */
 function pathauto_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
@@ -169,7 +174,7 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * This allows alias creators to override Pathauto and specify their
  * own aliases (Pathauto will be invisible to other users). Inserted
@@ -247,7 +252,7 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_node_operations().
+ * Implements hook_node_operations().
  */
 function pathauto_node_operations() {
   $operations = array(
@@ -278,7 +283,7 @@ function pathauto_node_operations_update($nodes) {
 // Taxonomy related functions.
 
 /**
- * Implementation of hook_taxonomy().
+ * Implements hook_taxonomy().
  */
 function pathauto_taxonomy($op, $type, $object = NULL) {
   switch ($type) {
@@ -320,7 +325,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
 // User related functions.
 
 /**
- * Implementation of hook_user() for users, trackers, and blogs.
+ * Implements hook_user() for users, trackers, and blogs.
  */
 function pathauto_user($op, &$edit, &$user, $category = FALSE) {
   switch ($op) {
