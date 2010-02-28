@@ -150,7 +150,7 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
   $output = _pathauto_clean_separators($output, $separator);
 
   // Enforce the maximum component length
-  $maxlength = min(variable_get('pathauto_max_component_length', 100), 128);
+  $maxlength = min(variable_get('pathauto_max_component_length', 100), _pathauto_get_schema_alias_maxlength());
   $output = drupal_substr($output, 0, $maxlength);
 
   return $output;
