@@ -124,6 +124,42 @@ function pathauto_path_alias_types() {
   return $objects;
 }
 
+/**
+ * Load an URL alias pattern by entity, bundle, and language.
+ *
+ * @param $entity
+ *   An entity (e.g. node, taxonomy, user, etc.)
+ * @param $bundle
+ *   A bundle (e.g. node type, vocabulary ID, etc.)
+ * @param $language
+ *   An optional language code.
+ */
+function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = '') {
+  static $patterns = array();
+
+  $pattern_id = "$entity:$bundle:$language";
+  if (!isset($patterns[$pattern_id])) {
+    $variables = array();
+    if ($language) {
+      $variables[] = "pathauto_{$entity}_{$bundle}_{$language}_pattern";
+    }
+    if ($bundle) {
+      $variables[] = "pathauto_{$entity}_{$bundle}_pattern";
+    }
+    $variables[] = "pathauto_{$entity}_pattern";
+
+    foreach ($variables as $variable) {
+      if ($pattern = trim(variable_get($variable, ''))) {
+        break;
+      }
+    }
+
+    $patterns[$pattern_id] = $pattern;
+  }
+
+  return $patterns[$pattern_id];
+}
+
 //==============================================================================
 // Some node related functions.
 
@@ -147,19 +183,10 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
       break;
     case 'insert':
     case 'update':
-      _pathauto_include();
-      // Get the specific pattern or the default
-      if (variable_get('language_content_type_'. $node->type, 0)) {
-        $pattern = trim(variable_get('pathauto_node_'. $node->type .'_'. $node->language .'_pattern', FALSE));
-      }
-      if (empty($pattern)) {
-        $pattern = trim(variable_get('pathauto_node_'. $node->type .'_pattern', FALSE));
-        if (empty($pattern)) {
-          $pattern = trim(variable_get('pathauto_node_pattern', FALSE));
-        }
-      }
-      // Only do work if there's a pattern
-      if ($pattern) {
+      // Only do work if there's a pattern.
+      $language = variable_get('language_content_type_' . $node->type, 0) ? $node->language : '';
+      if ($pattern = pathauto_pattern_load_by_entity('node', $node->type, $language)) {
+        _pathauto_include();
         // Only create an alias if the checkbox was not provided or if the checkbox was provided and is checked
         if (!isset($node->pathauto_perform_alias) || $node->pathauto_perform_alias) {
           $placeholders = pathauto_get_placeholders('node', $node);
@@ -188,19 +215,10 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
   // Process only node forms.
   if (isset($form['type']) && isset($form['#node']) && $form['type']['#value'] .'_node_form' == $form_id) {
     $node = $form['#node'];
-    $pattern = FALSE;
 
     // Find if there is an automatic alias pattern for this node type.
-    if (isset($form['language'])) {
-      $language = isset($form['language']['#value']) ? $form['language']['#value'] : $form['language']['#default_value'];
-      $pattern = trim(variable_get('pathauto_node_' . $form['type']['#value'] . '_' . $language . '_pattern', ''));
-    }
-    if (!$pattern) {
-      $pattern = trim(variable_get('pathauto_node_' . $form['type']['#value'] . '_pattern', ''));
-      if (!$pattern) {
-        $pattern = trim(variable_get('pathauto_node_pattern', ''));
-      }
-    }
+    $language = isset($node->language) ? $node->language : '';
+    $pattern = pathauto_pattern_load_by_entity('node', $node->type, $language);
 
     // If there is a pattern, show the automatic alias checkbox.
     if ($pattern) {
@@ -295,16 +313,20 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
       switch ($op) {
         case 'insert':
         case 'update':
-          _pathauto_include();
-          // Use the category info to automatically create an alias
           $category = (object) $object;
-          if ($category->name) {
-            $count = _taxonomy_pathauto_alias($category, $op);
-          }
 
-          // For all children generate new alias (important if [catpath] used)
-          foreach (taxonomy_get_tree($category->vid, $category->tid) as $subcategory) {
-            $count = _taxonomy_pathauto_alias($subcategory, $op);
+          // Only do work if there's a pattern.
+          if ($pattern = pathauto_pattern_load_by_entity('taxonomy', $category->vid)) {
+            _pathauto_include();
+            // Use the category info to automatically create an alias
+            if ($category->name) {
+              $count = _taxonomy_pathauto_alias($category, $op);
+            }
+
+            // For all children generate new alias (important if [catpath] used)
+            foreach (taxonomy_get_tree($category->vid, $category->tid) as $subcategory) {
+              $count = _taxonomy_pathauto_alias($subcategory, $op);
+            }
           }
 
           break;
