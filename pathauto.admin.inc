@@ -17,12 +17,6 @@
 function pathauto_admin_settings() {
   _pathauto_include();
 
-  // Make sure they have token
-  if (!function_exists('token_get_list')) {
-    drupal_set_message(t('It appears that the <a href="@token_link">Token module</a> is not installed. Please ensure that you have it installed so that Pathauto can work properly. You may need to disable Pathauto and re-enable it to get Token enabled.', array('@token_link' => 'http://drupal.org/project/token')), 'error');
-    return;
-  }
-
   // Default words to ignore
   $ignore_words = array(
     'a', 'an', 'as', 'at', 'before', 'but', 'by', 'for', 'from', 'is', 'in',
@@ -122,7 +116,7 @@ function pathauto_admin_settings() {
   $transliteration_help = t('When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet? Transliteration is handled by the Transliteration module.');
   if (!module_exists('transliteration')) {
     $disable_transliteration = TRUE;
-    $transliteration_help .= ' <strong>'. t("This option is disabled on your site because the Transliteration module either isn't installed, or isn't installed properly.") .'</strong>';
+    $transliteration_help .= ' <strong>' . t("This option is disabled on your site because the Transliteration module either isn't installed, or isn't installed properly.") . '</strong>';
     // Make sure we don't try to use Transliteration if it isn't available
     variable_set('pathauto_transliterate', FALSE);
   }
@@ -164,10 +158,10 @@ function pathauto_admin_settings() {
     if ($details['value'] == variable_get('pathauto_separator', '-')) {
       $details['default'] = PATHAUTO_PUNCTUATION_REPLACE;
     }
-    $form['punctuation']['pathauto_punctuation_'. $name] = array(
+    $form['punctuation']['pathauto_punctuation_' . $name] = array(
       '#type' => 'select',
       '#title' => $details['name'],
-      '#default_value' => variable_get('pathauto_punctuation_'. $name, $details['default']),
+      '#default_value' => variable_get('pathauto_punctuation_' . $name, $details['default']),
       '#options' => array(
         PATHAUTO_PUNCTUATION_REMOVE => t('Remove'),
         PATHAUTO_PUNCTUATION_REPLACE => t('Replace by separator'),
@@ -188,7 +182,7 @@ function pathauto_admin_settings() {
     $patterndefault = $settings->patterndefault;
     $groupheader = $settings->groupheader;
     $supportsfeeds = isset($settings->supportsfeeds) ? $settings->supportsfeeds : NULL;
-    variable_set('pathauto_'. $module .'_supportsfeeds', $supportsfeeds);
+    variable_set('pathauto_' . $module . '_supportsfeeds', $supportsfeeds);
 
     $form[$module] = array(
       '#type' => 'fieldset',
@@ -200,7 +194,7 @@ function pathauto_admin_settings() {
     $group_weight++;
 
     // Prompt for the default pattern for this module
-    $variable = 'pathauto_'. $module .'_pattern';
+    $variable = 'pathauto_' . $module . '_pattern';
     $description = '';
     if (!count($_POST)) {
       $error = _pathauto_check_pattern(variable_get($variable, $patterndefault), $settings->token_type);
@@ -222,7 +216,7 @@ function pathauto_admin_settings() {
     // them up here
     if (isset($settings->patternitems)) {
       foreach ($settings->patternitems as $itemname => $itemlabel) {
-        $variable = 'pathauto_'. $module .'_'. $itemname .'_pattern';
+        $variable = 'pathauto_' . $module . '_' . $itemname . '_pattern';
         $description = '';
         if (!count($_POST)) {
           $error = _pathauto_check_pattern(variable_get($variable, $patterndefault), $settings->token_type);
@@ -245,8 +239,8 @@ function pathauto_admin_settings() {
     // this module, as a description on the last pattern
     $doc = "<dl>\n";
     foreach ($settings->placeholders as $name => $description) {
-      $doc .= '<dt>'. $name .'</dt>';
-      $doc .= '<dd>'. $description .'</dd>';
+      $doc .= '<dt>' . $name . '</dt>';
+      $doc .= '<dd>' . $description . '</dd>';
     }
     $doc .= "</dl>\n";
     $form[$module]['token_help'] = array(
@@ -262,10 +256,10 @@ function pathauto_admin_settings() {
 
     // If the module supports bulk updates, offer the update action here
     if ($settings->bulkname) {
-      $variable = 'pathauto_'. $module .'_bulkupdate';
+      $variable = 'pathauto_' . $module . '_bulkupdate';
       if (variable_get($variable, FALSE)) {
         variable_set($variable, FALSE);
-        $function = $module .'_pathauto_bulkupdate';
+        $function = $module . '_pathauto_bulkupdate';
         call_user_func($function);
       }
       $form[$module][$variable] = array(
@@ -278,7 +272,7 @@ function pathauto_admin_settings() {
 
     // If the module supports feeds, offer to generate aliases for them
     if ($supportsfeeds) {
-      $variable = 'pathauto_'. $module .'_applytofeeds';
+      $variable = 'pathauto_' . $module . '_applytofeeds';
       $current = variable_get($variable, $supportsfeeds);
       // This checks for the old style from 2.0 and earlier. TODO: At some point we can drop that.
       if (is_numeric($current)) {
@@ -385,7 +379,7 @@ function pathauto_admin_settings_validate($form, &$form_state) {
   $punctuation = pathauto_punctuation_chars();
   foreach ($punctuation as $name => $details) {
     if ($details['value'] == $separator) {
-      $action = $form_state['values']['pathauto_punctuation_'. $name];
+      $action = $form_state['values']['pathauto_punctuation_' . $name];
       if ($action == PATHAUTO_PUNCTUATION_REMOVE) {
         drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings. This can cause problems with your patterns and especially with the catpath and termpath patterns. You should probably set the action for @name to be "replace by separator".', array('@name' => $details['name'])), 'error');
       }
@@ -409,7 +403,6 @@ function pathauto_admin_delete() {
    10) where dst like 'pattern' - DON'T DO
   */
 
-  $form = array();
   $form['delete'] = array(
     '#type' => 'fieldset',
     '#title' => t('Choose aliases to delete'),
@@ -439,7 +432,7 @@ function pathauto_admin_delete() {
   }
 
   // Warn them and give a button that shows we mean business
-  $form['warning'] = array('#value' => '<p>'. t('<strong>Note:</strong> there is no confirmation. Be sure of your action before clicking the "Delete aliases now!" button.<br />You may want to make a backup of the database and/or the url_alias table prior to using this feature.') .'</p>');
+  $form['warning'] = array('#value' => '<p>' . t('<strong>Note:</strong> there is no confirmation. Be sure of your action before clicking the "Delete aliases now!" button.<br />You may want to make a backup of the database and/or the url_alias table prior to using this feature.') . '</p>');
   $form['buttons']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Delete aliases now!'),
@@ -490,6 +483,6 @@ function _pathauto_warn_wysiwygs() {
     }
   }
   if ($wysiwyg_problem) {
-    return '<strong> '. t('You appear to be using a "WYSIWYG" editor which can cause problems if that editor runs on the Pathauto administrative settings page. Please be sure to disable these editors for all text boxes on this page. See the "WYSIWYG Conflicts" section of the README.txt file for more information.') .'</strong>';
+    return '<strong> ' . t('You appear to be using a "WYSIWYG" editor which can cause problems if that editor runs on the Pathauto administrative settings page. Please be sure to disable these editors for all text boxes on this page. See the "WYSIWYG Conflicts" section of the README.txt file for more information.') . '</strong>';
   }
 }

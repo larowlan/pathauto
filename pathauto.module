@@ -30,7 +30,7 @@ function pathauto_help($path, $arg) {
       $output .= '<h3>' . t('Settings') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Maximum alias and component length') . '</dt>';
-      $output .= '<dd>' . t('The <em>maximum alias length</em> and <em>maximum component length</em> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "alias" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "alias" column it will cause problems in situations where the system needs to append additional words to the aliased URL. For example, URLs generated for feeds will have "/feed" added to the end. You should enter a value that is the length of the "alias" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => _pathauto_get_schema_alias_maxlength())) . '</dd>';
+      $output .= '<dd>' . t('The <strong>maximum alias length</strong> and <strong>maximum component length</strong> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "alias" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "alias" column it will cause problems in situations where the system needs to append additional words to the aliased URL. For example, URLs generated for feeds will have "/feed" added to the end. You should enter a value that is the length of the "alias" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => _pathauto_get_schema_alias_maxlength())) . '</dd>';
       $output .= '<dt>' . t('Raw tokens') . '</dt>';
       $output .= '<dd>' . t('In Pathauto it is appropriate to use the -raw form of tokens. Paths are sent through a filtering system which ensures that raw user content is filtered. Failure to use -raw tokens can cause problems with the Pathauto punctuation filtering system.') . '</dd>';
       $output .= '</dl>';
@@ -42,7 +42,10 @@ function pathauto_help($path, $arg) {
  * Implements hook_perm().
  */
 function pathauto_perm() {
-  return array('administer pathauto', 'notify of path changes');
+  return array(
+    'administer pathauto',
+    'notify of path changes',
+  );
 }
 
 /**
@@ -66,6 +69,7 @@ function pathauto_menu() {
     'page arguments' => array('pathauto_admin_delete'),
     'access arguments' => array('administer url aliases'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 11,
     'file' => 'pathauto.admin.inc',
   );
 
@@ -189,10 +193,10 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
     // Find if there is an automatic alias pattern for this node type.
     if (isset($form['language'])) {
       $language = isset($form['language']['#value']) ? $form['language']['#value'] : $form['language']['#default_value'];
-      $pattern = trim(variable_get('pathauto_node_'. $form['type']['#value'] .'_'. $language .'_pattern', ''));
+      $pattern = trim(variable_get('pathauto_node_' . $form['type']['#value'] . '_' . $language . '_pattern', ''));
     }
     if (!$pattern) {
-      $pattern = trim(variable_get('pathauto_node_'. $form['type']['#value'] .'_pattern', ''));
+      $pattern = trim(variable_get('pathauto_node_' . $form['type']['#value'] . '_pattern', ''));
       if (!$pattern) {
         $pattern = trim(variable_get('pathauto_node_pattern', ''));
       }
@@ -232,7 +236,7 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
       );
 
       if (user_access('administer pathauto')) {
-        $form['path']['pathauto_perform_alias']['#description'] .= ' '. t('To control the format of the generated aliases, see the <a href="@pathauto">automated alias settings</a>.', array('@pathauto' => url('admin/build/path/pathauto')));
+        $form['path']['pathauto_perform_alias']['#description'] .= ' ' . t('To control the format of the generated aliases, see the <a href="@pathauto">automated alias settings</a>.', array('@pathauto' => url('admin/build/path/pathauto')));
       }
 
       if ($node->pathauto_perform_alias && !empty($node->old_alias) && empty($node->path)) {
