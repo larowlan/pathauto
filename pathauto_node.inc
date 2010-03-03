@@ -9,7 +9,7 @@
  */
 
 /**
- * Implementation of hook_pathauto().
+ * Implements hook_pathauto().
  */
 function node_pathauto($op) {
   switch ($op) {
@@ -17,7 +17,7 @@ function node_pathauto($op) {
       $settings = array();
       $settings['module'] = 'node';
       $settings['token_type'] = 'node';
-      $settings['groupheader'] = t('Node path settings');
+      $settings['groupheader'] = t('Node paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all node types with blank patterns below)');
       $settings['patterndefault'] = t('content/[title-raw]');
       $settings['bulkname'] = t('Bulk generate aliases for nodes that are not aliased');
@@ -111,8 +111,8 @@ function node_pathauto_bulkupdate() {
         $node->taxonomy = array_keys(taxonomy_node_get_terms($node));
       }
       $placeholders = pathauto_get_placeholders('node', $node);
-      $src = "node/$node->nid";
-      if (pathauto_create_alias('node', 'bulkupdate', $placeholders, $src, $node->nid, $node->type, $node->language)) {
+      $source = "node/$node->nid";
+      if (pathauto_create_alias('node', 'bulkupdate', $placeholders, $source, $node->nid, $node->type, $node->language)) {
         $count++;
       }
     }

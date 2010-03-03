@@ -9,7 +9,7 @@
  */
 
 /**
- * Implementation of hook_pathauto() for taxonomy module.
+ * Implements hook_pathauto().
  */
 function taxonomy_pathauto($op) {
   switch ($op) {
@@ -17,7 +17,7 @@ function taxonomy_pathauto($op) {
       $settings = array();
       $settings['module'] = 'taxonomy';
       $settings['token_type'] = 'taxonomy';
-      $settings['groupheader'] = t('Taxonomy term path settings');
+      $settings['groupheader'] = t('Taxonomy term paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
       $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');
       $patterns = token_get_list('taxonomy');
@@ -28,6 +28,7 @@ function taxonomy_pathauto($op) {
           }
         }
       }
+
       $settings['supportsfeeds'] = '0/feed';
       $settings['bulkname'] = t('Bulk generate aliases for terms that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing terms which do not already have aliases.');
@@ -102,14 +103,14 @@ function _taxonomy_pathauto_alias($category, $op) {
   $forum_vid = variable_get('forum_nav_vocabulary', '');
   // If we're in a forum vocabulary, also create a forum container, forum, or forum topic alias.
   if (module_exists('forum') && $forum_vid == (int)$category->vid) {
-    $src = 'forum/'. $category->tid;
-    if (pathauto_create_alias('forum', $op, $placeholders, $src, $category->tid, $category->vid)) {
+    $source = 'forum/'. $category->tid;
+    if (pathauto_create_alias('forum', $op, $placeholders, $source, $category->tid, $category->vid)) {
       $count++;
     }
   }
   else {
-    $src = taxonomy_term_path($category);
-    if (pathauto_create_alias('taxonomy', $op, $placeholders, $src, $category->tid, $category->vid)) {
+    $source = taxonomy_term_path($category);
+    if (pathauto_create_alias('taxonomy', $op, $placeholders, $source, $category->tid, $category->vid)) {
       $count++;
     }
   }
@@ -125,9 +126,10 @@ function forum_pathauto($op) {
       $settings = array();
       $settings['module'] = 'forum';
       $settings['token_type'] = 'taxonomy';
-      $settings['groupheader'] = t('Forum path settings');
+      $settings['groupheader'] = t('Forum paths');
       $settings['patterndescr'] = t('Pattern for forums and forum containers');
       $settings['patterndefault'] = t('[vocab-raw]/[catpath-raw]');
+
       $patterns = token_get_list('taxonomy');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
@@ -136,8 +138,9 @@ function forum_pathauto($op) {
           }
         }
       }
+
       $settings['supportsfeeds'] = '0/feed';
-      $settings['bulkname'] = t('Bulk generate forum paths');
+      $settings['bulkname'] = t('Bulk generate aliases for forum paths that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing forums and forum containers which do not already have aliases.');
       return (object) $settings;
     default:
