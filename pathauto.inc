@@ -26,7 +26,7 @@ function _pathauto_alias_exists($alias, $src, $language = '') {
     // Delete from path_redirect the exact same alias to the same node.
     path_redirect_delete_multiple(NULL, array('source' => $alias, 'redirect' => $src));
 
-    // If there still is this alias used in path_redirect, then create a different alias
+    // If there still is this alias used in path_redirect, then create a different alias.
     $redirects = path_redirect_load_multiple(NULL, array('source' => $alias));
   }
   if ($alias_pid || !empty($redirects)) {
@@ -127,14 +127,14 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     $output = strtr($output, $translations);
   }
 
-  // Reduce to the subset of ASCII96 letters and numbers
+  // Reduce strings to letters and numbers
   if (variable_get('pathauto_reduce_ascii', FALSE)) {
     $pattern = '/[^a-zA-Z0-9\/]+/ ';
     $output = preg_replace($pattern, $separator, $output);
   }
 
   // Get rid of words that are on the ignore list
-  $ignore_re = '\b'. preg_replace('/,/', '\b|\b', variable_get('pathauto_ignore_words', $ignore_words)) .'\b';
+  $ignore_re = '\b' . preg_replace('/,/', '\b|\b', variable_get('pathauto_ignore_words', $ignore_words)) . '\b';
 
   if (function_exists('mb_eregi_replace')) {
     $output = mb_eregi_replace($ignore_re, '', $output);
@@ -258,13 +258,13 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
 
   // Retrieve and apply the pattern for this content type
   if (!empty($type)) {
-    $pattern = trim(variable_get('pathauto_'. $module .'_'. $type .'_'. $language .'_pattern', ''));
+    $pattern = trim(variable_get("pathauto_{$module}_{$type}_{$language}_pattern", ''));
     if (empty($pattern)) {
-      $pattern = trim(variable_get('pathauto_'. $module .'_'. $type .'_pattern', ''));
+      $pattern = trim(variable_get("pathauto_{$module}_{$type}_pattern", ''));
     }
   }
   if (empty($pattern)) {
-    $pattern = trim(variable_get('pathauto_'. $module .'_pattern', ''));
+    $pattern = trim(variable_get("pathauto_{$module}_pattern", ''));
   }
   // No pattern? Do nothing (otherwise we may blow away existing aliases...)
   if (empty($pattern)) {
@@ -334,13 +334,13 @@ function pathauto_create_alias($module, $op, $placeholders, $src, $entity_id, $t
   }
 
   // If $pid is NULL, a new alias is created - otherwise, the existing
-  // alias for the designated src is replaced
+  // alias for the designated src is replaced.
   _pathauto_set_alias($src, $alias, $module, $entity_id, $pid, $verbose, $old_alias, $language);
 
   // Also create a related feed alias if requested, and if supported
   // by the module
-  if (drupal_strlen(variable_get('pathauto_'. $module .'_applytofeeds', ''))) {
-    $feedappend = variable_get('pathauto_'. $module .'_applytofeeds', '');
+  if (drupal_strlen(variable_get('pathauto_' . $module . '_applytofeeds', ''))) {
+    $feedappend = variable_get('pathauto_' . $module . '_applytofeeds', '');
 
     // For forums and taxonomies, the src doesn't always form the base of the rss feed (ie. image galleries)
     if ($module == 'taxonomy' || $module == 'forum') {
@@ -520,7 +520,7 @@ function pathauto_punctuation_chars() {
   $punctuation['exclamation']        = array('value' => '!', 'name' => t('Exclamation !'));
   $punctuation['tilde']              = array('value' => '~', 'name' => t('Tilde ~'));
   $punctuation['left_parenthesis']   = array('value' => '(', 'name' => t('Left parenthesis ('));
-  $punctuation['right_parenthesis']  = array('value' => ')', 'name' => t('right parenthesis )'));
+  $punctuation['right_parenthesis']  = array('value' => ')', 'name' => t('Right parenthesis )'));
   $punctuation['question_mark']      = array('value' => '?', 'name' => t('Question mark ?'));
   $punctuation['less_than']          = array('value' => '<', 'name' => t('Less than <'));
   $punctuation['greater_than']       = array('value' => '>', 'name' => t('Greater than >'));
