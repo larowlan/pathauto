@@ -54,10 +54,10 @@ class PathautoUnitTestCase extends DrupalWebTestCase {
     $tests = array(
       array('entity' => 'node', 'bundle' => 'story', 'language' => 'fr', 'expected' => 'story/[node:title]'),
       array('entity' => 'node', 'bundle' => 'story', 'language' => 'en', 'expected' => 'story/en/[node:title]'),
-      array('entity' => 'node', 'bundle' => 'story', 'language' => LANGUAGE_NONE, 'expected' => 'story/[node:title]'),
+      array('entity' => 'node', 'bundle' => 'story', 'language' => '', 'expected' => 'story/[node:title]'),
       array('entity' => 'node', 'bundle' => 'page', 'language' => 'en', 'expected' => 'content/[node:title]'),
-      array('entity' => 'user', 'bundle' => 'user', 'language' => LANGUAGE_NONE, 'expected' => 'users/[user:name]'),
-      array('entity' => 'invalid-entity', 'bundle' => '', 'language' => LANGUAGE_NONE, 'expected' => ''),
+      array('entity' => 'user', 'bundle' => 'user', 'language' => '', 'expected' => 'users/[user:name]'),
+      array('entity' => 'invalid-entity', 'bundle' => '', 'language' => '', 'expected' => ''),
     );
     foreach ($tests as $test) {
       $actual = pathauto_pattern_load_by_entity($test['entity'], $test['bundle'], $test['language']);
