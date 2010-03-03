@@ -335,6 +335,12 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
   // Replace the placeholders with the values provided by the module.
   $alias = str_replace($placeholders['tokens'], $placeholders['values'], $pattern);
 
+  // Two or more slashes should be collapsed into one
+  $alias = preg_replace('/\/+/', '/', $alias);
+
+  // Trim any leading or trailing slashes
+  $alias = preg_replace('/^\/|\/+$/', '', $alias);
+
   // Clean the alias.
   $alias = pathauto_clean_alias($alias);
 
