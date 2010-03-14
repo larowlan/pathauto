@@ -72,17 +72,15 @@ function _pathauto_token_values($type, $object = NULL, $label = NULL) {
 
       // Tokens [catpath] and [catpath-raw].
       if (isset($object->tid)) {
-        _pathauto_include();
+        module_load_include('inc', 'pathauto');
         $parents = taxonomy_get_parents_all($object->tid);
-        array_shift($parents);
-        $catpath = '';
-        $catpath_raw = '';
+        $catpath = $catpath_raw = array();
         foreach ($parents as $parent) {
-          $catpath = pathauto_cleanstring(check_plain($parent->name)) . '/' . $catpath;
-          $catpath_raw = pathauto_cleanstring($parent->name) . '/' . $catpath_raw;
+          array_unshift($catpath, pathauto_cleanstring(check_plain($parent->name)));
+          array_unshift($catpath_raw, pathauto_cleanstring($parent->name));
         }
-        $values[$label . 'path'] = $catpath . pathauto_cleanstring(check_plain($object->name));
-        $values[$label . 'path-raw'] = $catpath_raw . pathauto_cleanstring($object->name);
+        $values[$label . 'path'] = implode('/', $catpath);
+        $values[$label . 'path-raw'] = implode('/', $catpath_raw);
 
         // Token [catalias].
         $values[$label . 'alias'] = drupal_get_path_alias(taxonomy_term_path($object));

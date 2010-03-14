@@ -197,6 +197,7 @@ class PathautoBookTokenTestCase extends PathautoTestHelper {
     $this->assertToken('node', $sub_child_node1, 'bookpathalias', 'root/sub-page1');
   }
 }
+
 /*
  * Unit tests for the taxonomy tokens provided by Pathauto.
  */
