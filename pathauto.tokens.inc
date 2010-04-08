@@ -36,7 +36,7 @@ function _pathauto_token_list($type = 'all') {
 /**
  * Implements hook_token_values().
  */
-function _pathauto_token_values($type, $object = NULL, $label = NULL) {
+function _pathauto_token_values($type, $object = NULL, $options = array(), $label = NULL) {
   $values = array();
 
   switch ($type) {
@@ -55,7 +55,7 @@ function _pathauto_token_values($type, $object = NULL, $label = NULL) {
         // This query is copied from @taxonomy_node_get_terms()
         $term = db_fetch_object(db_query_range('SELECT t.* FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {vocabulary} v ON t.vid = v.vid WHERE r.vid = %d ORDER BY v.weight, t.weight, t.name', $object->vid, 0, 1));
         if ($term) {
-          $values = array_merge($values, _pathauto_token_values('taxonomy', $term, 'term'));
+          $values = array_merge($values, _pathauto_token_values('taxonomy', $term, $options, 'term'));
         }
       }
       break;
