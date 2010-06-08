@@ -198,7 +198,7 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
         if (!isset($node->pathauto_perform_alias) || $node->pathauto_perform_alias) {
           $placeholders = pathauto_get_placeholders('node', $node);
           $src = "node/$node->nid";
-          $alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
+          $node->path = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
         }
       }
       break;
