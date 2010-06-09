@@ -22,15 +22,6 @@ function node_pathauto($op) {
       $settings['patterndefault'] = t('content/[title-raw]');
       $settings['bulkname'] = t('Bulk generate aliases for nodes that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing nodes which do not already have aliases.');
-
-      $patterns = token_get_list('node');
-      foreach ($patterns as $type => $pattern_set) {
-        if ($type != 'global') {
-          foreach ($pattern_set as $pattern => $description) {
-            $settings['placeholders']['['. $pattern .']'] = $description;
-          }
-        }
-      }
       $settings['supportsfeeds'] = 'feed';
 
       if (module_exists('locale')) {

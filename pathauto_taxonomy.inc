@@ -20,15 +20,6 @@ function taxonomy_pathauto($op) {
       $settings['groupheader'] = t('Taxonomy term paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
       $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');
-      $patterns = token_get_list('taxonomy');
-      foreach ($patterns as $type => $pattern_set) {
-        if ($type != 'global') {
-          foreach ($pattern_set as $pattern => $description) {
-            $settings['placeholders']['['. $pattern .']'] = $description;
-          }
-        }
-      }
-
       $settings['supportsfeeds'] = '0/feed';
       $settings['bulkname'] = t('Bulk generate aliases for terms that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing terms which do not already have aliases.');
@@ -129,16 +120,6 @@ function forum_pathauto($op) {
       $settings['groupheader'] = t('Forum paths');
       $settings['patterndescr'] = t('Pattern for forums and forum containers');
       $settings['patterndefault'] = t('[vocab-raw]/[catpath-raw]');
-
-      $patterns = token_get_list('taxonomy');
-      foreach ($patterns as $type => $pattern_set) {
-        if ($type != 'global') {
-          foreach ($pattern_set as $pattern => $description) {
-            $settings['placeholders']['['. $pattern .']'] = $description;
-          }
-        }
-      }
-
       $settings['supportsfeeds'] = '0/feed';
       $settings['bulkname'] = t('Bulk generate aliases for forum paths that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing forums and forum containers which do not already have aliases.');

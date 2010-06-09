@@ -81,6 +81,13 @@ class PathautoUnitTestCase extends PathautoUnitTestHelper {
       $this->assertIdentical($actual, $test['expected'], t("pathauto_pattern_load_by_entity('@entity', '@bundle', '@language') returned '@actual', expected '@expected'", array('@entity' => $test['entity'], '@bundle' => $test['bundle'], '@language' => $test['language'], '@actual' => $actual, '@expected' => $test['expected'])));
     }
   }
+
+  function testGetRawTokens() {
+    $raw_tokens = _pathauto_get_raw_tokens();
+    $this->assertFalse(in_array('catpath', $raw_tokens), 'Non-raw tokens not included.');
+    $this->assertTrue(in_array('catpath-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
+    $this->assertFalse(in_array('catalias-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
+  }
 }
 
 /**
@@ -223,6 +230,43 @@ class PathautoFunctionalTestCase extends PathautoTestHelper {
 
     $this->assertEntityAlias('user', $account, 'users/' . drupal_strtolower($account->name));
     $this->assertEntityAlias('user', $this->admin_user, 'user/' . $this->admin_user->uid);
+  }
+
+  function testSettingsValidation() {
+    $edit = array();
+    $edit['pathauto_max_length'] = 'abc';
+    $edit['pathauto_max_component_length'] = 'abc';
+    $this->drupalPost('admin/build/path/settings', $edit, 'Save configuration');
+    $this->assertText('The field Maximum alias length is not a valid number.');
+    $this->assertText('The field Maximum component length is not a valid number.');
+    $this->assertNoText('The configuration options have been saved.');
+
+    $edit['pathauto_max_length'] = '0';
+    $edit['pathauto_max_component_length'] = '0';
+    $this->drupalPost('admin/build/path/settings', $edit, 'Save configuration');
+    $this->assertText('The field Maximum alias length cannot be less than 1.');
+    $this->assertText('The field Maximum component length cannot be less than 1.');
+    $this->assertNoText('The configuration options have been saved.');
+
+    $edit['pathauto_max_length'] = '999';
+    $edit['pathauto_max_component_length'] = '999';
+    $this->drupalPost('admin/build/path/settings', $edit, 'Save configuration');
+    $this->assertText('The field Maximum alias length cannot be greater than 128.');
+    $this->assertText('The field Maximum component length cannot be greater than 128.');
+    $this->assertNoText('The configuration options have been saved.');
+
+    $edit['pathauto_max_length'] = '50';
+    $edit['pathauto_max_component_length'] = '50';
+    $this->drupalPost('admin/build/path/settings', $edit, 'Save configuration');
+    $this->assertText('The configuration options have been saved.');
+  }
+
+  function testPatternsValidation() {
+    $edit = array();
+    $edit['pathauto_node_pattern'] = '[title-raw]/[user-created-small]/[cat]/[term]';
+    $this->drupalPost('admin/build/path/patterns', $edit, 'Save configuration');
+    $this->assertText('The Default path pattern (applies to all node types with blank patterns below) is using the following invalid tokens: [user-created-small], [cat].');
+    $this->assertNoText('The configuration options have been saved.');
   }
 }
 
