@@ -350,6 +350,12 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           // Only do work if there's a pattern.
           if ($pattern = pathauto_pattern_load_by_entity('taxonomy', $category->vid)) {
             _pathauto_include();
+
+            // Clear the taxonomy term's static cache.
+            if ($op == 'update') {
+              taxonomy_get_term($category->tid, TRUE);
+            }
+
             // Use the category info to automatically create an alias
             if ($category->name) {
               $count = _taxonomy_pathauto_alias($category, $op);
