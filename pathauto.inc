@@ -86,30 +86,7 @@ function _pathauto_existing_alias_data($src) {
  *   The cleaned string.
  */
 function pathauto_cleanstring($string, $clean_slash = TRUE) {
-  // Default words to ignore
-  $ignore_words = array(
-    'a', 'an', 'as', 'at', 'before', 'but', 'by', 'for', 'from', 'is', 'in',
-    'into', 'like', 'of', 'off', 'on', 'onto', 'per', 'since', 'than', 'the',
-    'this', 'that', 'to', 'up', 'via', 'with',
-  );
-
-  // Replace or drop punctuation based on user settings
-  $separator = variable_get('pathauto_separator', '-');
   $output = $string;
-  $punctuation = pathauto_punctuation_chars();
-  foreach ($punctuation as $name => $details) {
-    $action = variable_get('pathauto_punctuation_'. $name, 0);
-    // 2 is the action for "do nothing" with the punctuation
-    if ($action != 2) {
-      // Slightly tricky inline if which either replaces with the separator or nothing
-      $output = str_replace($details['value'], ($action ? $separator : ''), $output);
-    }
-  }
-
-  // If something is already urlsafe then don't remove slashes
-  if ($clean_slash) {
-    $output = str_replace('/', '', $output);
-  }
 
   // Optionally remove accents and transliterate
   if (variable_get('pathauto_transliterate', FALSE)) {
@@ -127,15 +104,38 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     $output = strtr($output, $translations);
   }
 
+  // Replace or drop punctuation based on user settings
+  $separator = variable_get('pathauto_separator', '-');
+  $punctuation = pathauto_punctuation_chars();
+  foreach ($punctuation as $name => $details) {
+    $action = variable_get('pathauto_punctuation_'. $name, 0);
+    // 2 is the action for "do nothing" with the punctuation
+    if ($action != 2) {
+      // Slightly tricky inline if which either replaces with the separator or nothing
+      $output = str_replace($details['value'], ($action ? $separator : ''), $output);
+    }
+  }
+
+  // If something is already urlsafe then don't remove slashes
+  if ($clean_slash) {
+    $output = str_replace('/', '', $output);
+  }
+
   // Reduce strings to letters and numbers
   if (variable_get('pathauto_reduce_ascii', FALSE)) {
     $pattern = '/[^a-zA-Z0-9\/]+/ ';
     $output = preg_replace($pattern, $separator, $output);
   }
 
+  // Default words to ignore
+  $ignore_words = array(
+    'a', 'an', 'as', 'at', 'before', 'but', 'by', 'for', 'from', 'is', 'in',
+    'into', 'like', 'of', 'off', 'on', 'onto', 'per', 'since', 'than', 'the',
+    'this', 'that', 'to', 'up', 'via', 'with',
+  );
+
   // Get rid of words that are on the ignore list
   $ignore_re = '\b' . preg_replace('/,/', '\b|\b', variable_get('pathauto_ignore_words', $ignore_words)) . '\b';
-
   if (function_exists('mb_eregi_replace')) {
     $output = mb_eregi_replace($ignore_re, '', $output);
   }
