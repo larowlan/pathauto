@@ -88,6 +88,24 @@ class PathautoUnitTestCase extends PathautoUnitTestHelper {
     $this->assertTrue(in_array('catpath-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
     $this->assertFalse(in_array('catalias-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
   }
+
+  /**
+   * Test the 'ignored words' removal functionality of pathauto_cleanstring().
+   */
+  function testIgnoredWordRemoval() {
+    variable_set('pathauto_ignore_words', ', that, this, with, ');
+
+    $tests = array(
+      'this' => 'this',
+      'this with that' => 'this-with-that',
+      'this thing with that thing' => 'thing-thing',
+    );
+
+    foreach ($tests as $input => $expected) {
+      $output = pathauto_cleanstring($input);
+      $this->assertEqual($output, $expected, t("pathauto_cleanstring('@input') expected '@expected', actual '@output'", array('@input' => $input, '@expected' => $expected, '@output' => $output)));
+    }
+  }
 }
 
 /**
