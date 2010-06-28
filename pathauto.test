@@ -41,6 +41,24 @@ class PathautoUnitTestCase extends DrupalWebTestCase {
   function testGetSchemaAliasMaxLength() {
     $this->assertIdentical(_pathauto_get_schema_alias_maxlength(), 128);
   }
+
+  /**
+   * Test the 'ignored words' removal functionality of pathauto_cleanstring().
+   */
+  function testIgnoredWordRemoval() {
+    variable_set('pathauto_ignore_words', ', that, this, with, ');
+
+    $tests = array(
+      'this' => 'this',
+      'this with that' => 'this-with-that',
+      'this thing with that thing' => 'thing-thing',
+    );
+
+    foreach ($tests as $input => $expected) {
+      $output = pathauto_cleanstring($input);
+      $this->assertEqual($output, $expected, t("pathauto_cleanstring('@input') expected '@expected', actual '@output'", array('@input' => $input, '@expected' => $expected, '@output' => $output)));
+    }
+  }
 }
 
 /**
