@@ -251,9 +251,17 @@ class PathautoTaxonomyTokenTestCase extends PathautoTestHelper {
     $term1 = $this->addTerm($this->vocab, array('weight' => 5));
     $term2 = $this->addTerm($this->vocab, array('weight' => -5));
     $term3 = $this->addTerm($this->vocab, array('weight' => 0));
-    $node = $this->drupalCreateNode(array('taxonomy' => array($term1->tid, $term2->tid, $term3->tid)));
+
+    $node = $this->drupalCreateNode(array(
+      'type' => 'story',
+      'taxonomy' => array($term1->tid, $term2->tid, $term3->tid),
+    ));
     $this->assertToken('node', $node, 'termpath', $term2->name);
     $this->assertToken('node', $node, 'termalias', "category/{$this->vocab->name}/{$term2->name}");
+
+    $non_term_node = $this->drupalCreateNode(array('type' => 'story'));
+    $this->assertToken('node', $non_term_node, 'termpath', '');
+    $this->assertToken('node', $non_term_node, 'termalias', '');
   }
 
   function addVocabulary(array $vocabulary = array()) {

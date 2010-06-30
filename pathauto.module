@@ -135,6 +135,9 @@ function pathauto_token_values($type, $object = NULL, $options = array(), $label
         if ($term) {
           $values = array_merge($values, pathauto_token_values('taxonomy', $term, $options, 'term'));
         }
+        else {
+          $values['termpath'] = $values['termpath-raw'] = $values['termalias'] = '';
+        }
       }
       break;
 
