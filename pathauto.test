@@ -392,6 +392,10 @@ class PathautoTaxonomyTokenTestCase extends PathautoUnitTestHelper {
 
     $this->assertToken('node', $node, 'termpath', $term2->name);
     $this->assertToken('node', $node, 'termalias', "category/{$this->vocab->name}/{$term2->name}");
+
+    $non_term_node = $this->drupalCreateNode(array('type' => 'story'));
+    $this->assertToken('node', $non_term_node, 'termpath', '');
+    $this->assertToken('node', $non_term_node, 'termalias', '');
   }
 
   function addVocabulary(array $vocabulary = array()) {

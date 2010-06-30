@@ -57,6 +57,9 @@ function _pathauto_token_values($type, $object = NULL, $options = array(), $labe
         if ($term) {
           $values = array_merge($values, _pathauto_token_values('taxonomy', $term, $options, 'term'));
         }
+        else {
+          $values['termpath'] = $values['termpath-raw'] = $values['termalias'] = '';
+        }
       }
       break;
 
