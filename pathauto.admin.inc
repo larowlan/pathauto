@@ -45,13 +45,16 @@ function pathauto_patterns_form($form_state) {
       '#default_value' => variable_get($variable, $patterndefault),
       '#size' => 65,
       '#maxlength' => 1280,
-      '#element_validate' => array('_pathauto_validate_pattern_element'),
-      '#token_type' => $settings->token_type,
+      '#element_validate' => array(
+        'token_element_validate_token_context',
+        '_pathauto_validate_pattern_element',
+      ),
+      '#token_types' => array($settings->token_type),
       '#parents' => array($variable),
     );
     if (!$_POST) {
       // Run validation to let user know of problems right away.
-      _pathauto_validate_pattern_element($form[$module][$variable], $form_state);
+      _form_validate($form[$module][$variable], $form_state);
     }
 
     // If the module supports a set of specialized patterns, set
@@ -65,13 +68,16 @@ function pathauto_patterns_form($form_state) {
           '#default_value' => variable_get($variable, ''),
           '#size' => 65,
           '#maxlength' => 1280,
-          '#element_validate' => array('_pathauto_validate_pattern_element'),
-          '#token_type' => $settings->token_type,
+          '#element_validate' => array(
+            'token_element_validate_token_context',
+            '_pathauto_validate_pattern_element',
+          ),
+          '#token_types' => array($settings->token_type),
           '#parents' => array($variable),
         );
         if (!$_POST) {
           // Run validation to let user know of problems right away.
-          _pathauto_validate_pattern_element($form[$module][$variable], $form_state);
+          _form_validate($form[$module][$variable], $form_state);
         }
       }
     }
@@ -301,23 +307,14 @@ function _pathauto_validate_numeric_element($element, &$form_state) {
  * Validate a form element that should have an URL alias pattern.
  */
 function _pathauto_validate_pattern_element(&$element, &$form_state) {
-  $value = isset($element['#value']) ? $element['#value'] : $element['#default_value'];
-  $invalid_tokens = token_get_invalid_tokens_by_context($value, array($element['#token_type']));
-  if ($invalid_tokens) {
-    form_error($element, t('The %pattern-title is using the following invalid tokens: @invalid-tokens.', array('%pattern-title' => $element['#title'], '@invalid-tokens' => implode(', ', $invalid_tokens))));
-  }
-
   // Find any non-raw tokens that do have a raw companion token and warn.
   module_load_include('inc', 'pathauto');
   $not_raw_tokens = array();
   $raw_tokens = _pathauto_get_raw_tokens();
+  $value = isset($element['#value']) ? $element['#value'] : $element['#default_value'];
   foreach (token_scan($value) as $token) {
     if (substr($token, -4) === '-raw') {
       // Skip raw tokens.
-      continue;
-    }
-    elseif (in_array($token, $invalid_tokens)) {
-      // Skips tokens we have already been warned about.
       continue;
     }
     elseif (in_array($token . '-raw', $raw_tokens)) {
