@@ -82,29 +82,36 @@ class PathautoUnitTestCase extends PathautoUnitTestHelper {
     }
   }
 
-  function testGetRawTokens() {
-    $raw_tokens = _pathauto_get_raw_tokens();
-    $this->assertFalse(in_array('catpath', $raw_tokens), 'Non-raw tokens not included.');
-    $this->assertTrue(in_array('catpath-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
-    $this->assertFalse(in_array('catalias-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
-  }
-
   /**
-   * Test the 'ignored words' removal functionality of pathauto_cleanstring().
+   * Test pathauto_cleanstring().
    */
-  function testIgnoredWordRemoval() {
-    variable_set('pathauto_ignore_words', ', that, this, with, ');
+  function testCleanString() {
+    $tests = array();
+    variable_set('pathauto_ignore_words', ', in, is,that, the  , this, with, ');
+    variable_set('pathauto_max_component_length', 35);
 
-    $tests = array(
-      'this' => 'this',
-      'this with that' => 'this-with-that',
-      'this thing with that thing' => 'thing-thing',
-    );
+    // Test the 'ignored words' removal.
+    $tests['this'] = 'this';
+    $tests['this with that'] = 'this-with-that';
+    $tests['this thing with that thing'] = 'thing-thing';
+
+    // Test length truncation and duplicate separator removal.
+    $tests[' - Pathauto is the greatest - module ever in Drupal history - '] = 'pathauto-greatest-module-ever';
 
     foreach ($tests as $input => $expected) {
       $output = pathauto_cleanstring($input);
       $this->assertEqual($output, $expected, t("pathauto_cleanstring('@input') expected '@expected', actual '@output'", array('@input' => $input, '@expected' => $expected, '@output' => $output)));
     }
+  }
+
+  /**
+   * Test _pathauto_get_raw_tokens().
+   */
+  function testGetRawTokens() {
+    $raw_tokens = _pathauto_get_raw_tokens();
+    $this->assertFalse(in_array('catpath', $raw_tokens), 'Non-raw tokens not included.');
+    $this->assertTrue(in_array('catpath-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
+    $this->assertFalse(in_array('catalias-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
   }
 }
 
@@ -389,7 +396,6 @@ class PathautoTaxonomyTokenTestCase extends PathautoUnitTestHelper {
       'type' => 'story',
       'taxonomy' => array($term1->tid, $term2->tid, $term3->tid),
     ));
-
     $this->assertToken('node', $node, 'termpath', $term2->name);
     $this->assertToken('node', $node, 'termalias', "category/{$this->vocab->name}/{$term2->name}");
 
