@@ -45,17 +45,11 @@ function pathauto_patterns_form($form_state) {
       '#default_value' => variable_get($variable, $patterndefault),
       '#size' => 65,
       '#maxlength' => 1280,
-      '#element_validate' => array(
-        'token_element_validate_token_context',
-        '_pathauto_validate_pattern_element',
-      ),
+      '#element_validate' => array('_pathauto_validate_pattern_element'),
+      '#after_build' => array('_pathauto_validate_pattern_element'),
       '#token_types' => array($settings->token_type),
       '#parents' => array($variable),
     );
-    if (!$_POST) {
-      // Run validation to let user know of problems right away.
-      _form_validate($form[$module][$variable], $form_state);
-    }
 
     // If the module supports a set of specialized patterns, set
     // them up here
@@ -68,17 +62,11 @@ function pathauto_patterns_form($form_state) {
           '#default_value' => variable_get($variable, ''),
           '#size' => 65,
           '#maxlength' => 1280,
-          '#element_validate' => array(
-            'token_element_validate_token_context',
-            '_pathauto_validate_pattern_element',
-          ),
+          '#element_validate' => array('_pathauto_validate_pattern_element'),
+          '#after_build' => array('_pathauto_validate_pattern_element'),
           '#token_types' => array($settings->token_type),
           '#parents' => array($variable),
         );
-        if (!$_POST) {
-          // Run validation to let user know of problems right away.
-          _form_validate($form[$module][$variable], $form_state);
-        }
       }
     }
 
@@ -307,6 +295,13 @@ function _pathauto_validate_numeric_element($element, &$form_state) {
  * Validate a form element that should have an URL alias pattern.
  */
 function _pathauto_validate_pattern_element(&$element, &$form_state) {
+  if (function_exists('token_element_validate_token_context') && function_exists('token_scan')) {
+    token_element_validate_token_context($element, $form_state);
+  }
+  else {
+    drupal_set_message(t('Please make sure you are using the latest version (6.x-1.x-dev) of Token module.'), 'error', FALSE);
+  }
+
   // Find any non-raw tokens that do have a raw companion token and warn.
   module_load_include('inc', 'pathauto');
   $not_raw_tokens = array();
@@ -321,6 +316,7 @@ function _pathauto_validate_pattern_element(&$element, &$form_state) {
       drupal_set_message(t('You are using the token [%token] which has a raw companion token [%raw_token]. For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing. See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $token . '-raw', '@pathauto-help' => url('admin/help/pathauto'))), 'error', FALSE);
     }
   }
+  return $element;
 }
 
 /**
