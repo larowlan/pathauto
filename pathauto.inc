@@ -96,7 +96,7 @@ function pathauto_cleanstring($string, $clean_slash = TRUE) {
     if (!$i18n_loaded) {
       $path = drupal_get_path('module', 'pathauto');
       if (is_file($path .'/i18n-ascii.txt')) {
-        $translations = parse_ini_file($path .'/i18n-ascii.txt');
+        $translations = drupal_parse_info_file($path .'/i18n-ascii.txt');
       }
       $i18n_loaded = true;
     }
