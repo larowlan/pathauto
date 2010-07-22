@@ -107,3 +107,16 @@ function pathauto_update_7() {
   }
   return $ret;
 }
+
+/**
+ * Remove the unsupported user/%/contact and user/%/tracker pattern variables.
+ */
+function pathauto_update_6200() {
+  variable_del('pathauto_contact_bulkupdate');
+  variable_del('pathauto_contact_pattern');
+  variable_del('pathauto_contact_supportsfeeds');
+  variable_del('pathauto_tracker_bulkupdate');
+  variable_del('pathauto_tracker_pattern');
+  variable_del('pathauto_tracker_supportsfeeds');
+  return array();
+}
