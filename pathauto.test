@@ -23,9 +23,13 @@ function pathauto_simpletest_alter(&$groups) {
  */
 class PathautoUnitTestHelper extends DrupalWebTestCase {
   function setUp() {
+    $args = func_get_args();
+
     // Call parent::setUp() allowing test cases to pass further modules.
-    $modules = func_get_args();
-    $modules = array_merge(array('token', 'path', 'pathauto'), $modules);
+    $modules = array('path', 'token', 'pathauto');
+    if (isset($args[0]) && is_array($args[0])) {
+      $modules = array_merge($modules, $args[0]);
+    }
     call_user_func_array(array('parent', 'setUp'), $modules);
   }
 
@@ -122,40 +126,115 @@ class PathautoTestHelper extends DrupalWebTestCase {
   protected $admin_user;
 
   function setUp() {
+    $args = func_get_args();
+
     // Call parent::setUp() allowing test cases to pass further modules.
-    $modules = func_get_args();
-    $modules = array_merge(array('path', 'token', 'pathauto'), $modules);
+    $modules = array('path', 'token', 'pathauto');
+    if (isset($args[0]) && is_array($args[0])) {
+      $modules = array_merge($modules, $args[0]);
+    }
     call_user_func_array(array('parent', 'setUp'), $modules);
 
     // Set pathauto settings we assume to be as-is in this test.
     variable_set('pathauto_node_page_pattern', 'content/[title-raw]');
 
-    $this->admin_user = $this->drupalCreateUser(array(
+    // Allow other modules to add additional permissions for the admin user.
+    $permissions = array(
       'administer pathauto',
       'administer url aliases',
       'create url aliases',
       'administer nodes',
       'administer users',
-    ));
+    );
+    if (isset($args[1]) && is_array($args[1])) {
+      $permissions = array_merge($permissions, $args[1]);
+    }
+    $this->admin_user = $this->drupalCreateUser($permissions);
 
     $this->drupalLogin($this->admin_user);
   }
 
-  function assertEntityAlias($entity_type, $entity, $expected_alias) {
+  function saveAlias($source, $alias, $language = '') {
+    path_set_alias($source, $alias, NULL, $language);
+    return db_fetch_array(db_query_range("SELECT * FROM {url_alias} WHERE src = '%s' AND dst = '%s' AND language = '%s' ORDER BY pid DESC", $source, $alias, $language, 0, 1));
+  }
+
+  function saveEntityAlias($entity_type, $entity, $alias, $language = '') {
+    $uri = $this->entity_uri($entity_type, $entity);
+    return $this->saveAlias($uri['path'], $alias, $language);
+  }
+
+  function assertEntityAlias($entity_type, $entity, $expected_alias, $language = '') {
+    $uri = $this->entity_uri($entity_type, $entity);
+    $this->assertAlias($uri['path'], $expected_alias, $language);
+  }
+
+  function assertNoEntityAlias($entity_type, $entity, $expected_alias, $langauge = '') {
+    $uri = $this->entity_uri($entity_type, $entity);
+    $this->assertEntityAlias($entity_type, $entity, $uri['path'], $language);
+  }
+
+  function assertAlias($source, $expected_alias, $language = '') {
+    $alias = drupal_get_path_alias($source, $language);
+    $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
+  }
+
+  function assertAliasExists($conditions) {
+    $alias = $this->path_load($conditions);
+    $this->assertTrue($alias, t('Alias with conditions @conditions found.', array('@conditions' => var_export($conditions, TRUE))));
+  }
+
+  function assertNoAliasExists($conditions) {
+    $alias = $this->path_load($conditions);
+    $this->assertFalse($alias, t('Alias with conditions @conditions not found.', array('@conditions' => var_export($conditions, TRUE))));
+  }
+
+  protected function entity_uri($entity_type, $entity) {
+    $uri = array();
+
     switch ($entity_type) {
       case 'node':
-        $path = 'node/' . $entity->nid;
+        $uri['path'] = 'node/' . $entity->nid;
+        break;
+      case 'taxonomy_term':
+        $uri['path'] = taxonomy_term_path($entity);
         break;
       case 'user':
-        $path = 'user/' . $entity->uid;
+        $uri['path'] = 'user/' . $entity->uid;
         break;
       default:
         return $this->fail(t('Unknown entity @type.', array('@type' => $entity_type)));
     }
 
-    drupal_clear_path_cache();
-    $alias = drupal_get_path_alias($path);
-    $this->assertIdentical($alias, $expected_alias, t('Alias for %path was %actual, expected %expected.', array('%path' => $path, '%actual' => $alias, '%expected' => $expected_alias)));
+    return $uri;
+  }
+
+  protected function path_load($conditions) {
+    if (is_numeric($conditions)) {
+      $conditions = array('pid' => $conditions);
+    }
+    elseif (is_string($conditions)) {
+      $conditions = array('src' => $conditions);
+    }
+
+    $args = array();
+    $schema = drupal_get_schema_unprocessed('system', 'url_alias');
+    foreach ($conditions as $field => $value) {
+      $field_type = $schema['fields'][$field]['type'];
+      if (is_array($value)) {
+        $conditions[$field] = "$field = " . db_placeholders($value, $field_type);
+        $args = array_merge($args, $value);
+      }
+      else {
+        $placeholder = db_type_placeholder($field_type);
+        $conditions[$field] = "$field = $placeholder";
+        $args[] = $value;
+      }
+
+    }
+
+    $sql = "SELECT * FROM {url_alias} WHERE " . implode(' AND ', $conditions);
+    return db_fetch_array(db_query_range($sql, $args, 0, 1));
   }
 }
 
@@ -420,5 +499,53 @@ class PathautoTaxonomyTokenTestCase extends PathautoUnitTestHelper {
     );
     taxonomy_save_term($term);
     return (object) $term;
+  }
+}
+
+class PathautoLocaleTestCase extends PathautoTestHelper {
+  public static function getInfo() {
+    return array(
+      'name' => 'Pathauto localization tests',
+      'description' => 'Test pathauto functionality with localization and translation.',
+      'group' => 'Pathauto',
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('locale', 'translation'), array('administer languages'));
+
+    // Add predefined language and reset the locale cache.
+    require_once './includes/locale.inc';
+    locale_add_language('fr', NULL, NULL, LANGUAGE_LTR, '', 'fr');
+    language_list('language', TRUE);
+    drupal_init_language();
+  }
+
+  /**
+   * Test that when an English node is updated, its old English alias is
+   * updated and its newer French alias is left intact.
+   */
+  function testLanguageAliases() {
+    $node = array(
+      'title' => 'English node',
+      'language' => 'en',
+      'path' => 'english-node',
+      'pathauto_perform_alias' => FALSE,
+    );
+    $node = $this->drupalCreateNode($node);
+    $english_alias = $this->path_load(array('dst' => 'english-node'));
+
+    // Also save a French alias that should not be left alone, even though
+    // it is the newer alias.
+    $this->saveEntityAlias('node', $node, 'french-node', 'fr');
+
+    // Update the node, triggering a change in the English alias.
+    $node = node_load($node->nid);
+    node_save($node);
+
+    // Check that the new English alias replaced the old one.
+    $this->assertEntityAlias('node', $node, 'content/english-node', 'en');
+    $this->assertEntityAlias('node', $node, 'french-node', 'fr');
+    $this->assertAliasExists(array('pid' => $english_alias['pid'], 'dst' => 'content/english-node'));
   }
 }
