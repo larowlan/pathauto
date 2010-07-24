@@ -21,7 +21,7 @@ function pathauto_simpletest_alter(&$groups) {
 /**
  * Helper test class with some added functions for testing.
  */
-class PathautoUnitTestHelper extends DrupalWebTestCase {
+class PathautoTestHelper extends DrupalWebTestCase {
   function setUp() {
     $args = func_get_args();
 
@@ -37,17 +37,118 @@ class PathautoUnitTestHelper extends DrupalWebTestCase {
     $tokens = pathauto_token_values($type, $object);
     $this->assertEqual($tokens[$token], $expected, t("Token value for [@token] was '!actual', expected value '!expected'.", array('@token' => $token, '!actual' => $tokens[$token], '!expected' => $expected)));
   }
+
+  function saveAlias($source, $alias, $language = '') {
+    path_set_alias($source, $alias, NULL, $language);
+    return db_fetch_array(db_query_range("SELECT * FROM {url_alias} WHERE src = '%s' AND dst = '%s' AND language = '%s' ORDER BY pid DESC", $source, $alias, $language, 0, 1));
+  }
+
+  function saveEntityAlias($entity_type, $entity, $alias, $language = '') {
+    $uri = $this->entity_uri($entity_type, $entity);
+    return $this->saveAlias($uri['path'], $alias, $language);
+  }
+
+  function assertEntityAlias($entity_type, $entity, $expected_alias, $language = '') {
+    $uri = $this->entity_uri($entity_type, $entity);
+    $this->assertAlias($uri['path'], $expected_alias, $language);
+  }
+
+  function assertNoEntityAlias($entity_type, $entity, $expected_alias, $langauge = '') {
+    $uri = $this->entity_uri($entity_type, $entity);
+    $this->assertEntityAlias($entity_type, $entity, $uri['path'], $language);
+  }
+
+  function assertAlias($source, $expected_alias, $language = '') {
+    $alias = drupal_get_path_alias($source, $language);
+    $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
+  }
+
+  function assertAliasExists($conditions) {
+    $alias = $this->path_load($conditions);
+    $this->assertTrue($alias, t('Alias with conditions @conditions found.', array('@conditions' => var_export($conditions, TRUE))));
+  }
+
+  function assertNoAliasExists($conditions) {
+    $alias = $this->path_load($conditions);
+    $this->assertFalse($alias, t('Alias with conditions @conditions not found.', array('@conditions' => var_export($conditions, TRUE))));
+  }
+
+  /**
+   * Backport of Drupal 7's entity_uri() function.
+   */
+  protected function entity_uri($entity_type, $entity) {
+    $uri = array();
+
+    switch ($entity_type) {
+      case 'node':
+        $uri['path'] = 'node/' . $entity->nid;
+        break;
+      case 'taxonomy_term':
+        $uri['path'] = taxonomy_term_path($entity);
+        break;
+      case 'user':
+        $uri['path'] = 'user/' . $entity->uid;
+        break;
+      default:
+        return $this->fail(t('Unknown entity @type.', array('@type' => $entity_type)));
+    }
+
+    return $uri;
+  }
+
+  /**
+   * Backport of Drupal 7's path_load() function.
+   */
+  protected function path_load($conditions) {
+    if (is_numeric($conditions)) {
+      $conditions = array('pid' => $conditions);
+    }
+    elseif (is_string($conditions)) {
+      $conditions = array('src' => $conditions);
+    }
+
+    // Adjust for some D7 {url_alias} column name changes so we can keep
+    // the test files in sync.
+    if (isset($conditions['source'])) {
+      $conditions['src'] = $conditions['source'];
+      unset($conditions['source']);
+    }
+    if (isset($conditions['alias'])) {
+      $conditions['dst'] = $conditions['alias'];
+      unset($conditions['alias']);
+    }
+
+    $args = array();
+    $schema = drupal_get_schema_unprocessed('system', 'url_alias');
+    foreach ($conditions as $field => $value) {
+      $field_type = $schema['fields'][$field]['type'];
+      if (is_array($value)) {
+        $conditions[$field] = "$field = " . db_placeholders($value, $field_type);
+        $args = array_merge($args, $value);
+      }
+      else {
+        $placeholder = db_type_placeholder($field_type);
+        $conditions[$field] = "$field = $placeholder";
+        $args[] = $value;
+      }
+
+    }
+
+    $sql = "SELECT * FROM {url_alias} WHERE " . implode(' AND ', $conditions);
+    return db_fetch_array(db_query_range($sql, $args, 0, 1));
+  }
 }
 
 /**
  * Unit tests for Pathauto functions.
  */
-class PathautoUnitTestCase extends PathautoUnitTestHelper {
+class PathautoUnitTestCase extends PathautoTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto unit tests',
       'description' => 'Unit tests for Pathauto functions.',
       'group' => 'Pathauto',
+      'dependencies' => array('token'),
     );
   }
 
@@ -109,6 +210,30 @@ class PathautoUnitTestCase extends PathautoUnitTestHelper {
   }
 
   /**
+   * Test the feed alias functionality of pathauto_create_alias().
+   */
+  function testFeedAliases() {
+    variable_set('pathauto_node_pattern', '[title-raw]');
+    variable_set('pathauto_node_applytofeeds', '');
+
+    // Create a node with an empty title, which should not create an alias.
+    $node = $this->drupalCreateNode(array('title' => ''));
+    $this->assertNoAliasExists(array('source' => "node/{$node->nid}"));
+    $this->assertNoAliasExists(array('source' => "node/{$node->nid}/feed"));
+
+    // Add a title to the node. This should still not generate a feed alias.
+    $node->title = 'Node title';
+    pathauto_node_update_alias($node, 'update');
+    $this->assertAliasExists(array('source' => "node/{$node->nid}", 'alias' => 'node-title'));
+    $this->assertNoAliasExists(array('source' => "node/{$node->nid}/feed"));
+
+    // Enable feeds for nodes. A feed alias should now be generated.
+    variable_set('pathauto_node_applytofeeds', ' feed ');
+    pathauto_node_update_alias($node, 'update');
+    $this->assertAliasExists(array('source' => "node/{$node->nid}/feed", 'alias' => 'node-title/feed'));
+  }
+
+  /**
    * Test _pathauto_get_raw_tokens().
    */
   function testGetRawTokens() {
@@ -122,18 +247,18 @@ class PathautoUnitTestCase extends PathautoUnitTestHelper {
 /**
  * Helper test class with some added functions for testing.
  */
-class PathautoTestHelper extends DrupalWebTestCase {
+class PathautoFunctionalTestHelper extends PathautoTestHelper {
   protected $admin_user;
 
   function setUp() {
     $args = func_get_args();
 
     // Call parent::setUp() allowing test cases to pass further modules.
-    $modules = array('path', 'token', 'pathauto');
+    $modules = array();
     if (isset($args[0]) && is_array($args[0])) {
       $modules = array_merge($modules, $args[0]);
     }
-    call_user_func_array(array('parent', 'setUp'), $modules);
+    parent::setUp($modules);
 
     // Set pathauto settings we assume to be as-is in this test.
     variable_set('pathauto_node_page_pattern', 'content/[title-raw]');
@@ -153,95 +278,12 @@ class PathautoTestHelper extends DrupalWebTestCase {
 
     $this->drupalLogin($this->admin_user);
   }
-
-  function saveAlias($source, $alias, $language = '') {
-    path_set_alias($source, $alias, NULL, $language);
-    return db_fetch_array(db_query_range("SELECT * FROM {url_alias} WHERE src = '%s' AND dst = '%s' AND language = '%s' ORDER BY pid DESC", $source, $alias, $language, 0, 1));
-  }
-
-  function saveEntityAlias($entity_type, $entity, $alias, $language = '') {
-    $uri = $this->entity_uri($entity_type, $entity);
-    return $this->saveAlias($uri['path'], $alias, $language);
-  }
-
-  function assertEntityAlias($entity_type, $entity, $expected_alias, $language = '') {
-    $uri = $this->entity_uri($entity_type, $entity);
-    $this->assertAlias($uri['path'], $expected_alias, $language);
-  }
-
-  function assertNoEntityAlias($entity_type, $entity, $expected_alias, $langauge = '') {
-    $uri = $this->entity_uri($entity_type, $entity);
-    $this->assertEntityAlias($entity_type, $entity, $uri['path'], $language);
-  }
-
-  function assertAlias($source, $expected_alias, $language = '') {
-    $alias = drupal_get_path_alias($source, $language);
-    $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
-  }
-
-  function assertAliasExists($conditions) {
-    $alias = $this->path_load($conditions);
-    $this->assertTrue($alias, t('Alias with conditions @conditions found.', array('@conditions' => var_export($conditions, TRUE))));
-  }
-
-  function assertNoAliasExists($conditions) {
-    $alias = $this->path_load($conditions);
-    $this->assertFalse($alias, t('Alias with conditions @conditions not found.', array('@conditions' => var_export($conditions, TRUE))));
-  }
-
-  protected function entity_uri($entity_type, $entity) {
-    $uri = array();
-
-    switch ($entity_type) {
-      case 'node':
-        $uri['path'] = 'node/' . $entity->nid;
-        break;
-      case 'taxonomy_term':
-        $uri['path'] = taxonomy_term_path($entity);
-        break;
-      case 'user':
-        $uri['path'] = 'user/' . $entity->uid;
-        break;
-      default:
-        return $this->fail(t('Unknown entity @type.', array('@type' => $entity_type)));
-    }
-
-    return $uri;
-  }
-
-  protected function path_load($conditions) {
-    if (is_numeric($conditions)) {
-      $conditions = array('pid' => $conditions);
-    }
-    elseif (is_string($conditions)) {
-      $conditions = array('src' => $conditions);
-    }
-
-    $args = array();
-    $schema = drupal_get_schema_unprocessed('system', 'url_alias');
-    foreach ($conditions as $field => $value) {
-      $field_type = $schema['fields'][$field]['type'];
-      if (is_array($value)) {
-        $conditions[$field] = "$field = " . db_placeholders($value, $field_type);
-        $args = array_merge($args, $value);
-      }
-      else {
-        $placeholder = db_type_placeholder($field_type);
-        $conditions[$field] = "$field = $placeholder";
-        $args[] = $value;
-      }
-
-    }
-
-    $sql = "SELECT * FROM {url_alias} WHERE " . implode(' AND ', $conditions);
-    return db_fetch_array(db_query_range($sql, $args, 0, 1));
-  }
 }
 
 /**
  * Test basic pathauto functionality.
  */
-class PathautoFunctionalTestCase extends PathautoTestHelper {
+class PathautoFunctionalTestCase extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto basic tests',
@@ -377,7 +419,7 @@ class PathautoFunctionalTestCase extends PathautoTestHelper {
 /*
  * Unit tests for the book tokens provided by Pathauto.
  */
-class PathautoBookTokenTestCase extends PathautoUnitTestHelper {
+class PathautoBookTokenTestCase extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto book tokens',
@@ -418,7 +460,7 @@ class PathautoBookTokenTestCase extends PathautoUnitTestHelper {
 /*
  * Unit tests for the taxonomy tokens provided by Pathauto.
  */
-class PathautoTaxonomyTokenTestCase extends PathautoUnitTestHelper {
+class PathautoTaxonomyTokenTestCase extends PathautoFunctionalTestHelper {
   protected $vocab;
 
   public static function getInfo() {
@@ -502,7 +544,7 @@ class PathautoTaxonomyTokenTestCase extends PathautoUnitTestHelper {
   }
 }
 
-class PathautoLocaleTestCase extends PathautoTestHelper {
+class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto localization tests',
@@ -533,19 +575,18 @@ class PathautoLocaleTestCase extends PathautoTestHelper {
       'pathauto_perform_alias' => FALSE,
     );
     $node = $this->drupalCreateNode($node);
-    $english_alias = $this->path_load(array('dst' => 'english-node'));
+    $english_alias = $this->path_load(array('alias' => 'english-node'));
 
     // Also save a French alias that should not be left alone, even though
     // it is the newer alias.
     $this->saveEntityAlias('node', $node, 'french-node', 'fr');
 
     // Update the node, triggering a change in the English alias.
-    $node = node_load($node->nid);
-    node_save($node);
+    pathauto_node_update_alias($node, 'update');
 
     // Check that the new English alias replaced the old one.
     $this->assertEntityAlias('node', $node, 'content/english-node', 'en');
     $this->assertEntityAlias('node', $node, 'french-node', 'fr');
-    $this->assertAliasExists(array('pid' => $english_alias['pid'], 'dst' => 'content/english-node'));
+    $this->assertAliasExists(array('pid' => $english_alias['pid'], 'alias' => 'content/english-node'));
   }
 }
