@@ -59,6 +59,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
   }
 
   function assertAlias($source, $expected_alias, $language = '') {
+    drupal_clear_path_cache();
     $alias = drupal_get_path_alias($source, $language);
     $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
   }
@@ -435,7 +436,7 @@ class PathautoFunctionalTestCase extends PathautoFunctionalTestHelper {
 /*
  * Unit tests for the book tokens provided by Pathauto.
  */
-class PathautoBookTokenTestCase extends PathautoFunctionalTestHelper {
+class PathautoBookTokenTestCase extends PathautoTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto book tokens',
@@ -445,7 +446,7 @@ class PathautoBookTokenTestCase extends PathautoFunctionalTestHelper {
   }
 
   function setUp() {
-    parent::setUp('book');
+    parent::setUp(array('book'));
     variable_set('book_allowed_types', array('book', 'page'));
     variable_set('pathauto_node_book_pattern', '[bookpathalias]/[title-raw]');
   }

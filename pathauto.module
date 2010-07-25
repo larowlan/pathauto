@@ -171,7 +171,7 @@ function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = '') 
 }
 
 /**
- * Delete an URL aliase and any sub-paths.
+ * Delete an URL alias and any sub-paths.
  *
  * Given a source like 'node/1' this function will delete any alias that have
  * that specific source or any sources that match 'node/1/%'.
