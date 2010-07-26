@@ -53,7 +53,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
     $this->assertAlias($uri['path'], $expected_alias, $language);
   }
 
-  function assertNoEntityAlias($entity_type, $entity, $expected_alias, $langauge = '') {
+  function assertNoEntityAlias($entity_type, $entity, $expected_alias, $language = '') {
     $uri = $this->entity_uri($entity_type, $entity);
     $this->assertEntityAlias($entity_type, $entity, $uri['path'], $language);
   }
