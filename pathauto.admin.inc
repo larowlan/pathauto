@@ -108,7 +108,7 @@ function pathauto_patterns_form($form_state) {
         '#title' => t('Internal feed alias text (leave blank to disable)'),
         '#size' => 65,
         '#maxlength' => 1280,
-        '#default_value' => $supportsfeeds,
+        '#default_value' => variable_get($variable, $supportsfeeds),
         '#description' => t('The text to use for aliases for RSS feeds. Examples are "0/feed" (used throughout Drupal core) and "feed" (used by some contributed Drupal modules, like Views).'),
       );
     }
