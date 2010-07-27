@@ -133,7 +133,8 @@ define('PATHAUTO_PREG_CLASS_UNICODE_WORD_BOUNDARY',
  *   TRUE if an alias exists, FALSE if not.
  */
 function _pathauto_alias_exists($alias, $source, $language = '') {
-  $alias_pid = db_result(db_query_range("SELECT pid FROM {url_alias} WHERE dst = '%s' AND src <> '%s' AND language = '%s'", array($alias, $source, $language), 0, 1));
+  $pid = db_result(db_query_range("SELECT pid FROM {url_alias} WHERE src <> '%s' AND dst = '%s' AND language IN ('%s', '') ORDER BY language DESC, pid DESC", $source, $alias, $language, 0, 1));
+
   if (module_exists('path_redirect') && function_exists('path_redirect_delete_multiple')) {
     // Delete from path_redirect the exact same alias to the same node.
     path_redirect_delete_multiple(NULL, array('source' => $alias, 'redirect' => $source));
@@ -141,7 +142,8 @@ function _pathauto_alias_exists($alias, $source, $language = '') {
     // If there still is this alias used in path_redirect, then create a different alias.
     $redirects = path_redirect_load_multiple(NULL, array('source' => $alias));
   }
-  if ($alias_pid || !empty($redirects)) {
+
+  if ($pid || !empty($redirects)) {
     return TRUE;
   }
   else {
@@ -420,10 +422,9 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
   $alias = pathauto_clean_alias($alias);
 
   // Shorten to a logical place based on the last separator.
+  // Make sure we're not ending the alias in the middle of a word.
   $separator = variable_get('pathauto_separator', '-');
   $maxlength = min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength());
-
-  // Make sure we're not ending the alias in the middle of a word.
   $alias = pathauto_truncate_utf8($alias, $maxlength, TRUE);
 
   // If the alias already exists, generate a new, hopefully unique, variant
@@ -648,6 +649,21 @@ function pathauto_punctuation_chars() {
 }
 
 /**
+ * Fetch the maximum length of the {url_alias}.dst field from the schema.
+ *
+ * @return
+ *   An integer of the maximum url alias length allowed by the database.
+ */
+function _pathauto_get_schema_alias_maxlength() {
+  static $maxlength;
+  if (!isset($maxlength)) {
+    $schema = drupal_get_schema('url_alias');
+    $maxlength = $schema['fields']['dst']['length'];
+  }
+  return $maxlength;
+}
+
+/**
  * Truncates a UTF-8-encoded string safely to a number of characters.
  *
  * This is a functional backport of Drupal 7's truncate_utf8().
@@ -727,21 +743,6 @@ function pathauto_truncate_utf8($string, $max_length, $wordsafe = FALSE, $add_el
   }
 
   return $string;
-}
-
-/**
- * Fetch the maximum length of the {url_alias}.dst field from the schema.
- *
- * @return
- *   An integer of the maximum url alias length allowed by the database.
- */
-function _pathauto_get_schema_alias_maxlength() {
-  static $maxlength;
-  if (!isset($maxlength)) {
-    $schema = drupal_get_schema('url_alias');
-    $maxlength = $schema['fields']['dst']['length'];
-  }
-  return $maxlength;
 }
 
 /**
