@@ -19,7 +19,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function pathauto_help($path, $arg) {
   switch ($path) {
@@ -43,21 +43,23 @@ function pathauto_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  */
 function pathauto_perm() {
-  return array('administer pathauto', 'notify of path changes');
+  return array(
+    'administer pathauto',
+    'notify of path changes',
+  );
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function pathauto_menu() {
   $items['admin/build/path/pathauto'] = array(
     'title' => 'Automated alias settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('pathauto_admin_settings'),
-    'access callback' => 'user_access',
     'access arguments' => array('administer pathauto'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
@@ -70,6 +72,7 @@ function pathauto_menu() {
     'page arguments' => array('pathauto_admin_delete'),
     'access arguments' => array('administer url aliases'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 30,
     'file' => 'pathauto.admin.inc',
   );
 
@@ -182,18 +185,22 @@ function pathauto_token_values($type, $object = NULL, $options = array(), $label
  * Used primarily by the bulk delete form.
  */
 function pathauto_path_alias_types() {
-  $objects = array('user/' => t('users'), 'node/' => t('content'));
+  $objects['user/'] = t('Users');
+  $objects['node/'] = t('Content');
   if (module_exists('blog')) {
-    $objects['blog/'] = t('user blogs');
+    $objects['blog/'] = t('User blogs');
   }
   if (module_exists('taxonomy')) {
-    $objects['taxonomy/'] = t('vocabularies and terms');
-  }
-  if (module_exists('tracker')) {
-    $objects['user/%/track'] = t('user trackers');
+    $objects['taxonomy/term/'] = t('Taxonomy terms');
   }
   if (module_exists('forum')) {
-    $objects['forum/%'] = t('forums');
+    $objects['forum/'] = t('Forums');
+  }
+  if (module_exists('contact')) {
+    $objects['user/%/contact'] = t('User contact forms');
+  }
+  if (module_exists('tracker')) {
+    $objects['user/%/track'] = t('User trackers');
   }
   return $objects;
 }
@@ -252,7 +259,7 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * This allows alias creators to override Pathauto and specify their
  * own aliases (Pathauto will be invisible to other users). Inserted
@@ -330,38 +337,71 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_node_operations().
+ * Implements hook_node_operations().
  */
 function pathauto_node_operations() {
-  $operations = array(
-    'update_alias' => array(
-      'label' => t('Update path alias'),
-      'callback' => 'pathauto_node_operations_update',
-    ),
+  $operations['pathauto_update_alias'] = array(
+    'label' => t('Update URL alias'),
+    'callback' => 'pathauto_node_update_alias_multiple',
+    'callback arguments' => array('bulkupdate', TRUE),
   );
   return $operations;
 }
 
 /**
- * Callback function for updating node aliases.
+ * Update the URL aliases for an individual node.
+ *
+ * @param $node
+ *   A node object.
+ * @param $op
+ *   Operation being performed on the node ('insert', 'update' or 'bulkupdate').
+ */
+function pathauto_node_update_alias($node, $op) {
+  module_load_include('inc', 'pathauto');
+  $placeholders = pathauto_get_placeholders('node', $node);
+  pathauto_create_alias('node', $op, $placeholders, "node/{$node->nid}", $node->nid, $node->type, $node->language);
+}
+
+/**
+ * Update the URL aliases for multiple nodes.
+ *
+ * @param $nids
+ *   An array of node IDs.
+ * @param $op
+ *   Operation being performed on the nodes ('insert', 'update' or
+ *   'bulkupdate').
+ * @param $message
+ *   A boolean if TRUE will display a message about how many nodes were
+ *   updated.
+ */
+function pathauto_node_update_alias_multiple($nids, $op, $message = FALSE) {
+  foreach ($nids as $nid) {
+    if ($node = node_load($nid, NULL, TRUE)) {
+      pathauto_node_update_alias($node, $op);
+    }
+  }
+  if ($message) {
+    drupal_set_message(format_plural(count($nids), 'Updated URL alias for 1 node.', 'Updated URL aliases for @count nodes.'));
+  }
+}
+
+/**
+ * Wrapper function backwards compatibility. Should be avoided.
  *
  * @param $nodes
- *   Array of node nid's.
+ *   An array of node IDs.
+ *
+ * @see pathauto_node_update_alias_multiple().
  */
 function pathauto_node_operations_update($nodes) {
-  _pathauto_include();
-  foreach ($nodes as $nid) {
-    $node = node_load($nid);
-    $placeholders = pathauto_get_placeholders('node', $node);
-    pathauto_create_alias('node', 'bulkupdate', $placeholders, "node/$node->nid", $node->nid, $node->type, $node->language);
-  }
+  return pathauto_node_update_alias_multiple($nodes, 'bulkupdate');
 }
 
 //==============================================================================
 // Taxonomy related functions.
 
 /**
- * Implementation of hook_taxonomy().
+ * Implements hook_taxonomy().
  */
 function pathauto_taxonomy($op, $type, $object = NULL) {
   switch ($type) {
@@ -409,7 +449,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
 // User related functions.
 
 /**
- * Implementation of hook_user() for users, trackers, and blogs.
+ * Implements hook_user() for users, trackers, blogs and contact forms..
  */
 function pathauto_user($op, &$edit, &$user, $category = FALSE) {
   switch ($op) {
@@ -442,6 +482,10 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
           $src = 'user/'. $user->uid .'/track';
           $alias = pathauto_create_alias('tracker', $op, $placeholders, $src, $user->uid);
         }
+        if (module_exists('contact')) {
+          $src = 'user/'. $user->uid .'/contact';
+          $alias = pathauto_create_alias('contact', $op, $placeholders, $src, $user->uid);
+        }
       }
       break;
     case 'delete':
@@ -454,8 +498,77 @@ function pathauto_user($op, &$edit, &$user, $category = FALSE) {
       path_set_alias('blog/'. $user->uid .'/feed');
       path_set_alias('user/'. $user->uid .'/track');
       path_set_alias('user/'. $user->uid .'/track/feed');
+      path_set_alias('user/'. $user->uid .'/contact');
       break;
     default:
       break;
+  }
+}
+
+/**
+ * Implements hook_user_operations().
+ */
+function pathauto_user_operations() {
+  $operations['pathauto_update_alias'] = array(
+    'label' => t('Update URL alias'),
+    'callback' => 'pathauto_user_update_alias_multiple',
+    'callback arguments' => array('bulkupdate', TRUE),
+  );
+  return $operations;
+}
+
+/**
+ * Update the URL aliases for an individual user account.
+ *
+ * @param $account
+ *   A user account object.
+ * @param $op
+ *   Operation being performed on the account ('insert', 'update' or
+ *   'bulkupdate').
+ *
+ * @todo Remove support for any sub-path aliases.
+ */
+function pathauto_user_update_alias($account, $op) {
+  module_load_include('inc', 'pathauto');
+  $placeholders = pathauto_get_placeholders('user', $account);
+  pathauto_create_alias('user', $op, $placeholders, "user/{$account->uid}", $account->uid);
+
+  if (module_exists('blog')) {
+    if (node_access('create', 'blog', $account)) {
+      pathauto_create_alias('blog', $op, $placeholders, "blog/{$account->uid}", $account->uid);
+    }
+    else {
+      path_set_alias('blog/'. $user->uid);
+      path_set_alias('blog/'. $user->uid .'/feed');
+    }
+  }
+  if (module_exists('tracker')) {
+    $alias = pathauto_create_alias('tracker', $op, $placeholders, "user/{$account->uid}/track", $user->uid);
+  }
+  if (module_exists('contact')) {
+    $alias = pathauto_create_alias('contact', $op, $placeholders, "user/{$account->uid}/contact", $user->uid);
+  }
+}
+
+/**
+ * Update the URL aliases for multiple user accounts.
+ *
+ * @param $uids
+ *   An array of user account IDs.
+ * @param $op
+ *   Operation being performed on the accounts ('insert', 'update' or
+ *   'bulkupdate').
+ * @param $message
+ *   A boolean if TRUE will display a message about how many accounts were
+ *   updated.
+ */
+function pathauto_user_update_alias_multiple($uids, $op, $message = FALSE) {
+  foreach ($uids as $uid) {
+    if ($account = user_load($uid)) {
+      pathauto_user_update_alias($account, $op);
+    }
+  }
+  if ($message) {
+    drupal_set_message(format_plural(count($uids), 'Updated URL alias for 1 user account.', 'Updated URL aliases for @count user accounts.'));
   }
 }
