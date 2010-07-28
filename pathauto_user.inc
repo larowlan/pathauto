@@ -20,11 +20,51 @@ function user_pathauto($op) {
       $settings['groupheader'] = t('User paths');
       $settings['patterndescr'] = t('Pattern for user account page paths');
       $settings['patterndefault'] = t('users/[user-raw]');
-      $settings['bulkname'] = t('Bulk generate aliases for users that are not aliased');
-      $settings['bulkdescr'] = t('Generate aliases for all existing user account pages which do not already have aliases.');
+      $settings['batch_update_callback'] = 'user_pathauto_bulk_update_batch_process';
+      $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto_user.inc';
       return (object) $settings;
     default:
       break;
+  }
+}
+
+/**
+ * Batch processing callback; Generate aliases for users.
+ */
+function user_pathauto_bulk_update_batch_process(&$context) {
+  if (!isset($context['sandbox']['current'])) {
+    $context['sandbox']['count'] = 0;
+    $context['sandbox']['current'] = 0;
+  }
+
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT('user/', CAST(u.uid AS CHAR)) = ua.src WHERE ua.src IS NULL AND u.uid > %d ORDER BY u.uid";
+  $args = array($context['sandbox']['current']);
+
+  // Get the total amount of items to process.
+  if (!isset($context['sandbox']['total'])) {
+    $count_sql = str_replace('SELECT u.uid', 'SELECT COUNT(u.uid)', $sql);
+    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+
+    // If there are no nodes to update, the stop immediately.
+    if (!$context['sandbox']['total']) {
+      $context['finished'] = 1;
+      return;
+    }
+  }
+
+  $query = db_query_range($sql, $args, 0, 25);
+  $uids = array();
+  while ($uid = db_result($query)) {
+    $uids[] = $uid;
+  }
+
+  pathauto_user_update_alias_multiple($uids, 'bulkupdate', array('alias blog' => FALSE));
+  $context['sandbox']['count'] += count($uids);
+  $context['sandbox']['current'] = max($uids);
+  $context['message'] = t('Updated alias for user @uid.', array('@uid' => end($uids)));
+
+  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+    $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
   }
 }
 
@@ -41,8 +81,8 @@ function blog_pathauto($op) {
       $settings['patterndescr'] = t('Pattern for blog page paths');
       $settings['patterndefault'] = t('blogs/[user-raw]');
       $settings['supportsfeeds'] = 'feed';
-      $settings['bulkname'] = t('Bulk generate aliases for blogs that are not aliased');
-      $settings['bulkdescr'] = t('Generate aliases for all existing blog pages which do not already have aliases.');
+      $settings['batch_update_callback'] = 'blog_pathauto_bulk_update_batch_process';
+      $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto_user.inc';
       return (object) $settings;
     default:
       break;
@@ -50,45 +90,42 @@ function blog_pathauto($op) {
 }
 
 /**
- * Bulk generate aliases for all users without aliases.
+ * Batch processing callback; Generate aliases for blogs.
  */
-function user_pathauto_bulkupdate() {
-  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', CAST(uid AS CHAR)) = src WHERE uid > 0 AND src IS NULL";
-  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
+function blog_pathauto_bulk_update_batch_process(&$context) {
+  if (!isset($context['sandbox']['current'])) {
+    $context['sandbox']['count'] = 0;
+    $context['sandbox']['current'] = 0;
+  }
 
-  $count = 0;
-  $placeholders = array();
-  while ($user = db_fetch_object($result)) {
-    $placeholders = pathauto_get_placeholders('user', $user);
-    $source = 'user/'. $user->uid;
-    if (pathauto_create_alias('user', 'bulkupdate', $placeholders, $source, $user->uid)) {
-      $count++;
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT('blog/', CAST(u.uid AS CHAR)) = ua.src WHERE ua.src IS NULL AND u.uid > %d ORDER BY u.uid";
+  $args = array($context['sandbox']['current']);
+
+  // Get the total amount of items to process.
+  if (!isset($context['sandbox']['total'])) {
+    $count_sql = str_replace('SELECT u.uid', 'SELECT COUNT(u.uid)', $sql);
+    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+
+    // If there are no nodes to update, the stop immediately.
+    if (!$context['sandbox']['total']) {
+      $context['finished'] = 1;
+      return;
     }
   }
 
-  drupal_set_message(format_plural($count,
-    'Bulk generation of users completed, one alias generated.',
-    'Bulk generation of users completed, @count aliases generated.'));
-}
-
-/**
- * Bulk generate aliases for all blogs without aliases.
- */
-function blog_pathauto_bulkupdate() {
-  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('blog/', CAST(uid AS CHAR)) = src WHERE uid > 0 AND src IS NULL";
-  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
-
-  $count = 0;
-  $placeholders = array();
-  while ($user = db_fetch_object($result)) {
-    $placeholders = pathauto_get_placeholders('user', $user);
-    $source = 'blog/'. $user->uid;
-    if (pathauto_create_alias('blog', 'bulkupdate', $placeholders, $source, $user->uid)) {
-      $count++;
-    }
+  $query = db_query_range($sql, $args, 0, 25);
+  $uids = array();
+  while ($uid = db_result($query)) {
+    $uids[] = $uid;
+    $account = user_load($uid);
+    pathauto_blog_update_alias($account, 'bulkupdate');
   }
 
-  drupal_set_message(format_plural($count,
-    'Bulk generation of user blogs completed, one alias generated.',
-    'Bulk generation of user blogs completed, @count aliases generated.'));
+  $context['sandbox']['count'] += count($uids);
+  $context['sandbox']['current'] = max($uids);
+  $context['message'] = t('Updated alias for blog user @uid.', array('@uid' => end($uids)));
+
+  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+    $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
+  }
 }

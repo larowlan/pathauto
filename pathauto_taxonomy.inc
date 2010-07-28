@@ -21,8 +21,8 @@ function taxonomy_pathauto($op) {
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
       $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');
       $settings['supportsfeeds'] = '0/feed';
-      $settings['bulkname'] = t('Bulk generate aliases for terms that are not aliased');
-      $settings['bulkdescr'] = t('Generate aliases for all existing terms which do not already have aliases.');
+      $settings['batch_update_callback'] = 'taxonomy_pathauto_bulk_update_batch_process';
+      $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto_taxonomy.inc';
 
       $vocabularies = taxonomy_get_vocabularies();
       if (sizeof($vocabularies) > 0) {
@@ -43,69 +43,44 @@ function taxonomy_pathauto($op) {
 }
 
 /**
- * Generate aliases for all categories without aliases.
+ * Batch processing callback; Generate aliases for taxonomy terms.
  */
-function taxonomy_pathauto_bulkupdate() {
-  // From all node types, only attempt to update those with patterns
-  $pattern_vids = array();
-  foreach (taxonomy_get_vocabularies() as $vid => $info) {
-    // TODO - If there's a default we shouldn't do this crazy where statement because all vocabularies get aliases.
-    // TODO - Special casing to exclude the forum vid (and the images vid and...?).
-    if (pathauto_pattern_load_by_entity('taxonomy', $vid)) {
-      $pattern_vids[] = $vid;
-      if (empty($vid_where)) {
-        $vid_where = " AND (vid = '%s' ";
-      }
-      else {
-        $vid_where .= " OR vid = '%s'";
-      }
-    }
+function taxonomy_pathauto_bulk_update_batch_process(&$context) {
+  if (!isset($context['sandbox']['current'])) {
+    $context['sandbox']['count'] = 0;
+    $context['sandbox']['current'] = 0;
   }
-  $vid_where .= ')';
-
-  // Exclude the forums and join all the args into one array so they can be passed to db_query
-  $forum_vid[] = variable_get('forum_nav_vocabulary', '');
-  $query_args = array_merge($forum_vid, $pattern_vids);
-  $query = "SELECT tid, vid, name, description, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', CAST(tid AS CHAR)) = src WHERE src IS NULL AND vid <> %d ". $vid_where;
-  $result = db_query_range($query, $query_args, 0, variable_get('pathauto_max_bulk_update', 50));
-
-  $count = 0;
-  $placeholders = array();
-  while ($category = db_fetch_object($result)) {
-    $count += _taxonomy_pathauto_alias($category, 'bulkupdate');
-  }
-
-  drupal_set_message(format_plural($count,
-    'Bulk generation of terms completed, one alias generated.',
-    'Bulk generation of terms completed, @count aliases generated.'));
-}
-
-/**
- * Create aliases for taxonomy objects.
- *
- * @param $category
- *   A taxonomy object.
- */
-function _taxonomy_pathauto_alias($category, $op) {
-  $count = 0;
-
-  $placeholders = pathauto_get_placeholders('taxonomy', $category);
 
   $forum_vid = variable_get('forum_nav_vocabulary', '');
-  // If we're in a forum vocabulary, also create a forum container, forum, or forum topic alias.
-  if (module_exists('forum') && $forum_vid == (int)$category->vid) {
-    $source = 'forum/'. $category->tid;
-    if (pathauto_create_alias('forum', $op, $placeholders, $source, $category->tid, $category->vid)) {
-      $count++;
+  $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON CONCAT('taxonomy/term/', CAST(t.tid AS CHAR)) = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid <> %d ORDER BY t.tid";
+  $args = array($context['sandbox']['current'], $forum_vid);
+
+  // Get the total amount of items to process.
+  if (!isset($context['sandbox']['total'])) {
+    $count_sql = str_replace('SELECT t.tid', 'SELECT COUNT(t.tid)', $sql);
+    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+
+    // If there are no nodes to update, the stop immediately.
+    if (!$context['sandbox']['total']) {
+      $context['finished'] = 1;
+      return;
     }
   }
-  else {
-    $source = taxonomy_term_path($category);
-    if (pathauto_create_alias('taxonomy', $op, $placeholders, $source, $category->tid, $category->vid)) {
-      $count++;
-    }
+
+  $query = db_query_range($sql, $args, 0, 25);
+  $tids = array();
+  while ($tid = db_result($query)) {
+    $tids[] = $tid;
   }
-  return $count;
+
+  pathauto_taxonomy_term_update_alias_multiple($tids, 'bulkupdate');
+  $context['sandbox']['count'] += count($tids);
+  $context['sandbox']['current'] = max($tids);
+  $context['message'] = t('Updated alias for term @tid.', array('@tid' => end($tids)));
+
+  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+    $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
+  }
 }
 
 /**
@@ -121,8 +96,8 @@ function forum_pathauto($op) {
       $settings['patterndescr'] = t('Pattern for forums and forum containers');
       $settings['patterndefault'] = t('[vocab-raw]/[catpath-raw]');
       $settings['supportsfeeds'] = '0/feed';
-      $settings['bulkname'] = t('Bulk generate aliases for forum paths that are not aliased');
-      $settings['bulkdescr'] = t('Generate aliases for all existing forums and forum containers which do not already have aliases.');
+      $settings['batch_update_callback'] = 'forum_pathauto_bulk_update_batch_process';
+      $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto_taxonomy.inc';
       return (object) $settings;
     default:
       break;
@@ -130,20 +105,42 @@ function forum_pathauto($op) {
 }
 
 /**
- * Generate aliases for all forums and forum containers without aliases.
+ * Batch processing callback; Generate aliases for forums.
  */
-function forum_pathauto_bulkupdate() {
-  $forum_vid = variable_get('forum_nav_vocabulary', '');
-  $query = "SELECT tid, vid, name, description, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('forum/', CAST(tid AS CHAR)) = src WHERE vid = %d AND src IS NULL";
-  $result = db_query_range($query, $forum_vid, 0, variable_get('pathauto_max_bulk_update', 50));
-
-  $count = 0;
-  $placeholders = array();
-  while ($category = db_fetch_object($result)) {
-    $count = _taxonomy_pathauto_alias($category, 'bulkupdate') + $count;
+function forum_pathauto_bulk_update_batch_process(&$context) {
+  if (!isset($context['sandbox']['current'])) {
+    $context['sandbox']['count'] = 0;
+    $context['sandbox']['current'] = 0;
   }
 
-  drupal_set_message(format_plural($count,
-    'Bulk update of forums and forum containers completed, one alias generated.',
-    'Bulk update of forums and forum containers completed, @count aliases generated.'));
+  $forum_vid = variable_get('forum_nav_vocabulary', '');
+  $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON CONCAT('forum/', CAST(t.tid AS CHAR)) = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid = %d ORDER BY t.tid";
+  $args = array($context['sandbox']['current'], $forum_vid);
+
+  // Get the total amount of items to process.
+  if (!isset($context['sandbox']['total'])) {
+    $count_sql = str_replace('SELECT t.tid', 'SELECT COUNT(t.tid)', $sql);
+    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+
+    // If there are no nodes to update, the stop immediately.
+    if (!$context['sandbox']['total']) {
+      $context['finished'] = 1;
+      return;
+    }
+  }
+
+  $query = db_query_range($sql, $args, 0, 25);
+  $tids = array();
+  while ($tid = db_result($query)) {
+    $tids[] = $tid;
+  }
+
+  pathauto_taxonomy_term_update_alias_multiple($tids, 'bulkupdate');
+  $context['sandbox']['count'] += count($tids);
+  $context['sandbox']['current'] = max($tids);
+  $context['message'] = t('Updated alias for forum @tid.', array('@tid' => end($tids)));
+
+  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+    $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
+  }
 }
