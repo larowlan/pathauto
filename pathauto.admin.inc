@@ -15,7 +15,7 @@
  * @see system_settings_form()
  */
 function pathauto_patterns_form($form_state) {
-  _pathauto_include();
+  module_load_include('inc', 'pathauto', 'pathauto.pathauto');
 
   // Call the hook on all modules - an array of 'settings' objects is returned
   $all_settings = module_invoke_all('pathauto', 'settings');
@@ -311,8 +311,6 @@ function pathauto_settings_form_validate($form, &$form_state) {
  * @ingroup forms
  */
 function pathauto_bulk_update_form() {
-  _pathauto_include();
-
   $form['#update_callbacks'] = array();
 
   $form['update'] = array(

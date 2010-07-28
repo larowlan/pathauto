@@ -98,16 +98,6 @@ function pathauto_menu() {
 }
 
 /**
- * Include all Pathauto include files.
- */
-function _pathauto_include() {
-  module_load_include('inc', 'pathauto');
-  module_load_include('inc', 'pathauto', 'pathauto_node');
-  module_load_include('inc', 'pathauto', 'pathauto_taxonomy');
-  module_load_include('inc', 'pathauto', 'pathauto_user');
-}
-
-/**
  * Implements hook_token_list().
  */
 function pathauto_token_list($type = 'all') {
@@ -201,6 +191,14 @@ function pathauto_path_delete_all($source) {
 
 //==============================================================================
 // Some node related functions.
+
+/**
+ * Implements hook_pathauto().
+ */
+function node_pathauto($op) {
+  module_load_include('inc', 'pathauto', 'pathauto.pathauto');
+  return _node_pathauto($op);
+}
 
 /**
  * Implements hook_nodeapi().
@@ -364,6 +362,22 @@ function pathauto_node_update_alias_multiple($nids, $op, $options = array()) {
 // Taxonomy related functions.
 
 /**
+ * Implements hook_pathauto() on behalf of taxonomy.module.
+ */
+function taxonomy_pathauto($op) {
+  module_load_include('inc', 'pathauto', 'pathauto.pathauto');
+  return _taxonomy_pathauto($op);
+}
+
+/**
+ * Implements hook_pathauto() on behalf of forum.module.
+ */
+function forum_pathauto($op) {
+  module_load_include('inc', 'pathauto', 'pathauto.pathauto');
+  return _forum_pathauto($op);
+}
+
+/**
  * Implements hook_taxonomy().
  */
 function pathauto_taxonomy($op, $type, $object = NULL) {
@@ -378,7 +392,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           if ($op == 'update') {
             taxonomy_get_term($term->tid, TRUE);
           }
-          
+
           pathauto_taxonomy_term_update_alias($term, $op);
           break;
         case 'delete':
@@ -459,6 +473,22 @@ function pathauto_taxonomy_term_update_alias_multiple(array $tids, $op, array $o
 
 //==============================================================================
 // User related functions.
+
+/**
+ * Implements hook_pathauto() on behalf of user.module.
+ */
+function user_pathauto($op) {
+  module_load_include('inc', 'pathauto', 'pathauto.pathauto');
+  return _user_pathauto($op);
+}
+
+/**
+ * Implements hook_pathauto() on behalf of blog.module.
+ */
+function blog_pathauto($op) {
+  module_load_include('inc', 'pathauto', 'pathauto.pathauto');
+  return _blog_pathauto($op);
+}
 
 /**
  * Implements hook_user() for users, trackers, and blogs.
