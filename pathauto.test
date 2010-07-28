@@ -489,7 +489,7 @@ class PathautoTaxonomyTokenTestCase extends PathautoFunctionalTestHelper {
   }
 
   function setUp() {
-    parent::setUp('taxonomy');
+    parent::setUp(array('taxonomy'));
     variable_set('pathauto_taxonomy_pattern', 'category/[vocab-raw]/[cat-raw]');
     // Reset the static taxonomy.module caches.
     taxonomy_vocabulary_load(0, TRUE);
