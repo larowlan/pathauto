@@ -491,44 +491,47 @@ function blog_pathauto($op) {
 }
 
 /**
- * Implements hook_user() for users, trackers, and blogs.
+ * Implements hook_user().
  */
-function pathauto_user($op, &$edit, &$user, $category = FALSE) {
+function pathauto_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'insert':
-    case 'update':
-      // Use the username to automatically create an alias
-      $pathauto_user = (object) array_merge((array) $user, $edit);
-      if ($user->name) {
-        module_load_include('inc', 'pathauto');
-        $placeholders = pathauto_get_placeholders('user', $pathauto_user);
-        $src = 'user/'. $user->uid;
-        $alias = pathauto_create_alias('user', $op, $placeholders, $src, $user->uid);
+      // When hook_user('insert') is run, most of the account object has been
+      // saved into $account, except for $account->data and $account->roles.
+      // Since tokens may depend on the user's data or permissions, we need to
+      // ensure we have a 'full' user object.
+      $merged_account = drupal_clone($account);
 
-        if (module_exists('blog')) {
-          $new_user = drupal_clone($user);
-          if ($category == 'account') {
-            $new_user->roles = isset($edit['roles']) ? $edit['roles'] : array();
-            $new_user->roles[DRUPAL_AUTHENTICATED_RID] = t('authenticated user'); // Add this back
-          }
-          if (node_access('create', 'blog', $new_user)) {
-            $src = 'blog/'. $user->uid;
-            $alias = pathauto_create_alias('blog', $op, $placeholders, $src, $user->uid);
-          }
-          else {
-            pathauto_path_delete_all("blog/{$user->uid}");
+      // Merge in account data.
+      $merged_account->data = array();
+      $user_fields = user_fields();
+      foreach ($edit as $key => $value) {
+        if ((substr($key, 0, 4) !== 'auth') && ($key != 'roles') && (!in_array($key, $user_fields)) && ($value !== NULL)) {
+          $merged_account->data[$key] = $value;
+        }
+      }
+
+      // Merge in user roles.
+      if (isset($edit['roles']) && is_array($edit['roles'])) {
+        $roles = user_roles();
+        foreach (array_keys($edit['roles']) as $rid) {
+          if (!isset($merged_account->roles[$rid])) {
+            $merged_account->roles[$rid] = $roles[$rid];
           }
         }
       }
+
+      pathauto_user_update_alias($merged_account, 'insert');
       break;
+
+    case 'after_update':
+      pathauto_user_update_alias($account, 'update');
+      break;
+
     case 'delete':
       // If the user is deleted, remove the path aliases
-      $user = (object) $user;
-      pathauto_path_delete_all("user/{$user->uid}");
-      // They may have enabled these modules and/or feeds when the user was created, so let's try to delete all of them
-      pathauto_path_delete_all("blog/{$user->uid}");
-      break;
-    default:
+      pathauto_path_delete_all("user/{$account->uid}");
+      pathauto_path_delete_all("blog/{$account->uid}");
       break;
   }
 }
