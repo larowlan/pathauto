@@ -384,18 +384,6 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
     return '';
   }
 
-  if ($module == 'taxonomy') {
-    // Get proper path for term.
-    $term_path = taxonomy_term_path(taxonomy_get_term($entity_id));
-    if ($term_path != $source) {
-      // Quietly alias 'taxonomy/term/[tid]' with proper path for term.
-      $update_data = _pathauto_existing_alias_data($source, $language);
-      _pathauto_set_alias($source, $term_path, $module, $entity_id, $update_data['pid'], FALSE, $update_data['old_alias'], $language);
-      // Set $source as proper path.
-      $source = $term_path;
-    }
-  }
-
   // Special handling when updating an item which is already aliased.
   $pid = NULL;
   $old_alias = NULL;
