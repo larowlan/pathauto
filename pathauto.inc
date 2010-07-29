@@ -182,7 +182,6 @@ function _pathauto_existing_alias_data($source, $language = '') {
         $output['old_alias'] = $existing->dst;
         break;
       case PATHAUTO_UPDATE_ACTION_NO_NEW:
-      default:
         // Do nothing
         break;
     }
@@ -352,12 +351,13 @@ function pathauto_clean_alias($alias) {
  * @param $op
  *   Operation being performed on the content being aliased
  *   ('insert', 'update', 'return', or 'bulkupdate').
- * @param $placeholders
- *   An array whose keys consist of the translated placeholders
- *   which appear in patterns (e.g., t('[title]')) and values are the
- *   actual values to be substituted into the pattern (e.g., $node->title).
  * @param $source
  *   The "real" URI of the content to be aliased (e.g., "node/$node->nid").
+ * @param $data
+ *   An associative array of objects needed to apply the alias' pattern, keyed
+ *   by their type.  Example: array('term' => $term, 'vocabulary' =>
+ *   $vocabulary). Only one key/value pair is supported, otherwise you may
+ *   pass the results from pathauto_get_placeholders() here.
  * @param $entity_id
  *   The entity ID (node ID, user ID, etc.).
  * @param $type
@@ -369,7 +369,7 @@ function pathauto_clean_alias($alias) {
  * @return
  *   The alias that was created.
  */
-function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id, $type = NULL, $language = '') {
+function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type = NULL, $language = '') {
   if (($op != 'bulkupdate') and variable_get('pathauto_verbose', FALSE) && user_access('notify of path changes')) {
     $verbose = TRUE;
   }
@@ -382,6 +382,18 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
   if (empty($pattern)) {
     // No pattern? Do nothing (otherwise we may blow away existing aliases...)
     return '';
+  }
+
+  // Support for when $source and $placeholders were swapped.
+  if (is_array($source) && is_string($data)) {
+    $placeholders = $source;
+    $source = $data;
+  }
+  elseif (!isset($data['tokens']) && !isset($data['values'])) {
+    $placeholders = pathauto_get_placeholders(key($data), current($data));
+  }
+  else {
+    $placeholders = $data;
   }
 
   // Special handling when updating an item which is already aliased.
@@ -437,15 +449,14 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
 
   // If $pid is NULL, a new alias is created - otherwise, the existing
   // alias for the designated source is replaced.
-  _pathauto_set_alias($source, $alias, $module, $entity_id, $pid, $verbose, $old_alias, $language);
+  _pathauto_set_alias($source, $alias, $pid, $verbose, $old_alias, $language);
 
   // Also create a related feed alias if requested, and if supported
   // by the module
   $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
   if (drupal_strlen($feedappend)) {
     // If the alias to generate is not empty, then we can append the feed
-    // string. Otherwise we want to keep $alias as an empty string so that
-    // an existing alias may be removed.
+    // string.
     if (drupal_strlen($alias)) {
       $alias .= '/feed';
     }
@@ -453,11 +464,11 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
     // For forums and taxonomies, the source doesn't always form the base of the rss feed (ie. image galleries)
     if ($module == 'taxonomy' || $module == 'forum') {
       $update_data = _pathauto_existing_alias_data("taxonomy/term/$entity_id/$feedappend", $language);
-      _pathauto_set_alias("taxonomy/term/$entity_id/$feedappend", $alias, $module, $entity_id, $update_data['pid'], $verbose, $update_data['old_alias'], $language);
+      _pathauto_set_alias("taxonomy/term/$tid/$feedappend", $alias, $update_data['pid'], $verbose, $update_data['old_alias'], $language);
     }
     else {
       $update_data = _pathauto_existing_alias_data("$source/$feedappend", $language);
-      _pathauto_set_alias("$source/$feedappend", $alias, $module, $entity_id, $update_data['pid'], $verbose, $update_data['old_alias'], $language);
+      _pathauto_set_alias("$source/$feedappend", $alias, $update_data['pid'], $verbose, $update_data['old_alias'], $language);
     }
   }
 
@@ -489,10 +500,6 @@ function _pathauto_path_is_callback($path) {
  *   The internal path.
  * @param $alias
  *   The visible externally used path.
- * @param $entity_type
- *   The entity type (node, user, etc.).
- * @param $entity_id
- *   The entity ID (node ID, user ID, etc.).
  * @param $pid
  *   If the item is currently aliased, the pid for that item.
  * @param $verbose
@@ -502,7 +509,7 @@ function _pathauto_path_is_callback($path) {
  * @param $language
  *   The path's language.
  */
-function _pathauto_set_alias($source, $alias, $entity_type, $entity_id, $pid = NULL, $verbose = FALSE, $old_alias = NULL, $language = '') {
+function _pathauto_set_alias($source, $alias, $pid = NULL, $verbose = FALSE, $old_alias = NULL, $language = '') {
   // Alert users that an existing callback cannot be overridden automatically
   if (_pathauto_path_is_callback($alias)) {
     if ($verbose && user_access('notify of path changes')) {

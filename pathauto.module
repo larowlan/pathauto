@@ -254,8 +254,7 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
           // alias that would be genereted by pathauto. If they are the same,
           // then keep the automatic alias enabled.
           module_load_include('inc', 'pathauto');
-          $placeholders = pathauto_get_placeholders('node', $node);
-          $pathauto_alias = pathauto_create_alias('node', 'return', $placeholders, "node/{$node->nid}", $node->nid, $node->type, $node->language);
+          $pathauto_alias = pathauto_create_alias('node', 'return', "node/{$node->nid}", array('node' => $node), $node->nid, $node->type, $node->language);
           $node->pathauto_perform_alias = isset($node->path) && $node->path == $pathauto_alias;
         }
         else {
@@ -329,8 +328,7 @@ function pathauto_node_update_alias($node, $op, $options = array()) {
   }
 
   module_load_include('inc', 'pathauto');
-  $placeholders = pathauto_get_placeholders('node', $node);
-  pathauto_create_alias('node', $op, $placeholders, "node/{$node->nid}", $node->nid, $node->type, $language);
+  pathauto_create_alias('node', $op, "node/{$node->nid}", array('node' => $node), $node->nid, $node->type, $language);
 }
 
 /**
@@ -434,8 +432,7 @@ function pathauto_taxonomy_term_update_alias($term, $op, $options = array()) {
 
   module_load_include('inc', 'pathauto');
   $source = taxonomy_term_path($term);
-  $placeholders = pathauto_get_placeholders('taxonomy', $term);
-  pathauto_create_alias($module, $op, $placeholders, $source, $term->tid, $term->vid);
+  pathauto_create_alias($module, $op, $source, array('taxonomy' => $term), $term->tid, $term->vid);
 
   if (!empty($options['alias children'])) {
     // For all children generate new alias.
@@ -568,13 +565,10 @@ function pathauto_user_update_alias($account, $op, $options = array()) {
   }
 
   module_load_include('inc', 'pathauto');
-  $placeholders = pathauto_get_placeholders('user', $account);
-  pathauto_create_alias('user', $op, $placeholders, "user/{$account->uid}", $account->uid);
+  pathauto_create_alias('user', $op, "user/{$account->uid}", array('user' => $account), $account->uid);
 
   // Because blogs are also associated with users, also generate the blog paths.
   if (!empty($options['alias blog'])) {
-    // Allow placeholders to be re-used.
-    $options['placeholders'] = $placeholders;
     pathauto_blog_update_alias($account, $op);
   }
 }
@@ -622,9 +616,8 @@ function pathauto_blog_update_alias($account, $op, $options = array()) {
   }
 
   module_load_include('inc', 'pathauto');
-  $placeholders = isset($options['placeholders']) ? $options['placeholders'] : pathauto_get_placeholders('user', $account);
   if (node_access('create', 'blog', $account)) {
-    pathauto_create_alias('blog', $op, $placeholders, "blog/{$account->uid}", $account->uid);
+    pathauto_create_alias('blog', $op, "blog/{$account->uid}", array('user' => $account), $account->uid);
   }
   else {
     pathauto_path_delete_all("blog/{$user->uid}");

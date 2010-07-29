@@ -608,6 +608,7 @@ class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
     );
     $node = $this->drupalCreateNode($node);
     $english_alias = $this->path_load(array('alias' => 'english-node'));
+    $this->assertTrue($english_alias, 'Alias created with proper language.');
 
     // Also save a French alias that should not be left alone, even though
     // it is the newer alias.

@@ -94,7 +94,7 @@ function pathauto_update_6200() {
 }
 
 /**
- * Remove obsolete variable since batch API is now used.
+ * Remove obsolete variables since batch API is now used.
  */
 function pathauto_update_6201() {
   variable_del('pathauto_max_bulk_update');
