@@ -19,7 +19,7 @@ function _node_pathauto($op) {
       $settings['token_type'] = 'node';
       $settings['groupheader'] = t('Node paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all node types with blank patterns below)');
-      $settings['patterndefault'] = t('content/[title-raw]');
+      $settings['patterndefault'] = 'content/[title-raw]';
       $settings['batch_update_callback'] = 'node_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
       $settings['supportsfeeds'] = 'feed';
@@ -97,7 +97,7 @@ function _taxonomy_pathauto($op) {
       $settings['token_type'] = 'taxonomy';
       $settings['groupheader'] = t('Taxonomy term paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
-      $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');
+      $settings['patterndefault'] = 'category/[vocab-raw]/[catpath-raw]';
       $settings['supportsfeeds'] = '0/feed';
       $settings['batch_update_callback'] = 'taxonomy_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
@@ -172,7 +172,7 @@ function _forum_pathauto($op) {
       $settings['token_type'] = 'taxonomy';
       $settings['groupheader'] = t('Forum paths');
       $settings['patterndescr'] = t('Pattern for forums and forum containers');
-      $settings['patterndefault'] = t('[vocab-raw]/[catpath-raw]');
+      $settings['patterndefault'] = '[vocab-raw]/[catpath-raw]';
       $settings['supportsfeeds'] = '0/feed';
       $settings['batch_update_callback'] = 'forum_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
@@ -234,7 +234,7 @@ function _user_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('User paths');
       $settings['patterndescr'] = t('Pattern for user account page paths');
-      $settings['patterndefault'] = t('users/[user-raw]');
+      $settings['patterndefault'] = 'users/[user-raw]';
       $settings['batch_update_callback'] = 'user_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
       return (object) $settings;
@@ -294,7 +294,7 @@ function _blog_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('Blog paths');
       $settings['patterndescr'] = t('Pattern for blog page paths');
-      $settings['patterndefault'] = t('blogs/[user-raw]');
+      $settings['patterndefault'] = 'blogs/[user-raw]';
       $settings['supportsfeeds'] = 'feed';
       $settings['batch_update_callback'] = 'blog_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
