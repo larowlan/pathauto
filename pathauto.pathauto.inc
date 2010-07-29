@@ -70,7 +70,7 @@ function node_pathauto_bulk_update_batch_process(&$context) {
     }
   }
 
-  $query = db_query_range($sql, $args, 0, 5);
+  $query = db_query_range($sql, $args, 0, 25);
   $nids = array();
   while ($nid = db_result($query)) {
     $nids[] = $nid;
