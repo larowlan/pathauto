@@ -97,7 +97,7 @@ function _taxonomy_pathauto($op) {
       $settings['token_type'] = 'taxonomy';
       $settings['groupheader'] = t('Taxonomy term paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
-      $settings['patterndefault'] = 'category/[vocab-raw]/[catpath-raw]';
+      $settings['patterndefault'] = '[vocab-raw]/[catpath-raw]';
       $settings['supportsfeeds'] = '0/feed';
       $settings['batch_update_callback'] = 'taxonomy_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
