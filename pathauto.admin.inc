@@ -260,6 +260,7 @@ function _pathauto_validate_pattern_element(&$element, &$form_state) {
   }
   else {
     drupal_set_message(t('Please make sure you are using the latest version (6.x-1.x-dev) of Token module.'), 'error', FALSE);
+    return;
   }
 
   // Find any non-raw tokens that do have a raw companion token and warn.
