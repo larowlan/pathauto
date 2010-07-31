@@ -209,9 +209,9 @@ function pathauto_path_alias_types() {
 // Some node related functions.
 
 /**
- * Implementation of hook_nodeapi().
+ * Implements hook_nodeapi().
  */
-function pathauto_nodeapi(&$node, $op, $teaser, $page) {
+function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
   switch ($op) {
     case 'presave':
       // About to be saved (before insert/update)
@@ -252,8 +252,6 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
     case 'delete':
       path_set_alias('node/'. $node->nid);
       path_set_alias('node/'. $node->nid .'/feed');
-      break;
-    default:
       break;
   }
 }
@@ -411,36 +409,32 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
         case 'update':
           _pathauto_include();
           // Use the category info to automatically create an alias
-          $category = (object) $object;
+          $term = (object) $object;
 
           // Clear the taxonomy term's static cache.
           if ($op == 'update') {
-            taxonomy_get_term($category->tid, TRUE);
+            taxonomy_get_term($term->tid, TRUE);
           }
 
-          if ($category->name) {
-            $count = _taxonomy_pathauto_alias($category, $op);
+          if ($term->name) {
+            $count = _taxonomy_pathauto_alias($term, $op);
           }
 
           // For all children generate new alias (important if [catpath] used)
-          foreach (taxonomy_get_tree($category->vid, $category->tid) as $subcategory) {
+          foreach (taxonomy_get_tree($term->vid, $term->tid) as $subcategory) {
             $count = _taxonomy_pathauto_alias($subcategory, $op);
           }
 
           break;
         case 'delete':
           // If the category is deleted, remove the path aliases
-          $category = (object) $object;
-          path_set_alias('taxonomy/term/'. $category->tid);
-          path_set_alias(taxonomy_term_path($category));
-          path_set_alias('forum/'. $category->tid);
-          path_set_alias('taxonomy/term/'. $category->tid .'/0/feed');
-          break;
-        default:
+          $term = (object) $object;
+          path_set_alias('taxonomy/term/'. $term->tid);
+          path_set_alias(taxonomy_term_path($term));
+          path_set_alias('forum/'. $term->tid);
+          path_set_alias('taxonomy/term/'. $term->tid .'/0/feed');
           break;
       }
-      break;
-    default:
       break;
   }
 }
@@ -449,9 +443,9 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
 // User related functions.
 
 /**
- * Implements hook_user() for users, trackers, blogs and contact forms..
+ * Implements hook_user().
  */
-function pathauto_user($op, &$edit, &$user, $category = FALSE) {
+function pathauto_user($op, &$edit, &$user, $category = NULL) {
   switch ($op) {
     case 'insert':
     case 'update':
