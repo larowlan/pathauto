@@ -252,23 +252,48 @@ function _pathauto_validate_numeric_element($element, &$form_state) {
 }
 
 /**
- * Validate a form element that should have an URL alias pattern.
+ * Element validation callback for URL alias patterns.
+ *
+ * This function performs the following validations:
+ * - Checks if the pattern has at least one token.
+ * - Checks if any tokens with raw companions are being used and recommends
+ *   use of the raw tokens.
+ */
+/**
+ * Validate a form element that should have at least one token.
+ *
+ * Also check if the pattern is using tokens that have a raw companion.
  */
 function _pathauto_validate_pattern_element(&$element, &$form_state) {
-  if (function_exists('token_element_validate_token_context') && function_exists('token_scan')) {
-    token_element_validate_token_context($element, $form_state);
+  // Get the current value of the element (since this can be used during both
+  // form display and validation).
+  $value = isset($element['#value']) ? $element['#value'] : $element['#default_value'];
+
+  // Empty patterns need no further validation.
+  if (!drupal_strlen($value)) {
+    return $element;
+  }
+
+  // Check to see if the required token functions are available.
+  if (!function_exists('token_scan') || !function_exists('token_element_validate_token_context')) {
+    drupal_set_message(t('Please make sure you are using the latest version of the Token module.'), 'error', FALSE);
+    return $element;
+  }
+
+  // Check for at least one token.
+  $tokens = token_scan($value);
+  if (empty($tokens)) {
+    form_error($element, t('The %name should contain at least one token to ensure unique URL aliases are created.', array('%name' => $element['#title'])));
   }
   else {
-    drupal_set_message(t('Please make sure you are using the latest version (6.x-1.x-dev) of Token module.'), 'error', FALSE);
-    return;
+    token_element_validate_token_context($element, $form_state);
   }
 
   // Find any non-raw tokens that do have a raw companion token and warn.
   module_load_include('inc', 'pathauto');
   $not_raw_tokens = array();
   $raw_tokens = _pathauto_get_raw_tokens();
-  $value = isset($element['#value']) ? $element['#value'] : $element['#default_value'];
-  foreach (token_scan($value) as $token) {
+  foreach ($tokens as $token) {
     if (substr($token, -4) === '-raw') {
       // Skip raw tokens.
       continue;
@@ -277,6 +302,7 @@ function _pathauto_validate_pattern_element(&$element, &$form_state) {
       drupal_set_message(t('You are using the token [%token] which has a raw companion token [%raw_token]. For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing. See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $token . '-raw', '@pathauto-help' => url('admin/help/pathauto'))), 'error', FALSE);
     }
   }
+
   return $element;
 }
 

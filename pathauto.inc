@@ -350,7 +350,6 @@ function pathauto_clean_alias($alias) {
  *
  * @see _pathauto_set_alias()
  * @see pathauto_get_placeholders()
- * @see token_replace()
  */
 function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type = NULL, $language = '') {
   if (($op != 'bulkupdate') and variable_get('pathauto_verbose', FALSE) && user_access('notify of path changes')) {
@@ -394,6 +393,14 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
 
   // Replace the placeholders with the values provided by the module.
   $alias = str_replace($placeholders['tokens'], $placeholders['values'], $pattern);
+
+  // Check if the token replacement has not actually replaced any values. If
+  // that is the case, then stop because we should not generate an alias.
+  // @see token_scan()
+  $pattern_tokens_removed = preg_replace('/\[([^\s]+?)\]/', '', $pattern);
+  if ($alias === $pattern_tokens_removed) {
+    return '';
+  }
 
   // Two or more slashes should be collapsed into one
   $alias = preg_replace('/\/+/', '/', $alias);

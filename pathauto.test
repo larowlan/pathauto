@@ -61,7 +61,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
     return $this->assertAliasExists(array('source' => $uri['path']));
   }
 
-  function assertNoEntityAlias($entity_type, $entity, $expected_alias, $language = '') {
+  function assertNoEntityAlias($entity_type, $entity, $language = '') {
     $uri = $this->entity_uri($entity_type, $entity);
     $this->assertEntityAlias($entity_type, $entity, $uri['path'], $language);
   }
@@ -328,6 +328,19 @@ class PathautoUnitTestCase extends PathautoTestHelper {
     pathauto_node_update_alias($node, 'bulkupdate');
     $this->assertEntityAlias('node', $node, 'content/sixth-title');
   }
+
+  /**
+   * Test that pathauto_create_alias() will not create an alias for a pattern
+   * that does not get any tokens replaced.
+   */
+  function testNoTokensNoAlias() {
+    $node = $this->drupalCreateNode(array('title' => ''));
+    $this->assertNoEntityAlias('node', $node);
+
+    $node->title = 'hello';
+    pathauto_nodeapi($node, 'update');
+    $this->assertEntityAlias('node', $node, 'content/hello');
+  }
 }
 
 /**
@@ -496,9 +509,17 @@ class PathautoFunctionalTestCase extends PathautoFunctionalTestHelper {
   function testPatternsValidation() {
     $edit = array();
     $edit['pathauto_node_pattern'] = '[title-raw]/[user-created-small]/[cat]/[term]';
+    $edit['pathauto_node_page_pattern'] = 'page';
     $this->drupalPost('admin/build/path/patterns', $edit, 'Save configuration');
     $this->assertText('The Default path pattern (applies to all node types with blank patterns below) is using the following invalid tokens: [user-created-small], [cat].');
+    $this->assertText('The Pattern for all Page paths should contain at least one token to ensure unique URL aliases are created.');
     $this->assertNoText('The configuration options have been saved.');
+
+    $edit['pathauto_node_pattern'] = '[title-raw]';
+    $edit['pathauto_node_page_pattern'] = 'page/[title-raw]';
+    $edit['pathauto_node_story_pattern'] = '';
+    $this->drupalPost('admin/build/path/patterns', $edit, 'Save configuration');
+    $this->assertText('The configuration options have been saved.');
   }
 }
 
