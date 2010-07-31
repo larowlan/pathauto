@@ -545,6 +545,7 @@ class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
     $this->saveAlias('node/invalid', 'content/english-node', '');
 
     // Update the node, triggering a change in the English alias.
+    $node->pathauto_perform_alias = TRUE;
     pathauto_nodeapi($node, 'update');
 
     // Check that the new English alias replaced the old one.

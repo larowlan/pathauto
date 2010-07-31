@@ -402,11 +402,11 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           break;
         case 'delete':
           // If the category is deleted, remove the path aliases
-          $category = (object) $object;
-          $term_path = taxonomy_term_path($category);
+          $term = (object) $object;
+          $term_path = taxonomy_term_path($term);
           pathauto_path_delete_all($term_path);
-          if ($term_path != "taxonomy/term/{$category->tid}") {
-            pathauto_path_delete_all("taxonomy/term/{$category->tid}");
+          if ($term_path != "taxonomy/term/{$term->tid}") {
+            pathauto_path_delete_all("taxonomy/term/{$term->tid}");
           }
           break;
       }
