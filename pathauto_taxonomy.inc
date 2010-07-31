@@ -19,7 +19,7 @@ function taxonomy_pathauto($op) {
       $settings['token_type'] = 'taxonomy';
       $settings['groupheader'] = t('Taxonomy term paths');
       $settings['patterndescr'] = t('Default path pattern (applies to all vocabularies with blank patterns below)');
-      $settings['patterndefault'] = t('category/[vocab-raw]/[catpath-raw]');
+      $settings['patterndefault'] = 'category/[vocab-raw]/[catpath-raw]';
       $patterns = token_get_list('taxonomy');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
@@ -133,7 +133,7 @@ function forum_pathauto($op) {
       $settings['token_type'] = 'taxonomy';
       $settings['groupheader'] = t('Forum paths');
       $settings['patterndescr'] = t('Pattern for forums and forum containers');
-      $settings['patterndefault'] = t('[vocab-raw]/[catpath-raw]');
+      $settings['patterndefault'] = '[vocab-raw]/[catpath-raw]';
       $patterns = token_get_list('taxonomy');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {

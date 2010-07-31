@@ -19,7 +19,7 @@ function user_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('User paths');
       $settings['patterndescr'] = t('Pattern for user account page paths');
-      $settings['patterndefault'] = t('users/[user-raw]');
+      $settings['patterndefault'] = 'users/[user-raw]';
       $patterns = token_get_list('user');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
@@ -47,7 +47,7 @@ function blog_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('Blog paths');
       $settings['patterndescr'] = t('Pattern for blog page paths');
-      $settings['patterndefault'] = t('blogs/[user-raw]');
+      $settings['patterndefault'] = 'blogs/[user-raw]';
       $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders']['['. $pattern .']'] = $description;
@@ -72,7 +72,7 @@ function tracker_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('User tracker paths');
       $settings['patterndescr'] = t('Pattern for user-tracker page paths');
-      $settings['patterndefault'] = t('users/[user-raw]/track');
+      $settings['patterndefault'] = 'users/[user-raw]/track';
       $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders']['['. $pattern .']'] = $description;
@@ -97,7 +97,7 @@ function contact_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('User contact forms paths');
       $settings['patterndescr'] = t('Pattern for the user contact form paths');
-      $settings['patterndefault'] = t('users/[user-raw]/contact');
+      $settings['patterndefault'] = 'users/[user-raw]/contact';
       $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders']['['. $pattern .']'] = $description;
