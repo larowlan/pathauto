@@ -152,42 +152,20 @@ function _pathauto_alias_exists($alias, $source, $language = '') {
 }
 
 /**
- * Returns old alias and pid if there is already an alias
- * pointing to a different item.
+ * Fetches an existing URL alias given a path and optional language.
  *
  * @param $source
- *   A string that is the internal path.
+ *   An internal Drupal path.
  * @param $language
- *   A string containing the language code to check against.
+ *   An optional language code to look up the path in.
  * @return
- *   An array with the keys "pid" and "old_alias" containing
- *   the "pid" and old "alias", respectively, of the old alias.
+ *   FALSE if no alias was found or an associative array containing the
+ *   following keys:
+ *   - pid: Unique path alias identifier.
+ *   - alias: The URL alias.
  */
 function _pathauto_existing_alias_data($source, $language = '') {
-  $output = array(
-    'pid' => '',
-    'old_alias' => ''
-  );
-
-  $existing = db_fetch_object(db_query_range("SELECT pid, dst FROM {url_alias} WHERE src = '%s' AND language IN ('%s', '') ORDER BY language DESC, pid DESC", $source, $language, 0, 1));
-  if ($existing) {
-    // The item is already aliased, check what to do...
-    switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
-      case PATHAUTO_UPDATE_ACTION_DELETE:
-      case PATHAUTO_UPDATE_ACTION_REDIRECT:
-        // Replace old alias - remember the pid to update
-        $output['pid'] = $existing->pid;
-      case PATHAUTO_UPDATE_ACTION_LEAVE:
-        // Add new alias in addition to old one
-        $output['old_alias'] = $existing->dst;
-        break;
-      case PATHAUTO_UPDATE_ACTION_NO_NEW:
-        // Do nothing
-        break;
-    }
-  }
-
-  return $output;
+  return db_fetch_array(db_query_range("SELECT pid, dst AS alias FROM {url_alias} WHERE src = '%s' AND language IN ('%s', '') ORDER BY language DESC, pid DESC", $source, $language, 0, 1));
 }
 
 /**
@@ -352,12 +330,13 @@ function pathauto_clean_alias($alias) {
  *   Operation being performed on the content being aliased
  *   ('insert', 'update', 'return', or 'bulkupdate').
  * @param $source
- *   The "real" URI of the content to be aliased (e.g., "node/$node->nid").
+ *   An internal Drupal path to be aliased.
  * @param $data
- *   An associative array of objects needed to apply the alias' pattern, keyed
- *   by their type.  Example: array('term' => $term, 'vocabulary' =>
- *   $vocabulary). Only one key/value pair is supported, otherwise you may
- *   pass the results from pathauto_get_placeholders() here.
+ *   An array of keyed objects to pass to token_replace(). For simple
+ *   replacement scenarios 'node', 'user', and others are common keys, with an
+ *   accompanying node or user object being the value.  Only one key/value pair
+ *   is supported, otherwise you may pass the results from
+ *   pathauto_get_placeholders() here.
  * @param $entity_id
  *   The entity ID (node ID, user ID, etc.).
  * @param $type
@@ -368,6 +347,10 @@ function pathauto_clean_alias($alias) {
  *   A string specify the path's language.
  * @return
  *   The alias that was created.
+ *
+ * @see _pathauto_set_alias()
+ * @see pathauto_get_placeholders()
+ * @see token_replace()
  */
 function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type = NULL, $language = '') {
   if (($op != 'bulkupdate') and variable_get('pathauto_verbose', FALSE) && user_access('notify of path changes')) {
@@ -397,16 +380,16 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
   }
 
   // Special handling when updating an item which is already aliased.
-  $pid = NULL;
-  $old_alias = NULL;
-  if ($op == 'update' or $op == 'bulkupdate') {
-    if (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE) == PATHAUTO_UPDATE_ACTION_NO_NEW) {
-      // Do nothing
-      return '';
+  $existing_alias = NULL;
+  if ($op == 'update' || $op == 'bulkupdate') {
+    if ($existing_alias = _pathauto_existing_alias_data($source, $language)) {
+      switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
+        case PATHAUTO_UPDATE_ACTION_NO_NEW:
+          // If an alias already exists, and the update action is set to do nothing,
+          // then gosh-darn it, do nothing.
+          return '';
+      }
     }
-    $update_data = _pathauto_existing_alias_data($source, $language);
-    $pid = $update_data['pid'];
-    $old_alias = $update_data['old_alias'];
   }
 
   // Replace the placeholders with the values provided by the module.
@@ -426,6 +409,11 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
   $separator = variable_get('pathauto_separator', '-');
   $maxlength = min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength());
   $alias = pathauto_truncate_utf8($alias, $maxlength, TRUE);
+
+  // If we have arrived at an empty string, discontinue.
+  if (!drupal_strlen($alias)) {
+    return '';
+  }
 
   // If the alias already exists, generate a new, hopefully unique, variant
   if (_pathauto_alias_exists($alias, $source, $language)) {
@@ -447,29 +435,30 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     return $alias;
   }
 
-  // If $pid is NULL, a new alias is created - otherwise, the existing
-  // alias for the designated source is replaced.
-  _pathauto_set_alias($source, $alias, $pid, $verbose, $old_alias, $language);
+  // Build the new path alias array and send it off to be created.
+  $path = array(
+    'source' => $source,
+    'alias' => $alias,
+    'language' => $language,
+  );
+  _pathauto_set_alias($path, $existing_alias, $verbose);
 
-  // Also create a related feed alias if requested, and if supported
-  // by the module
+  // Also create a related feed alias if requested and supported.
   $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
   if (drupal_strlen($feedappend)) {
-    // If the alias to generate is not empty, then we can append the feed
-    // string.
-    if (drupal_strlen($alias)) {
-      $alias .= '/feed';
+    // For forums and taxonomies, the source doesn't always form the base of the rss feed (ie. image galleries)
+    if ($module == 'taxonomy' || $module == 'forum' && !empty($entity_id)) {
+      $source = "taxonomy/term/{$entity_id}";
     }
 
-    // For forums and taxonomies, the source doesn't always form the base of the rss feed (ie. image galleries)
-    if ($module == 'taxonomy' || $module == 'forum') {
-      $update_data = _pathauto_existing_alias_data("taxonomy/term/$entity_id/$feedappend", $language);
-      _pathauto_set_alias("taxonomy/term/$tid/$feedappend", $alias, $update_data['pid'], $verbose, $update_data['old_alias'], $language);
-    }
-    else {
-      $update_data = _pathauto_existing_alias_data("$source/$feedappend", $language);
-      _pathauto_set_alias("$source/$feedappend", $alias, $update_data['pid'], $verbose, $update_data['old_alias'], $language);
-    }
+    // Build the feed path alias array and send it off to be created.
+    $path = array(
+      'source' => "$source/$feedappend",
+      'alias' => "$alias/feed",
+      'language' => $language,
+    );
+    $existing_alias = _pathauto_existing_alias_data($path['source'], $path['language']);
+    _pathauto_set_alias($path, $existing_alias, $verbose);
   }
 
   return $alias;
@@ -496,61 +485,89 @@ function _pathauto_path_is_callback($path) {
 /**
  * Private function for Pathauto to create an alias.
  *
- * @param $source
- *   The internal path.
- * @param $alias
- *   The visible externally used path.
- * @param $pid
- *   If the item is currently aliased, the pid for that item.
+ * @param $path
+ *   An associative array containing the following keys:
+ *   - source: The internal system path.
+ *   - alias: The URL alias.
+ *   - pid: (optional) Unique path alias identifier.
+ *   - language: (optional) The language of the alias.
+ * @param $existing_alias
+ *   (optional) An associative array of the existing path alias.
  * @param $verbose
  *   If the admin has enabled verbose, should be TRUE. Else FALSE or NULL.
- * @param $old_alias
- *   If the item is currently aliased, the existing alias for that item.
- * @param $language
- *   The path's language.
+ * @return
+ *   TRUE if the path was saved, or NULL otherwise.
+ *
+ * @see path_set_alias()
  */
-function _pathauto_set_alias($source, $alias, $pid = NULL, $verbose = FALSE, $old_alias = NULL, $language = '') {
+function _pathauto_set_alias($path, $existing_alias = NULL, $verbose = FALSE) {
   // Alert users that an existing callback cannot be overridden automatically
-  if (_pathauto_path_is_callback($alias)) {
+  if (_pathauto_path_is_callback($path['alias'])) {
     if ($verbose && user_access('notify of path changes')) {
-      drupal_set_message(t('Ignoring alias %alias due to existing path conflict.', array('%alias' => $alias)));
+      drupal_set_message(t('Ignoring alias %alias due to existing path conflict.', array('%alias' => $path['alias'])));
     }
     return;
   }
   // Alert users if they are trying to create an alias that is the same as the internal path
-  if ($source == $alias) {
+  if ($path['source'] == $path['alias']) {
     if ($verbose && user_access('notify of path changes')) {
-      drupal_set_message(t('Ignoring alias %alias because it is the same as the internal path.', array('%alias' => $alias)));
+      drupal_set_message(t('Ignoring alias %alias because it is the same as the internal path.', array('%alias' => $path['alias'])));
     }
     return;
   }
 
-  // Skip replacing the current alias with an identical alias
-  if ($old_alias != $alias) {
-    path_set_alias($source, $alias, $pid, $language);
+  $path += array(
+    'pid' => NULL,
+    'language' => '',
+  );
 
-    if (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE) == PATHAUTO_UPDATE_ACTION_REDIRECT
-        && module_exists('path_redirect')
-        && function_exists('path_redirect_save')) {
-      if (!empty($old_alias)) {
-        $redirect = array(
-          'source' => $old_alias,
-          'redirect' => $source,
-        );
-        path_redirect_save($redirect);
+  // Skip replacing the current alias with an identical alias
+  if (empty($existing_alias) || $existing_alias['alias'] != $path['alias']) {
+    // If there is already an alias, respect some update actions.
+    if (!empty($existing_alias)) {
+      switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
+        case PATHAUTO_UPDATE_ACTION_NO_NEW:
+          // Do not create the alias.
+          return;
+        case PATHAUTO_UPDATE_ACTION_LEAVE:
+          // Create a new alias instead of overwriting the existing by leaving
+          // $path['pid'] empty.
+          break;
+        case PATHAUTO_UPDATE_ACTION_REDIRECT:
+          // Create a redirect
+          if (module_exists('path_redirect') && function_exists('path_redirect_save')) {
+            $redirect = array(
+              'source' => $existing_alias['alias'],
+              'redirect' => $path['source'],
+            );
+            path_redirect_save($redirect);
+          }
+          // Intentionally fall through to the next condition since we still
+          // want to replace the existing alias.
+        case PATHAUTO_UPDATE_ACTION_DELETE:
+          // Both the redirect and delete actions should overwrite the existing
+          // alias.
+          $path['pid'] = $existing_alias['pid'];
+          break;
       }
     }
+
+    // Save the path array.
+    path_set_alias($path['source'], $path['alias'], $path['pid'], $path['language']);
+
     if ($verbose && user_access('notify of path changes')) {
       if (!empty($redirect)) {
-        drupal_set_message(t('Created new alias %alias for %source, replacing %old_alias. %old_alias now redirects to %alias.', array('%alias' => $alias, '%source' => $source, '%old_alias' => $old_alias)));
+        drupal_set_message(t('Created new alias %alias for %source, replacing %old_alias. %old_alias now redirects to %alias.', array('%alias' => $path['alias'], '%source' => $path['source'], '%old_alias' => $existing_alias['alias'])));
       }
-      elseif ($pid) {
-        drupal_set_message(t('Created new alias %alias for %source, replacing %old_alias.', array('%alias' => $alias, '%source' => $source, '%old_alias' => $old_alias)));
+      elseif (!empty($existing_alias['pid'])) {
+        drupal_set_message(t('Created new alias %alias for %source, replacing %old_alias.', array('%alias' => $path['alias'], '%source' => $path['source'], '%old_alias' => $existing_alias['pid'])));
       }
       else {
-        drupal_set_message(t('Created new alias %alias for %source.', array('%alias' => $alias, '%source' => $source)));
+        drupal_set_message(t('Created new alias %alias for %source.', array('%alias' => $path['alias'], '%source' => $path['source'])));
       }
     }
+
+    return TRUE;
   }
 }
 

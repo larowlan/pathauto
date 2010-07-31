@@ -31,6 +31,9 @@ class PathautoTestHelper extends DrupalWebTestCase {
       $modules = array_merge($modules, $args[0]);
     }
     call_user_func_array(array('parent', 'setUp'), $modules);
+
+    // Clear some static caches.
+    pathauto_pattern_load_by_entity('', '', '', TRUE);
   }
 
   function assertToken($type, $object, $token, $expected) {
@@ -55,7 +58,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
 
   function assertEntityAliasExists($entity_type, $entity) {
     $uri = $this->entity_uri($entity_type, $entity);
-    $this->assertAliasExists(array('source' => $uri['path']));
+    return $this->assertAliasExists(array('source' => $uri['path']));
   }
 
   function assertNoEntityAlias($entity_type, $entity, $expected_alias, $language = '') {
@@ -77,6 +80,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
   function assertAliasExists($conditions) {
     $alias = $this->path_load($conditions);
     $this->assertTrue($alias, t('Alias with conditions @conditions found.', array('@conditions' => var_export($conditions, TRUE))));
+    return $alias;
   }
 
   function assertNoAliasExists($conditions) {
@@ -239,13 +243,13 @@ class PathautoUnitTestCase extends PathautoTestHelper {
 
     // Add a title to the node. This should still not generate a feed alias.
     $node->title = 'Node title';
-    pathauto_node_update_alias($node, 'update');
+    pathauto_nodeapi($node, 'update');
     $this->assertAliasExists(array('source' => "node/{$node->nid}", 'alias' => 'node-title'));
     $this->assertNoAliasExists(array('source' => "node/{$node->nid}/feed"));
 
     // Enable feeds for nodes. A feed alias should now be generated.
     variable_set('pathauto_node_applytofeeds', ' feed ');
-    pathauto_node_update_alias($node, 'update');
+    pathauto_nodeapi($node, 'update');
     $this->assertAliasExists(array('source' => "node/{$node->nid}/feed", 'alias' => 'node-title/feed'));
   }
 
@@ -273,6 +277,56 @@ class PathautoUnitTestCase extends PathautoTestHelper {
     $this->assertFalse(in_array('catpath', $raw_tokens), 'Non-raw tokens not included.');
     $this->assertTrue(in_array('catpath-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
     $this->assertFalse(in_array('catalias-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
+  }
+
+  /**
+   * Test the different update actions in pathauto_create_alias().
+   */
+  function testUpdateActions() {
+    // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'insert'.
+    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $node = $this->drupalCreateNode(array('title' => 'First title'));
+    $this->assertEntityAlias('node', $node, 'content/first-title');
+
+    // Default action is PATHAUTO_UPDATE_ACTION_DELETE.
+    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE);
+    $node->title = 'Second title';
+    pathauto_nodeapi($node, 'update');
+    $this->assertEntityAlias('node', $node, 'content/second-title');
+    $this->assertNoAliasExists(array('alias' => 'content/first-title'));
+
+    // Test PATHAUTO_UPDATE_ACTION_LEAVE
+    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_LEAVE);
+    $node->title = 'Third title';
+    pathauto_nodeapi($node, 'update');
+    $this->assertEntityAlias('node', $node, 'content/third-title');
+    $this->assertAliasExists(array('source' => "node/{$node->nid}", 'alias' => 'content/second-title'));
+
+    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE);
+    $node->title = 'Fourth title';
+    pathauto_nodeapi($node, 'update');
+    $this->assertEntityAlias('node', $node, 'content/fourth-title');
+    $this->assertNoAliasExists(array('alias' => 'content/third-title'));
+    // The older second alias is not deleted yet.
+    $older_path = $this->assertAliasExists(array('source' => "node/{$node->nid}", 'alias' => 'content/second-title'));
+    path_set_alias(NULL, NULL, $older_path['pid']);
+
+    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $node->title = 'Fifth title';
+    pathauto_nodeapi($node, 'update');
+    $this->assertEntityAlias('node', $node, 'content/fourth-title');
+    $this->assertNoAliasExists(array('alias' => 'content/fith-title'));
+
+    // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'update'.
+    $this->deleteAllAliases();
+    pathauto_nodeapi($node, 'update');
+    $this->assertEntityAlias('node', $node, 'content/fifth-title');
+
+    // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
+    $this->deleteAllAliases();
+    $node->title = 'Sixth title';
+    pathauto_node_update_alias($node, 'bulkupdate');
+    $this->assertEntityAlias('node', $node, 'content/sixth-title');
   }
 }
 
@@ -448,6 +502,108 @@ class PathautoFunctionalTestCase extends PathautoFunctionalTestHelper {
   }
 }
 
+class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
+  public static function getInfo() {
+    return array(
+      'name' => 'Pathauto localization tests',
+      'description' => 'Test pathauto functionality with localization and translation.',
+      'group' => 'Pathauto',
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('locale', 'translation'), array('administer languages'));
+
+    // Add predefined language and reset the locale cache.
+    require_once './includes/locale.inc';
+    locale_add_language('fr', NULL, NULL, LANGUAGE_LTR, '', 'fr');
+    language_list('language', TRUE);
+    drupal_init_language();
+  }
+
+  /**
+   * Test that when an English node is updated, its old English alias is
+   * updated and its newer French alias is left intact.
+   */
+  function testLanguageAliases() {
+    $node = array(
+      'title' => 'English node',
+      'language' => 'en',
+      'path' => 'english-node',
+      'pathauto_perform_alias' => FALSE,
+    );
+    $node = $this->drupalCreateNode($node);
+    $english_alias = $this->path_load(array('alias' => 'english-node'));
+    $this->assertTrue($english_alias, 'Alias created with proper language.');
+
+    // Also save a French alias that should not be left alone, even though
+    // it is the newer alias.
+    $this->saveEntityAlias('node', $node, 'french-node', 'fr');
+
+    // Add an alias with the soon-to-be generated alias, causing the upcoming
+    // alias update to generate a unique alias with the '-0' suffix.
+    $this->saveAlias('node/invalid', 'content/english-node', '');
+
+    // Update the node, triggering a change in the English alias.
+    pathauto_nodeapi($node, 'update');
+
+    // Check that the new English alias replaced the old one.
+    $this->assertEntityAlias('node', $node, 'content/english-node-0', 'en');
+    $this->assertEntityAlias('node', $node, 'french-node', 'fr');
+    $this->assertAliasExists(array('pid' => $english_alias['pid'], 'alias' => 'content/english-node-0'));
+  }
+}
+
+/**
+ * Bulk update functionality tests.
+ */
+class PathautoBulkUpdateTestCase extends PathautoFunctionalTestHelper {
+  private $nodes;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Pathauto bulk updating',
+      'description' => 'Tests bulk updating of URL aliases.',
+      'group' => 'Pathauto',
+    );
+  }
+
+  function testBulkUpdate() {
+    // Create some nodes.
+    $this->nodes = array();
+    for ($i = 1; $i <= 5; $i++) {
+      $node = $this->drupalCreateNode();
+      $this->nodes[$node->nid] = $node;
+    }
+
+    // Clear out all aliases.
+    $this->deleteAllAliases();
+
+    // Bulk create aliases.
+    $edit = array(
+      'update[node_pathauto_bulk_update_batch_process]' => TRUE,
+      'update[user_pathauto_bulk_update_batch_process]' => TRUE,
+    );
+    $this->drupalPost('admin/build/path/update_bulk', $edit, t('Update'));
+    $this->assertText('Generated 7 URL aliases.'); // 5 nodes + 2 users
+
+    // Check that aliases have actually been created.
+    foreach ($this->nodes as $node) {
+      $this->assertEntityAliasExists('node', $node);
+    }
+    $this->assertEntityAliasExists('user', $this->admin_user);
+
+    // Add a new node.
+    $new_node = $this->drupalCreateNode(array('alias' => '', 'pathauto_perform_alias' => FALSE));
+
+    // Run the update again which should only run against the new node.
+    $this->drupalPost('admin/build/path/update_bulk', $edit, t('Update'));
+    $this->assertText('Generated 1 URL alias.'); // 1 node + 0 users
+
+    $this->assertEntityAliasExists('node', $new_node);
+  }
+}
+
 /*
  * Unit tests for the book tokens provided by Pathauto.
  */
@@ -573,107 +729,5 @@ class PathautoTaxonomyTokenTestCase extends PathautoFunctionalTestHelper {
     );
     taxonomy_save_term($term);
     return (object) $term;
-  }
-}
-
-class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto localization tests',
-      'description' => 'Test pathauto functionality with localization and translation.',
-      'group' => 'Pathauto',
-    );
-  }
-
-  function setUp() {
-    parent::setUp(array('locale', 'translation'), array('administer languages'));
-
-    // Add predefined language and reset the locale cache.
-    require_once './includes/locale.inc';
-    locale_add_language('fr', NULL, NULL, LANGUAGE_LTR, '', 'fr');
-    language_list('language', TRUE);
-    drupal_init_language();
-  }
-
-  /**
-   * Test that when an English node is updated, its old English alias is
-   * updated and its newer French alias is left intact.
-   */
-  function testLanguageAliases() {
-    $node = array(
-      'title' => 'English node',
-      'language' => 'en',
-      'path' => 'english-node',
-      'pathauto_perform_alias' => FALSE,
-    );
-    $node = $this->drupalCreateNode($node);
-    $english_alias = $this->path_load(array('alias' => 'english-node'));
-    $this->assertTrue($english_alias, 'Alias created with proper language.');
-
-    // Also save a French alias that should not be left alone, even though
-    // it is the newer alias.
-    $this->saveEntityAlias('node', $node, 'french-node', 'fr');
-
-    // Add an alias with the soon-to-be generated alias, causing the upcoming
-    // alias update to generate a unique alias with the '-0' suffix.
-    $this->saveAlias('node/invalid', 'content/english-node', '');
-
-    // Update the node, triggering a change in the English alias.
-    pathauto_node_update_alias($node, 'update');
-
-    // Check that the new English alias replaced the old one.
-    $this->assertEntityAlias('node', $node, 'content/english-node-0', 'en');
-    $this->assertEntityAlias('node', $node, 'french-node', 'fr');
-    $this->assertAliasExists(array('pid' => $english_alias['pid'], 'alias' => 'content/english-node-0'));
-  }
-}
-
-/**
- * Bulk update functionality tests.
- */
-class PathautoBulkUpdateTestCase extends PathautoFunctionalTestHelper {
-  private $nodes;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto bulk updating',
-      'description' => 'Tests bulk updating of URL aliases.',
-      'group' => 'Pathauto',
-    );
-  }
-
-  function testBulkUpdate() {
-    // Create some nodes.
-    $this->nodes = array();
-    for ($i = 1; $i <= 5; $i++) {
-      $node = $this->drupalCreateNode();
-      $this->nodes[$node->nid] = $node;
-    }
-
-    // Clear out all aliases.
-    $this->deleteAllAliases();
-
-    // Bulk create aliases.
-    $edit = array(
-      'update[node_pathauto_bulk_update_batch_process]' => TRUE,
-      'update[user_pathauto_bulk_update_batch_process]' => TRUE,
-    );
-    $this->drupalPost('admin/build/path/update_bulk', $edit, t('Update'));
-    $this->assertText('Generated 7 URL aliases.'); // 5 nodes + 2 users
-
-    // Check that aliases have actually been created.
-    foreach ($this->nodes as $node) {
-      $this->assertEntityAliasExists('node', $node);
-    }
-    $this->assertEntityAliasExists('user', $this->admin_user);
-
-    // Add a new node.
-    $new_node = $this->drupalCreateNode(array('alias' => '', 'pathauto_perform_alias' => FALSE));
-
-    // Run the update again which should only run against the new node.
-    $this->drupalPost('admin/build/path/update_bulk', $edit, t('Update'));
-    $this->assertText('Generated 1 URL alias.'); // 1 node + 0 users
-
-    $this->assertEntityAliasExists('node', $new_node);
   }
 }

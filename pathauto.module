@@ -141,10 +141,17 @@ function pathauto_path_alias_types() {
  * @param $bundle
  *   A bundle (e.g. node type, vocabulary ID, etc.)
  * @param $language
- *   An optional language code.
+ *   A language code, defaults to the language-neutral empty string.
+ * @param $clear
+ *   An optional boolean to clear the function's internal cache if TRUE.
  */
-function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = '') {
+function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = '', $clear = FALSE) {
   static $patterns = array();
+
+  if ($clear) {
+    $patterns = array();
+    return;
+  }
 
   $pattern_id = "$entity:$bundle:$language";
   if (!isset($patterns[$pattern_id])) {
@@ -203,7 +210,7 @@ function node_pathauto($op) {
 /**
  * Implements hook_nodeapi().
  */
-function pathauto_nodeapi(&$node, $op, $teaser, $page) {
+function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
   switch ($op) {
     case 'presave':
       // About to be saved (before insert/update)
@@ -221,7 +228,7 @@ function pathauto_nodeapi(&$node, $op, $teaser, $page) {
     case 'insert':
     case 'update':
       if (!isset($node->pathauto_perform_alias) || !empty($node->pathauto_perform_alias)) {
-        pathauto_node_update_alias($node, 'insert');
+        pathauto_node_update_alias($node, $op);
       }
       break;
     case 'delete':
