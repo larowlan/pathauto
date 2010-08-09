@@ -214,10 +214,6 @@ function pathauto_cleanstring($string) {
     }
   }
 
-  // Remove slashes.
-  // @todo Merge into punctuation replacement.
-  $output = str_replace('/', '', $output);
-
   // Reduce strings to letters and numbers
   if (variable_get('pathauto_reduce_ascii', FALSE)) {
     $pattern = '/[^a-zA-Z0-9\/]+/';
@@ -677,7 +673,8 @@ function pathauto_punctuation_chars() {
     $punctuation['question_mark']      = array('value' => '?', 'name' => t('Question mark ?'));
     $punctuation['less_than']          = array('value' => '<', 'name' => t('Less than <'));
     $punctuation['greater_than']       = array('value' => '>', 'name' => t('Greater than >'));
-    $punctuation['back_slash']         = array('value' => '\\', 'name' => t('Back slash \\'));
+    $punctuation['slash']              = array('value' => '\/', 'name' => t('Slash /'));
+    $punctuation['back_slash']         = array('value' => '\\', 'name' => t('Backslash \\'));
   }
 
   return $punctuation;
