@@ -384,7 +384,7 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     $placeholders = $source;
     $source = $data;
   }
-  elseif (!isset($data['tokens']) && !isset($data['values'])) {
+  elseif (is_array($data) && !isset($data['tokens']) && !isset($data['values'])) {
     $placeholders = pathauto_get_placeholders(key($data), current($data));
   }
   else {
@@ -422,7 +422,6 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     'module' => $module,
     'op' => $op,
     'source' => $source,
-    'data' => $data,
     'entity_id' => $entity_id,
     'type' => $type,
     'language' => $language,
