@@ -445,7 +445,7 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     do {
       // Append an incrementing numeric suffix until we find a unique alias.
       $unique_suffix = $separator . $i;
-      $alias = truncate_utf8($original_alias, $maxlength - drupal_strlen($unique_suffix, TRUE)) . $unique_suffix;
+      $alias = pathauto_truncate_utf8($original_alias, $maxlength - drupal_strlen($unique_suffix, TRUE)) . $unique_suffix;
       $i++;
     } while (_pathauto_alias_exists($alias, $source, $language));
 
