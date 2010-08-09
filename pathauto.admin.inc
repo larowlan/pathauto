@@ -235,23 +235,6 @@ function pathauto_settings_form() {
 }
 
 /**
- * Validate a form element that should have an numeric value.
- */
-function _pathauto_validate_numeric_element($element, &$form_state) {
-  $value = $element['#value'];
-
-  if (!is_numeric($value)) {
-    form_error($element, t('The field %name is not a valid number.', array('%name' => $element['#title'])));
-  }
-  elseif (isset($element['#max_value']) && $value > $element['#max_value']) {
-    form_error($element, t('The field %name cannot be greater than @max.', array('%name' => $element['#title'], '@max' => $element['#max_value'])));
-  }
-  elseif (isset($element['#min_value']) && $value < $element['#min_value']) {
-    form_error($element, t('The field %name cannot be less than @min.', array('%name' => $element['#title'], '@min' => $element['#min_value'])));
-  }
-}
-
-/**
  * Element validation callback for URL alias patterns.
  *
  * This function performs the following validations:
@@ -304,6 +287,23 @@ function _pathauto_validate_pattern_element(&$element, &$form_state) {
   }
 
   return $element;
+}
+
+/**
+ * Validate a form element that should have an numeric value.
+ */
+function _pathauto_validate_numeric_element($element, &$form_state) {
+  $value = $element['#value'];
+
+  if (!is_numeric($value)) {
+    form_error($element, t('The field %name is not a valid number.', array('%name' => $element['#title'])));
+  }
+  elseif (isset($element['#max_value']) && $value > $element['#max_value']) {
+    form_error($element, t('The field %name cannot be greater than @max.', array('%name' => $element['#title'], '@max' => $element['#max_value'])));
+  }
+  elseif (isset($element['#min_value']) && $value < $element['#min_value']) {
+    form_error($element, t('The field %name cannot be less than @min.', array('%name' => $element['#title'], '@min' => $element['#min_value'])));
+  }
 }
 
 /**
