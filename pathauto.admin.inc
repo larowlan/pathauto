@@ -384,13 +384,20 @@ function _pathauto_check_pattern($pattern, $type) {
  * Validate pathauto_admin_settings form submissions.
  */
 function pathauto_admin_settings_validate($form, &$form_state) {
+  module_load_include('inc', 'pathauto');
+
+  // Perform a basic check for HTML characters in the strings to remove field.
+  if (strip_tags($form_state['values']['pathauto_ignore_words']) != $form_state['values']['pathauto_ignore_words']) {
+    form_set_error('pathauto_ignore_words', t('The <em>Strings to remove</em> field must not contain HTML. Make sure to disable any WYSIWYG editors for this field.'));
+  }
+
   // Validate that the separator is not set to be removed per http://drupal.org/node/184119
   // This isn't really all that bad so warn, but still allow them to save the value.
   $separator = $form_state['values']['pathauto_separator'];
   $punctuation = pathauto_punctuation_chars();
   foreach ($punctuation as $name => $details) {
     if ($details['value'] == $separator) {
-      $action = $form_state['values']['pathauto_punctuation_'. $name];
+      $action = $form_state['values']['pathauto_punctuation_' . $name];
       if ($action == 0) {
         drupal_set_message(t('You have configured the @name to be the separator and to be removed when encountered in strings. This can cause problems with your patterns and especially with the catpath and termpath patterns. You should probably set the action for @name to be "replace by separator"', array('@name' => $details['name'])), 'error');
       }
