@@ -16,18 +16,18 @@ function _pathauto_token_list($type = 'all') {
   if (module_exists('taxonomy')) {
     if ($type == 'taxonomy' || $type == 'all') {
       $tokens['taxonomy']['catpath'] = t('As [cat], but including its supercategories separated by /.');
-      $tokens['taxonomy']['catpath-raw'] = t('As [cat-raw], but including its supercategories separated by /. WARNING - raw user input.');
+      $tokens['taxonomy']['catpath-raw'] = t('As [cat-raw], but including its supercategories separated by /.');
       $tokens['taxonomy']['catalias'] = t('URL alias for the term.');
     }
     if ($type == 'node' || $type == 'all') {
       $tokens['node']['termpath'] = t('As [term], but including its supercategories separated by /.');
-      $tokens['node']['termpath-raw'] = t('As [term-raw], but including its supercategories separated by /. WARNING - raw user input.');
-      $tokens['node']['termalias'] = t('URL alias for the term.');
+      $tokens['node']['termpath-raw'] = t('As [term-raw], but including its supercategories separated by /.');
+      $tokens['node']['termalias'] = t('The URL alias of the taxonomy term.');
     }
   }
   if (module_exists('book')) {
     if ($type == 'node' || $type == 'all') {
-      $tokens['node']['bookpathalias'] = t('URL alias for the parent book.');
+      $tokens['node']['bookpathalias'] = t('The URL alias of the parent book of the node.');
     }
   }
   return $tokens;
@@ -58,7 +58,9 @@ function _pathauto_token_values($type, $object = NULL, $options = array(), $labe
           $values = array_merge($values, _pathauto_token_values('taxonomy', $term, $options, 'term'));
         }
         else {
-          $values['termpath'] = $values['termpath-raw'] = $values['termalias'] = '';
+          $values['termpath'] = '';
+          $values['termpath-raw'] = '';
+          $values['termalias'] = '';
         }
       }
       break;
@@ -79,8 +81,9 @@ function _pathauto_token_values($type, $object = NULL, $options = array(), $labe
         $parents = taxonomy_get_parents_all($object->tid);
         $catpath = $catpath_raw = array();
         foreach ($parents as $parent) {
-          array_unshift($catpath, pathauto_cleanstring(check_plain($parent->name)));
-          array_unshift($catpath_raw, pathauto_cleanstring($parent->name));
+          $term_name_cleaned = pathauto_cleanstring($parent->name);
+          array_unshift($catpath, check_plain($term_name_cleaned));
+          array_unshift($catpath_raw, $term_name_cleaned);
         }
         $values[$label . 'path'] = implode('/', $catpath);
         $values[$label . 'path-raw'] = implode('/', $catpath_raw);
