@@ -242,11 +242,6 @@ function pathauto_settings_form() {
  * - Checks if any tokens with raw companions are being used and recommends
  *   use of the raw tokens.
  */
-/**
- * Validate a form element that should have at least one token.
- *
- * Also check if the pattern is using tokens that have a raw companion.
- */
 function _pathauto_validate_pattern_element(&$element, &$form_state) {
   // Get the current value of the element (since this can be used during both
   // form display and validation).
