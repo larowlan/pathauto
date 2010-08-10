@@ -635,6 +635,36 @@ function _pathauto_get_schema_alias_maxlength() {
 }
 
 /**
+ * Fetch an array of non-raw tokens that have matching raw tokens.
+ *
+ * @return
+ *   An array of tokens.
+ */
+function _pathauto_get_raw_tokens() {
+  static $raw_tokens;
+
+  if (!isset($raw_tokens)) {
+    $raw_tokens = array();
+
+    // Build one big list of tokens.
+    foreach (token_get_list('all') as $tokens) {
+      $raw_tokens = array_merge($raw_tokens, array_keys($tokens));
+    }
+
+    // Filter out any tokens without -raw as a suffix.
+    foreach ($raw_tokens as $index => $token) {
+      if (substr($token, -4) !== '-raw') {
+        unset($raw_tokens[$index]);
+      }
+    }
+
+    array_unique($raw_tokens);
+  }
+
+  return $raw_tokens;
+}
+
+/**
  * Return all the possible paths of the i18n-ascii.txt transliteration file.
  *
  * @return
