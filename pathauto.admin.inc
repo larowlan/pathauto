@@ -113,24 +113,29 @@ function pathauto_admin_settings() {
     '#description' => t('What should pathauto do when updating an existing content item which already has an alias?'),
   );
 
-  $disable_transliteration = TRUE;
-  $path = drupal_get_path('module', 'pathauto');
-  $transliteration_help = t('When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet? Transliteration is determined by the i18n-ascii.txt file in the Pathauto directory. <strong>This option is disabled on your site because you do not have an i18n-ascii.txt file in the Pathauto directory.</strong>');
-  if (is_file($path .'/i18n-ascii.txt')) {
-    $disable_transliteration = FALSE;
-    $transliteration_help = t('When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet? Transliteration is determined by the i18n-ascii.txt file in the Pathauto directory.');
-  }
-  else {
-    // Perhaps they've removed the file, set the transliterate option to FALSE
-    variable_set('pathauto_transliterate', FALSE);
-  }
   $form['general']['pathauto_transliterate'] = array(
     '#type' => 'checkbox',
     '#title' => t('Transliterate prior to creating alias'),
     '#default_value' => variable_get('pathauto_transliterate', FALSE),
-    '#description' => $transliteration_help,
-    '#disabled' => $disable_transliteration,
+    '#description' => t('When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the ASCII-96 alphabet?'),
+    '#disabled' => !_pathauto_get_i18n_file(),
   );
+  $i18n_locations = _pathauto_get_i18n_possible_files();
+  foreach ($i18n_locations as $key => $file) {
+    $i18n_locations[$key] = check_plain($file);
+    if (file_exists($file)) {
+      $i18n_locations[$key] .= ' - <span class="admin-enabled">' . t('File exists') . '</span>';
+    }
+    else {
+      $i18n_locations[$key] .= ' - <span class="admin-disabled">'  . t('Does not exist') . '</span>';
+    }
+  }
+  $form['general']['pathauto_transliterate']['#description'] .= ' ' . t('Transliteration is determined by the i18n-ascii.txt file in the following possible locations, in order of precedence: !locations', array('!locations' => theme('item_list', $i18n_locations)));
+  if ($form['general']['pathauto_transliterate']['#disabled']) {
+    // Perhaps they've removed the file, set the transliterate option to FALSE
+    variable_set('pathauto_transliterate', FALSE);
+  }
+
   $form['general']['pathauto_reduce_ascii'] = array(
     '#type' => 'checkbox',
     '#title' => t('Reduce strings to letters and numbers from ASCII-96'),

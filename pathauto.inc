@@ -59,7 +59,7 @@ function _pathauto_existing_alias_data($source, $language = '') {
 /**
  * Clean up a string segment to be used in an URL alias.
  *
- * Peforms the following possible alterations:
+ * Performs the following possible alterations:
  * - Process the string through the transliteration module.
  * - Replace or remove punctuation with the separator character.
  * - Remove back-slashes.
@@ -68,7 +68,7 @@ function _pathauto_existing_alias_data($source, $language = '') {
  * - Replace whitespace with the separator character.
  * - Trim duplicate, leading, and trailing separators.
  * - Convert to lower-case.
- * - Shorten to a desired length and logical position based on word boundries.
+ * - Shorten to a desired length and logical position based on word boundaries.
  *
  * This function should *not* be called on URL alias or path strings because it
  * is assumed that they are already clean.
@@ -83,18 +83,18 @@ function pathauto_cleanstring($string) {
 
   // Optionally remove accents and transliterate
   if (variable_get('pathauto_transliterate', FALSE)) {
-    static $i18n_loaded = false;
-    static $translations = array();
+    static $translations;
 
-    if (!$i18n_loaded) {
-      $path = drupal_get_path('module', 'pathauto');
-      if (is_file($path .'/i18n-ascii.txt')) {
-        $translations = drupal_parse_info_file($path .'/i18n-ascii.txt');
+    if (!isset($translations)) {
+      $translations = FALSE;
+      if ($file = _pathauto_get_i18n_file()) {
+        $translations = parse_ini_file($file);
       }
-      $i18n_loaded = true;
     }
 
-    $output = strtr($output, $translations);
+    if (!empty($translations)) {
+      $output = strtr($output, $translations);
+    }
   }
 
   // Replace or drop punctuation based on user settings
@@ -204,10 +204,10 @@ function _pathauto_clean_separators($string, $separator = NULL) {
 /**
  * Clean up an URL alias.
  *
- * Peforms the following alterations:
+ * Performs the following alterations:
  * - Trim duplicate, leading, and trailing back-slashes.
  * - Trim duplicate, leading, and trailing separators.
- * - Shorten to a desired length and logical position based on word boundries.
+ * - Shorten to a desired length and logical position based on word boundaries.
  *
  * @param $alias
  *   A string with the URL alias to clean up.
@@ -374,7 +374,7 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
   // Also create a related feed alias if requested and supported.
   $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
   if (drupal_strlen($feedappend)) {
-    // For forums and taxonomies, the source doesn't always form the base of the rss feed (ie. image galleries)
+    // For forums and taxonomies, the source doesn't always form the base of the RSS feed (i.e. image galleries)
     if ($module == 'taxonomy' || $module == 'forum' && !empty($entity_id)) {
       $source = "taxonomy/term/{$entity_id}";
     }
@@ -596,7 +596,7 @@ function pathauto_punctuation_chars() {
  * Fetch the maximum length of the {url_alias}.dst field from the schema.
  *
  * @return
- *   An integer of the maximum url alias length allowed by the database.
+ *   An integer of the maximum URL alias length allowed by the database.
  */
 function _pathauto_get_schema_alias_maxlength() {
   static $maxlength;
@@ -605,4 +605,41 @@ function _pathauto_get_schema_alias_maxlength() {
     $maxlength = $schema['fields']['dst']['length'];
   }
   return $maxlength;
+}
+
+/**
+ * Return all the possible paths of the i18n-ascii.txt transliteration file.
+ *
+ * @return
+ *   An array of possible file paths.
+ */
+function _pathauto_get_i18n_possible_files() {
+  $config = conf_path();
+  $modulepath = drupal_get_path('module', 'pathauto');
+  $file = 'i18n-ascii.txt';
+  return array("$config/$file", "sites/all/$file", "$modulepath/$file");
+}
+
+/**
+ * Fetch the path to the i18n-ascii.txt transliteration file
+ *
+ * @return
+ *   The complete path or FALSE if not found in any of the possible paths.
+ *
+ * @see _pathauto_get_i18n_possible_files()
+ */
+function _pathauto_get_i18n_file() {
+  static $i18n_file;
+
+  if (!isset($i18n_file)) {
+    $i18n_file = FALSE;
+    foreach (_pathauto_get_i18n_possible_files() as $file) {
+      if (file_exists($file)) {
+        $i18n_file = $file;
+        break;
+      }
+    }
+  }
+
+  return $i18n_file;
 }
