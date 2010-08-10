@@ -614,10 +614,17 @@ function _pathauto_get_schema_alias_maxlength() {
  *   An array of possible file paths.
  */
 function _pathauto_get_i18n_possible_files() {
-  $config = conf_path();
-  $modulepath = drupal_get_path('module', 'pathauto');
   $file = 'i18n-ascii.txt';
-  return array("$config/$file", "sites/all/$file", "$modulepath/$file");
+  $files = array(
+    conf_path() . '/' . $file,
+    "sites/all/$file",
+    drupal_get_path('module', 'pathauto') . '/' . $file,
+  );
+  // Always prefer $conf['pathauto_i18n_file'] if defined.
+  if ($conf_file = variable_get('pathauto_i18n_file', '')) {
+    array_unshift($files, $conf_file);
+  }
+  return $files;
 }
 
 /**
