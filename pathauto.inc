@@ -361,13 +361,6 @@ function pathauto_clean_alias($alias) {
  * @see pathauto_get_placeholders()
  */
 function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type = NULL, $language = '') {
-  if (($op != 'bulkupdate') and variable_get('pathauto_verbose', FALSE) && user_access('notify of path changes')) {
-    $verbose = TRUE;
-  }
-  else {
-    $verbose = FALSE;
-  }
-
   // Retrieve and apply the pattern for this content type.
   $pattern = pathauto_pattern_load_by_entity($module, $type, $language);
   if (empty($pattern)) {
@@ -462,7 +455,7 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     'alias' => $alias,
     'language' => $language,
   );
-  _pathauto_set_alias($path, $existing_alias, $verbose);
+  _pathauto_set_alias($path, $existing_alias);
 
   // Also create a related feed alias if requested and supported.
   $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
@@ -479,7 +472,7 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
       'language' => $language,
     );
     $existing_alias = _pathauto_existing_alias_data($path['source'], $path['language']);
-    _pathauto_set_alias($path, $existing_alias, $verbose);
+    _pathauto_set_alias($path, $existing_alias);
   }
 
   return $alias;
