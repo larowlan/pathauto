@@ -543,27 +543,33 @@ function pathauto_get_placeholders($type, $object) {
   }
   $full = token_get_values($type, $object, TRUE);
   $tokens = token_prepare_tokens($full->tokens);
-  $replacements = array();
-  foreach ($tokens as $index => $token) {
-    $replacements[$token] = $full->values[$index];
-  }
-  pathauto_clean_token_values($replacements);
-  return array('tokens' => array_keys($replacements), 'values' => array_values($replacements));
+  $values = pathauto_clean_token_values($full);
+  return array('tokens' => $tokens, 'values' => $values);
 }
 
 /**
  * Clean tokens so they are URL friendly.
  *
- * @param $replacements
- *   An array of token replacements that need to be "cleaned" for use in the URL.
+ * @param $full
+ *   An array of token values from token_get_values() that need to be "cleaned"
+ *   for use in the URL.
+ *
+ * @return
+ *   An array of the cleaned tokens.
  */
-function pathauto_clean_token_values(&$replacements) {
-  foreach ($replacements as $token => $value) {
+function pathauto_clean_token_values($full) {
+  $replacements = array();
+  foreach ($full->values as $key => $value) {
     // Only clean non-path tokens.
-    if (!preg_match('/(path|alias|url|url-brief)(-raw)?\]$/', $token)) {
+    $token = $full->tokens[$key];
+    if (!preg_match('/(path|alias|url|url-brief)(-raw)?$/', $token)) {
       $replacements[$token] = pathauto_cleanstring($value);
     }
+    else {
+      $replacements[$token] = $value;
+    }
   }
+  return $replacements;
 }
 
 /**
