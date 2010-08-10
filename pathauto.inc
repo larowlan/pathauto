@@ -362,7 +362,7 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
     'alias' => $alias,
     'language' => $language,
   );
-  _pathauto_set_alias($path, $existing_alias);
+  _pathauto_set_alias($path, $existing_alias, $op);
 
   // Also create a related feed alias if requested and supported.
   $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
@@ -379,7 +379,7 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
       'language' => $language,
     );
     $existing_alias = _pathauto_existing_alias_data($path['source'], $path['language']);
-    _pathauto_set_alias($path, $existing_alias);
+    _pathauto_set_alias($path, $existing_alias, $op);
   }
 
   return $alias;
@@ -414,13 +414,15 @@ function _pathauto_path_is_callback($path) {
  *   - language: (optional) The language of the alias.
  * @param $existing_alias
  *   (optional) An associative array of the existing path alias.
+ * @param $op
+ *   An optional string with the operation being performed.
  * @return
  *   TRUE if the path was saved, or NULL otherwise.
  *
  * @see path_set_alias()
  */
-function _pathauto_set_alias($path, $existing_alias = NULL) {
-  $verbose = _pathauto_verbose();
+function _pathauto_set_alias($path, $existing_alias = NULL, $op = NULL) {
+  $verbose = _pathauto_verbose(NULL, $op);
 
   // Alert users that an existing callback cannot be overridden automatically
   if (_pathauto_path_is_callback($path['alias'])) {
@@ -508,7 +510,7 @@ function _pathauto_set_alias($path, $existing_alias = NULL) {
  * @return
  *   TRUE if verbose output is enabled, or FALSE otherwise.
  */
-function _pathauto_verbose($message = '', $op = NULL) {
+function _pathauto_verbose($message = NULL, $op = NULL) {
   static $verbose;
 
   if (!isset($verbose)) {
