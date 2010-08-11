@@ -287,9 +287,9 @@ class PathautoUnitTestCase extends PathautoTestHelper {
    */
   function testGetRawTokens() {
     $raw_tokens = _pathauto_get_raw_tokens();
-    $this->assertFalse(in_array('catpath', $raw_tokens), 'Non-raw tokens not included.');
-    $this->assertTrue(in_array('catpath-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
-    $this->assertFalse(in_array('catalias-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
+    $this->assertFalse(in_array('node-path', $raw_tokens), 'Non-raw tokens not included.');
+    $this->assertTrue(in_array('node-path-raw', $raw_tokens), 'Token [catpath] has a matching raw token.');
+    $this->assertFalse(in_array('node-url-raw', $raw_tokens), 'Token [catalias] does not have a matching raw token.');
   }
 
   /**
