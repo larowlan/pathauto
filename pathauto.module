@@ -89,6 +89,34 @@ function _pathauto_include() {
 }
 
 /**
+ * Implementation of hook_token_list() for Pathauto specific tokens.
+ */
+function pathauto_token_list($type = 'all') {
+  $tokens = array();
+  if (module_exists('taxonomy')) {
+    if ($type == 'taxonomy' || $type == 'all') {
+      $tokens['taxonomy']['catpath'] = t('As [cat], but including its supercategories separated by /.');
+      $tokens['taxonomy']['catpath-raw'] = t('As [cat-raw], but including its supercategories separated by /.');
+      $tokens['taxonomy']['catalias'] = t('The URL alias of the category.');
+      $tokens['taxonomy']['catalias-raw'] = t('The URL alias of the category.');
+    }
+    if ($type == 'node' || $type == 'all') {
+      $tokens['node']['termpath'] = t('As [term], but including its supercategories separated by /.');
+      $tokens['node']['termpath-raw'] = t('As [term-raw], but including its supercategories separated by /.');
+      $tokens['node']['termalias'] = t('The URL alias of the taxonomy term.');
+      $tokens['node']['termalias-raw'] = t('The URL alias of the taxonomy term.');
+    }
+  }
+  if (module_exists('book')) {
+    if ($type == 'node' || $type == 'all') {
+      $tokens['node']['bookpathalias'] = t('The URL alias of the parent book of the node.');
+      $tokens['node']['bookpathalias-raw'] = t('The URL alias of the parent book of the node.');
+    }
+  }
+  return $tokens;
+}
+
+/**
  * Implementation of hook_token_values() for Pathauto specific tokens.
  */
 function pathauto_token_values($type, $object = NULL) {
@@ -100,10 +128,12 @@ function pathauto_token_values($type, $object = NULL) {
           // We're on a node and it's a book and it has a parent? Get the book path alias
           if (module_exists('book')) {
             if ($object->type == 'book' && $object->parent) {
-              $values['bookpathalias'] = drupal_get_path_alias('node/'. $object->parent);
+              $values['bookpathalias-raw'] = drupal_get_path_alias('node/'. $object->parent);
+              $values['bookpathalias']     = check_plain($values['bookpathalias-raw']);
             }
             else {
               $values['bookpathalias'] = '';
+              $values['bookpathalias-raw'] = '';
             }
           }
 
@@ -142,45 +172,19 @@ function pathauto_token_values($type, $object = NULL) {
               $values[$label .'-raw'] = $category->name;
             }
 
-            $values[$label .'alias'] = drupal_get_path_alias('taxonomy/term/'. $category->tid);
-            if (!strncasecmp($values[$label .'alias'], 'taxonomy', 8)) {
-              $values[$label .'alias'] = $values[$label];
-            }
+            $values[$label .'alias-raw'] = drupal_get_path_alias('taxonomy/term/'. $category->tid);
+            $values[$label .'alias']     = check_plain($values[$label .'alias-raw']);
           }
           else { // Provide some defaults if they aren't set.
             $values[$label .'path'] = '';
             $values[$label .'path-raw'] = '';
             $values[$label .'alias'] = '';
+            $values[$label .'alias-raw'] = '';
           }
       }
       return $values;
     }
   }
-}
-
-/**
- * Implementation of hook_token_list() for Pathauto specific tokens.
- */
-function pathauto_token_list($type = 'all') {
-  $tokens = array();
-  if (module_exists('taxonomy')) {
-    if ($type == 'taxonomy' || $type == 'all') {
-      $tokens['taxonomy']['catpath'] = t('As [cat], but including its supercategories separated by /.');
-      $tokens['taxonomy']['catpath-raw'] = t('As [cat-raw], but including its supercategories separated by /. WARNING - raw user input.');
-      $tokens['taxonomy']['catalias'] = t('URL alias for the category.');
-    }
-    if ($type == 'node' || $type == 'all') {
-      $tokens['node']['termpath'] = t('As [term], but including its supercategories separated by /.');
-      $tokens['node']['termpath-raw'] = t('As [term-raw], but including its supercategories separated by /. WARNING - raw user input.');
-      $tokens['node']['termalias'] = t('URL alias for the term.');
-    }
-  }
-  if (module_exists('book')) {
-    if ($type == 'node' || $type == 'all') {
-      $tokens['node']['bookpathalias'] = t('URL alias for the parent book.');
-    }
-  }
-  return $tokens;
 }
 
 /**
