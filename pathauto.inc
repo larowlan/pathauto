@@ -656,6 +656,13 @@ function pathauto_clean_token_values($full) {
     if (!preg_match('/(path|alias|url|url-brief)(-raw)?$/', $token)) {
       $replacements[$token] = pathauto_cleanstring($value);
     }
+    elseif (preg_match('/(bookpath|menupath)(-raw)?$/', $token)) {
+      // A few tokens violate the path/path-raw naming convention and should
+      // still have their segments cleaned using pathauto_cleanstring().
+      $segments = explode('/', $value);
+      $segments = array_map('pathauto_cleanstring', $segments);
+      $replacements[$token] = implode('/', $segments);
+    }
     else {
       $replacements[$token] = $value;
     }
