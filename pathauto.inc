@@ -632,7 +632,7 @@ function _pathauto_verbose($message = NULL, $op = NULL) {
  *   Pathauto expects to see them.
  */
 function pathauto_get_placeholders($type, $object) {
-  $full = token_get_values($type, $object, TRUE);
+  $full = token_get_values($type, $object, TRUE, array('pathauto' => TRUE));
   $tokens = token_prepare_tokens($full->tokens);
   $values = pathauto_clean_token_values($full);
   return array('tokens' => $tokens, 'values' => $values);
@@ -653,17 +653,20 @@ function pathauto_clean_token_values($full) {
   foreach ($full->values as $key => $value) {
     // Only clean non-path tokens.
     $token = $full->tokens[$key];
-    if (!preg_match('/(path|alias|url|url-brief)(-raw)?$/', $token)) {
-      $replacements[$token] = pathauto_cleanstring($value);
-    }
-    elseif (preg_match('/(bookpath|menupath)(-raw)?$/', $token)) {
-      // A few tokens violate the path/path-raw naming convention and should
-      // still have their segments cleaned using pathauto_cleanstring().
-      $segments = explode('/', $value);
-      $segments = array_map('pathauto_cleanstring', $segments);
+    if (strpos($token, 'path') !== FALSE && is_array($value)) {
+      // The token value is an array if we specified $options['pathauto'] = TRUE,
+      // then we should assume this is a 'segment' URL that should be pieced back
+      // together.
+      $segments = array_map('pathauto_cleanstring', $value);
       $replacements[$token] = implode('/', $segments);
     }
+    elseif (!preg_match('/(path|alias|url|url-brief)(-raw)?$/', $token)) {
+      // Tokens that do not match URL-type names should still have their values
+      // cleaned.
+      $replacements[$token] = pathauto_cleanstring($value);
+    }
     else {
+      // The token must be an URL or alias token that should not be left raw.
       $replacements[$token] = $value;
     }
   }

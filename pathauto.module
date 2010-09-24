@@ -108,9 +108,9 @@ function pathauto_token_list($type = 'all') {
 /**
  * Implements hook_token_values().
  */
-function pathauto_token_values($type, $object = NULL) {
+function pathauto_token_values($type, $object = NULL, $options = array()) {
   module_load_include('inc', 'pathauto', 'pathauto.tokens');
-  return _pathauto_token_values($type, $object);
+  return _pathauto_token_values($type, $object, $options);
 }
 
 /**
