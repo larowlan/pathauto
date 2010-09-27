@@ -657,7 +657,7 @@ function pathauto_clean_token_values($full, $options = array()) {
       // If the token name contains 'path', the token value is an array, and
       // the 'pathauto' option was passed to token_get_values(), then the token
       // should have each segment cleaned, and then glued back together to
-      // construct an value resembling an URL.
+      // construct a value resembling an URL.
       $segments = array_map('pathauto_cleanstring', $value);
       $replacements[$token] = implode('/', $segments);
     }
@@ -666,7 +666,7 @@ function pathauto_clean_token_values($full, $options = array()) {
       $replacements[$token] = $value;
     }
     else {
-      // Tokens is not an URL, so it should have its value cleaned.
+      // Token is not an URL, so it should have its value cleaned.
       $replacements[$token] = pathauto_cleanstring($value);
     }
   }
