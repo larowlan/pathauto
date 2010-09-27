@@ -89,7 +89,7 @@ function _pathauto_token_values($type, $object = NULL, $options = array(), $labe
           array_unshift($catpath, check_plain($parent->name));
           array_unshift($catpath_raw, $parent->name);
         }
-        
+
         $values[$label . 'path'] = !empty($options['pathauto']) ? $catpath : implode('/', $catpath);
         $values[$label . 'path-raw'] = !empty($options['pathauto']) ? $catpath_raw : implode('/', $catpath_raw);
 
