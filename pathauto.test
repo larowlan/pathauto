@@ -29,8 +29,8 @@ class PathautoTestHelper extends DrupalWebTestCase {
   }
 
   function assertToken($type, $object, $token, $expected) {
-    $tokens = pathauto_token_values($type, $object);
-    $this->assertEqual($tokens[$token], $expected, t("Token value for [@token] was '!actual', expected value '!expected'.", array('@token' => $token, '!actual' => $tokens[$token], '!expected' => $expected)));
+    $tokens = pathauto_get_placeholders($type, $object);
+    $this->assertEqual($tokens['values'][$token], $expected, t("Token value for [@token] was '!actual', expected value '!expected'.", array('@token' => $token, '!actual' => $tokens['values'][$token], '!expected' => $expected)));
   }
 
   function saveAlias($source, $alias, $language = '') {
