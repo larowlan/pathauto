@@ -162,7 +162,6 @@ function pathauto_token_values($type, $object = NULL, $options = array(), $label
 
       // Tokens [catpath] and [catpath-raw].
       if (isset($object->tid)) {
-        module_load_include('inc', 'pathauto');
         $parents = taxonomy_get_parents_all($object->tid);
         $catpath = $catpath_raw = array();
         foreach ($parents as $parent) {
