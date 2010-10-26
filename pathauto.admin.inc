@@ -45,6 +45,7 @@ function pathauto_patterns_form($form_state) {
       '#element_validate' => array('_pathauto_validate_pattern_element'),
       '#after_build' => array('_pathauto_validate_pattern_element'),
       '#token_types' => array($settings->token_type),
+      '#min_tokens' => 1,
       '#parents' => array($variable),
     );
 
@@ -62,6 +63,7 @@ function pathauto_patterns_form($form_state) {
           '#element_validate' => array('_pathauto_validate_pattern_element'),
           '#after_build' => array('_pathauto_validate_pattern_element'),
           '#token_types' => array($settings->token_type),
+          '#min_tokens' => 1,
           '#parents' => array($variable),
         );
       }
@@ -253,31 +255,28 @@ function _pathauto_validate_pattern_element(&$element, &$form_state) {
   }
 
   // Check to see if the required token functions are available.
-  if (!function_exists('token_scan') || !function_exists('token_element_validate_token_context')) {
+  if (!function_exists('token_scan') || !function_exists('token_element_validate')) {
     drupal_set_message(t('Please make sure you are using the latest version of the Token module.'), 'error', FALSE);
     return $element;
   }
-
-  // Check for at least one token.
-  $tokens = token_scan($value);
-  if (empty($tokens)) {
-    form_error($element, t('The %name should contain at least one token to ensure unique URL aliases are created.', array('%name' => $element['#title'])));
-  }
-  else {
-    token_element_validate_token_context($element, $form_state);
-  }
+  
+  // Run token validation.
+  $element = token_element_validate($element, $form_state);
 
   // Find any non-raw tokens that do have a raw companion token and warn.
-  module_load_include('inc', 'pathauto');
-  $not_raw_tokens = array();
-  $raw_tokens = _pathauto_get_raw_tokens();
-  foreach ($tokens as $token) {
-    if (substr($token, -4) === '-raw') {
-      // Skip raw tokens.
-      continue;
-    }
-    elseif (in_array($token . '-raw', $raw_tokens)) {
-      drupal_set_message(t('You are using the token [%token] which has a raw companion token [%raw_token]. For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing. See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $token . '-raw', '@pathauto-help' => url('admin/help/pathauto'))), 'error', FALSE);
+  if (!form_get_errors($element)) {
+    // Skip if there are already errors on this field.
+    module_load_include('inc', 'pathauto');
+    $not_raw_tokens = array();
+    $raw_tokens = _pathauto_get_raw_tokens();
+    foreach (token_scan($value) as $token) {
+      if (substr($token, -4) === '-raw') {
+        // Skip raw tokens.
+        continue;
+      }
+      elseif (in_array($token . '-raw', $raw_tokens)) {
+        drupal_set_message(t('You are using the token [%token] which has a raw companion token [%raw_token]. For Pathauto patterns you should use the -raw version of tokens unless you really know what you are doing. See the <a href="@pathauto-help">Pathauto help</a> for more details.', array('%token' => $token, '%raw_token' => $token . '-raw', '@pathauto-help' => url('admin/help/pathauto'))), 'error', FALSE);
+      }
     }
   }
 
