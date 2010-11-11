@@ -7,7 +7,8 @@
  *
  * This also contains some constants giving human readable names to some numeric
  * settings; they're included here as they're only rarely used outside this file
- * anyway. Use _pathauto_include() if the constants need to be available.
+ * anyway. Use module_load_include('inc', 'pathauto') if the constants need to
+ * be available.
  *
  * @ingroup pathauto
  */
