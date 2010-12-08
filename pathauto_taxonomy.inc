@@ -57,6 +57,11 @@ function taxonomy_pathauto_bulkupdate() {
   // From all node types, only attempt to update those with patterns
   $pattern_vids = array();
   foreach (taxonomy_get_vocabularies() as $vid => $info) {
+    // Exclude forum module's vocabulary.
+    if ($vid == variable_get('forum_nav_vocabulary', '')) {
+      continue;
+    }
+
     $pattern = trim(variable_get('pathauto_taxonomy_'. $vid .'_pattern', ''));
 
     // If it's not set, check the default
@@ -67,26 +72,18 @@ function taxonomy_pathauto_bulkupdate() {
     }
     if (!empty($pattern)) {
       $pattern_vids[] = $vid;
-      if (empty($vid_where)) {
-        $vid_where = " AND (vid = '%s' ";
-      }
-      else {
-        $vid_where .= " OR vid = '%s'";
-      }
     }
   }
-  $vid_where .= ')';
-
-  // Exclude the forums and join all the args into one array so they can be passed to db_query
-  $forum_vid[] = variable_get('forum_nav_vocabulary', '');
-  $query_args = array_merge($forum_vid, $pattern_vids);
-  $query = "SELECT tid, vid, name, description, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('taxonomy/term/', CAST(tid AS CHAR)) = src WHERE src IS NULL AND vid <> %d ". $vid_where;
-  $result = db_query_range($query, $query_args, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
-  $placeholders = array();
-  while ($category = db_fetch_object($result)) {
-    $count += _taxonomy_pathauto_alias($category, 'bulkupdate');
+  if (!empty($pattern_vids)) {
+    $sql = "SELECT td.tid FROM {term_data} td LEFT JOIN {url_alias} ua ON CONCAT('taxonomy/term/', CAST(td.tid AS CHAR)) = ua.src WHERE ua.src IS NULL AND td.vid IN (" . db_placeholders($pattern_vids, 'int') . ")";
+    $query = db_query_range($sql, $pattern_vids, 0, variable_get('pathauto_max_bulk_update', 50));
+
+    while ($tid = db_result($query)) {
+      $term = taxonomy_get_term($tid);
+      $count += _taxonomy_pathauto_alias($term, 'bulkupdate');
+    }
   }
 
   drupal_set_message(format_plural($count,
@@ -156,13 +153,13 @@ function forum_pathauto($op) {
  */
 function forum_pathauto_bulkupdate() {
   $forum_vid = variable_get('forum_nav_vocabulary', '');
-  $query = "SELECT tid, vid, name, description, src, dst FROM {term_data} LEFT JOIN {url_alias} ON CONCAT('forum/', CAST(tid AS CHAR)) = src WHERE vid = %d AND src IS NULL";
-  $result = db_query_range($query, $forum_vid, 0, variable_get('pathauto_max_bulk_update', 50));
+  $sql = "SELECT td.tid FROM {term_data} td LEFT JOIN {url_alias} ua ON CONCAT('forum/', CAST(td.tid AS CHAR)) = ua.src WHERE ua.src IS NULL AND td.vid = %d";
+  $query = db_query_range($sql, $forum_vid, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
-  $placeholders = array();
-  while ($category = db_fetch_object($result)) {
-    $count = _taxonomy_pathauto_alias($category, 'bulkupdate') + $count;
+  while ($tid = db_result($query)) {
+    $term = taxonomy_get_term($tid);
+    $count += _taxonomy_pathauto_alias($term, 'bulkupdate');
   }
 
   drupal_set_message(format_plural($count,
