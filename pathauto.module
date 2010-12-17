@@ -98,6 +98,24 @@ function pathauto_menu() {
 }
 
 /**
+ * Deprecated. Use module_load_include('inc', 'pathauto') instead.
+ */
+function _pathauto_include() {
+  module_load_include('inc', 'pathauto');
+
+  // Trigger a watchdog notice about whatever file/function is improperly
+  // calling this deprecated function.
+  $backtrace = debug_backtrace();
+  watchdog('pathauto', "The !deprecated function has been deprecated and !replacement should be used instead. It was called from %file on line %line, function %function().", array(
+    '!deprecated' => __FUNCTION__,
+    '!replacement' => "module_load_include('inc', 'pathauto')",
+    '%file' => basename($backtrace[0]['file']),
+    '%line' => $backtrace[0]['line'],
+    '%function' => $backtrace[1]['function'],
+  ), WATCHDOG_NOTICE);
+}
+
+/**
  * Implements hook_token_list().
  */
 function pathauto_token_list($type = 'all') {
