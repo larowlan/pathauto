@@ -245,9 +245,7 @@ function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
       break;
     case 'insert':
     case 'update':
-      if (!isset($node->pathauto_perform_alias) || !empty($node->pathauto_perform_alias)) {
-        pathauto_node_update_alias($node, $op);
-      }
+      pathauto_node_update_alias($node, $op);
       break;
     case 'delete':
       pathauto_path_delete_all("node/{$node->nid}");
@@ -346,7 +344,12 @@ function pathauto_node_operations() {
  *   An optional array of additional options.
  */
 function pathauto_node_update_alias($node, $op, $options = array()) {
-  // Skip processing if the term has no pattern.
+  // Skip processing if the user has disabled pathauto for the node.
+  if (isset($node->pathauto_perform_alias) && empty($node->pathauto_perform_alias)) {
+    return;
+  }
+
+  // Skip processing if the node has no pattern.
   $language = isset($node->language) ? $node->language : '';
   if (!pathauto_pattern_load_by_entity('node', $node->type, $language)) {
     return;
@@ -443,6 +446,11 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
  *   An optional array of additional options.
  */
 function pathauto_taxonomy_term_update_alias($term, $op, $options = array()) {
+  // Skip processing if the user has disabled pathauto for the term.
+  if (isset($term->pathauto_perform_alias) && empty($term->pathauto_perform_alias)) {
+    return;
+  }
+
   $options += array('alias children' => FALSE);
 
   $module = 'taxonomy';
@@ -582,6 +590,11 @@ function pathauto_user_operations() {
  *   An optional array of additional options.
  */
 function pathauto_user_update_alias($account, $op, $options = array()) {
+  // Skip processing if the user has disabled pathauto for the account.
+  if (isset($account->pathauto_perform_alias) && empty($account->pathauto_perform_alias)) {
+    return;
+  }
+
   $options += array('alias blog' => module_exists('blog'));
 
   // Skip processing if the account has no pattern.
