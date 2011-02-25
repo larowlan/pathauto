@@ -1,4 +1,3 @@
-// $Id$
 if (Drupal.jsEnabled) {
   $(document).ready(function() {
     if ($("#edit-pathauto-perform-alias").size() && $("#edit-pathauto-perform-alias").attr("checked")) {
