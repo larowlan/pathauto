@@ -189,7 +189,7 @@ function forum_pathauto_bulk_update_batch_process(&$context) {
     $context['sandbox']['current'] = 0;
   }
 
-  $concat = _pathauto_sql_concat("'taxonomy/term/'", 't.tid');
+  $concat = _pathauto_sql_concat("'forum/'", 't.tid');
   $forum_vid = variable_get('forum_nav_vocabulary', '');
   $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid = %d ORDER BY t.tid";
   $args = array($context['sandbox']['current'], $forum_vid);
