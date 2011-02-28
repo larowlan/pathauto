@@ -213,6 +213,42 @@ function pathauto_path_delete_all($source) {
   drupal_clear_path_cache();
 }
 
+/**
+ * Return the proper SQL to perform cross-db and field-type concatenation.
+ *
+ * @return
+ *   A string of SQL with the concatenation.
+ */
+function _pathauto_sql_concat() {
+  $args = func_get_args();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      return 'CONCAT(' . implode(', ', $args) . ')';
+    default:
+      // The ANSI standard of concatentation uses the double-pipe.
+      return '(' . implode(' || ', $args) . ')';
+  }
+}
+
+/**
+ * Return the proper SQL to perform a simple count query.
+ *
+ * This is an internal Pathauto function and should not be used in any other
+ * modules.
+ *
+ * @param $sql
+ *   A simple SQL query string.
+ *
+ * @return
+ *   The count query SQL string.
+ */
+function _pathauto_sql_count($sql) {
+  $sql = preg_replace('/SELECT .* FROM/', 'SELECT COUNT(*) FROM', $sql);
+  $sql = preg_replace('/ORDER BY .*/', '', $sql);
+  return $sql;
+}
+
 //==============================================================================
 // Some node related functions.
 

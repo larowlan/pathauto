@@ -54,13 +54,13 @@ function node_pathauto_bulk_update_batch_process(&$context) {
     $context['sandbox']['current'] = 0;
   }
 
-  $sql = "SELECT n.nid FROM {node} n LEFT JOIN {url_alias} ua ON CONCAT('node/', CAST(n.nid AS CHAR)) = ua.src WHERE ua.src IS NULL AND n.nid > %d ORDER BY n.nid";
+  $concat = _pathauto_sql_concat("'node/'", 'n.nid');
+  $sql = "SELECT n.nid FROM {node} n LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND n.nid > %d ORDER BY n.nid";
   $args = array($context['sandbox']['current']);
 
   // Get the total amount of items to process.
   if (!isset($context['sandbox']['total'])) {
-    $count_sql = str_replace('SELECT n.nid', 'SELECT COUNT(n.nid)', $sql);
-    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+    $context['sandbox']['total'] = db_result(db_query(_pathauto_sql_count($sql), $args));
 
     // If there are no nodes to update, the stop immediately.
     if (!$context['sandbox']['total']) {
@@ -127,14 +127,14 @@ function taxonomy_pathauto_bulk_update_batch_process(&$context) {
     $context['sandbox']['current'] = 0;
   }
 
+  $concat = _pathauto_sql_concat("'taxonomy/term/'", 't.tid');
   $forum_vid = variable_get('forum_nav_vocabulary', '');
-  $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON CONCAT('taxonomy/term/', CAST(t.tid AS CHAR)) = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid <> %d ORDER BY t.tid";
+  $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid <> %d ORDER BY t.tid";
   $args = array($context['sandbox']['current'], $forum_vid);
 
   // Get the total amount of items to process.
   if (!isset($context['sandbox']['total'])) {
-    $count_sql = str_replace('SELECT t.tid', 'SELECT COUNT(t.tid)', $sql);
-    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+    $context['sandbox']['total'] = db_result(db_query(_pathauto_sql_count($sql), $args));
 
     // If there are no nodes to update, the stop immediately.
     if (!$context['sandbox']['total']) {
@@ -189,14 +189,14 @@ function forum_pathauto_bulk_update_batch_process(&$context) {
     $context['sandbox']['current'] = 0;
   }
 
+  $concat = _pathauto_sql_concat("'taxonomy/term/'", 't.tid');
   $forum_vid = variable_get('forum_nav_vocabulary', '');
-  $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON CONCAT('forum/', CAST(t.tid AS CHAR)) = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid = %d ORDER BY t.tid";
+  $sql = "SELECT t.tid FROM {term_data} t LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND t.tid > %d AND t.vid = %d ORDER BY t.tid";
   $args = array($context['sandbox']['current'], $forum_vid);
 
   // Get the total amount of items to process.
   if (!isset($context['sandbox']['total'])) {
-    $count_sql = str_replace('SELECT t.tid', 'SELECT COUNT(t.tid)', $sql);
-    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+    $context['sandbox']['total'] = db_result(db_query(_pathauto_sql_count($sql), $args));
 
     // If there are no nodes to update, the stop immediately.
     if (!$context['sandbox']['total']) {
@@ -250,13 +250,13 @@ function user_pathauto_bulk_update_batch_process(&$context) {
     $context['sandbox']['current'] = 0;
   }
 
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT('user/', CAST(u.uid AS CHAR)) = ua.src WHERE ua.src IS NULL AND u.uid > %d ORDER BY u.uid";
+  $concat = _pathauto_sql_concat("'user/'", 'u.uid');
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND u.uid > %d ORDER BY u.uid";
   $args = array($context['sandbox']['current']);
 
   // Get the total amount of items to process.
   if (!isset($context['sandbox']['total'])) {
-    $count_sql = str_replace('SELECT u.uid', 'SELECT COUNT(u.uid)', $sql);
-    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+    $context['sandbox']['total'] = db_result(db_query(_pathauto_sql_count($sql), $args));
 
     // If there are no nodes to update, the stop immediately.
     if (!$context['sandbox']['total']) {
@@ -311,13 +311,13 @@ function blog_pathauto_bulk_update_batch_process(&$context) {
     $context['sandbox']['current'] = 0;
   }
 
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT('blog/', CAST(u.uid AS CHAR)) = ua.src WHERE ua.src IS NULL AND u.uid > %d ORDER BY u.uid";
+  $concat = _pathauto_sql_concat("'blog/'", 'u.uid');
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND u.uid > %d ORDER BY u.uid";
   $args = array($context['sandbox']['current']);
 
   // Get the total amount of items to process.
   if (!isset($context['sandbox']['total'])) {
-    $count_sql = str_replace('SELECT u.uid', 'SELECT COUNT(u.uid)', $sql);
-    $context['sandbox']['total'] = db_result(db_query($count_sql, $args));
+    $context['sandbox']['total'] = db_result(db_query(_pathauto_sql_count($sql), $args));
 
     // If there are no nodes to update, the stop immediately.
     if (!$context['sandbox']['total']) {
