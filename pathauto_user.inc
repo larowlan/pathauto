@@ -113,7 +113,8 @@ function contact_pathauto($op) {
  * Bulk generate aliases for all users without aliases.
  */
 function user_pathauto_bulkupdate() {
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT('user/', CAST(u.uid AS CHAR)) = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
+  $concat = _pathauto_sql_concat("'user/'", 'u.uid');
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
   $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
@@ -136,7 +137,8 @@ function user_pathauto_bulkupdate() {
  * Bulk generate aliases for all blogs without aliases.
  */
 function blog_pathauto_bulkupdate() {
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT('blog/', CAST(u.uid AS CHAR)) = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
+  $concat = _pathauto_sql_concat("'blog/'", 'u.uid');
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
   $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
@@ -159,9 +161,8 @@ function blog_pathauto_bulkupdate() {
  * Bulk generate aliases for user trackers without aliases.
  */
 function tracker_pathauto_bulkupdate() {
-  // We do the double CONCAT because Pgsql8.1 doesn't support more than three arguments to CONCAT
-  // Hopefully some day we can remove that.
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT(CONCAT('user/', CAST(u.uid AS CHAR)), '/track') = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
+  $concat = _pathauto_sql_concat("'user/'", 'u.uid', "'/track'");
+  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
   $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;

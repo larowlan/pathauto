@@ -206,6 +206,24 @@ function pathauto_path_alias_types() {
   return $objects;
 }
 
+/**
+ * Return the proper SQL to perform cross-db and field-type concatenation.
+ *
+ * @return
+ *   A string of SQL with the concatenation.
+ */
+function _pathauto_sql_concat() {
+  $args = func_get_args();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      return 'CONCAT(' . implode(', ', $args) . ')';
+    default:
+      // The ANSI standard of concatentation uses the double-pipe.
+      return '(' . implode(' || ', $args) . ')';
+  }
+}
+
 //==============================================================================
 // Some node related functions.
 

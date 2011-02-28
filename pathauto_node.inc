@@ -96,7 +96,8 @@ function node_pathauto_bulkupdate() {
 
   $count = 0;
   if (count($pattern_types)) {
-    $sql = "SELECT n.nid FROM {node} n LEFT JOIN {url_alias} ua ON CONCAT('node/', CAST(n.nid AS CHAR)) = ua.src WHERE ua.src IS NULL AND n.type IN (". db_placeholders($pattern_types, 'varchar') .')';
+    $concat = _pathauto_sql_concat("'node/'", 'n.nid');
+    $sql = "SELECT n.nid FROM {node} n LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND n.type IN (". db_placeholders($pattern_types, 'varchar') .')';
     $query = db_query_range($sql, $pattern_types, 0, variable_get('pathauto_max_bulk_update', 50));
 
     $placeholders = array();
