@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Hook implementations for node module integration.
