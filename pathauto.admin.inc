@@ -420,7 +420,7 @@ function pathauto_bulk_update_batch_finished($success, $results, $operations) {
       drupal_set_message(format_plural($results['count_changed'], 'Generated 1 URL alias.', 'Generated @count URL aliases.'));
     }
     else {
-      drupal_set_message('No new URL aliases to generate.');
+      drupal_set_message(t('No new URL aliases to generate.'));
     }
   }
   else {
