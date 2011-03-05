@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Hook implementations for taxonomy module integration.

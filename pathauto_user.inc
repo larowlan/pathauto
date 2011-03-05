@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Hook implementations for user module integration.
