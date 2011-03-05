@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Admin page callbacks for the Pathauto module.
@@ -257,7 +258,7 @@ function _pathauto_validate_pattern_element(&$element, &$form_state) {
     drupal_set_message(t('Please make sure you are using the latest version of the Token module.'), 'error', FALSE);
     return $element;
   }
-  
+
   // Run token validation.
   $element = token_element_validate($element, $form_state);
 
