@@ -247,6 +247,11 @@ function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
       break;
     case 'insert':
     case 'update':
+      // Skip processing if the user has disabled pathauto for the node.
+      if (isset($node->pathauto_perform_alias) && empty($node->pathauto_perform_alias)) {
+        return;
+      }
+
       _pathauto_include();
       // Get the specific pattern or the default
       if (variable_get('language_content_type_'. $node->type, 0)) {
@@ -260,12 +265,9 @@ function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
       }
       // Only do work if there's a pattern
       if ($pattern) {
-        // Only create an alias if the checkbox was not provided or if the checkbox was provided and is checked
-        if (!isset($node->pathauto_perform_alias) || $node->pathauto_perform_alias) {
-          $placeholders = pathauto_get_placeholders('node', $node);
-          $src = "node/$node->nid";
-          $node->path = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
-        }
+        $placeholders = pathauto_get_placeholders('node', $node);
+        $src = "node/$node->nid";
+        $node->path = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
       }
       break;
     case 'delete':
@@ -426,15 +428,20 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
       switch ($op) {
         case 'insert':
         case 'update':
-          _pathauto_include();
-          // Use the category info to automatically create an alias
           $term = (object) $object;
+
+          // Skip processing if the user has disabled pathauto for the term.
+          if (isset($term->pathauto_perform_alias) && empty($term->pathauto_perform_alias)) {
+            return;
+          }
 
           // Clear the taxonomy term's static cache.
           if ($op == 'update') {
             taxonomy_get_term($term->tid, TRUE);
           }
 
+          // Use the category info to automatically create an alias
+          _pathauto_include();
           if ($term->name) {
             $count = _taxonomy_pathauto_alias($term, $op);
           }
@@ -468,9 +475,16 @@ function pathauto_user($op, &$edit, &$user, $category = NULL) {
   switch ($op) {
     case 'insert':
     case 'update':
-      _pathauto_include();
-      // Use the username to automatically create an alias
+      // Build the user object.
       $pathauto_user = (object) array_merge((array) $user, $edit);
+
+      // Skip processing if the user has disabled pathauto for the account.
+      if (isset($pathauto_user->pathauto_perform_alias) && empty($pathauto_user->pathauto_perform_alias)) {
+        return;
+      }
+
+      // Use the username to automatically create an alias
+      _pathauto_include();
       if ($user->name) {
         $placeholders = pathauto_get_placeholders('user', $pathauto_user);
         $src = 'user/'. $user->uid;
@@ -512,8 +526,6 @@ function pathauto_user($op, &$edit, &$user, $category = NULL) {
       path_set_alias('user/'. $user->uid .'/track');
       path_set_alias('user/'. $user->uid .'/track/feed');
       path_set_alias('user/'. $user->uid .'/contact');
-      break;
-    default:
       break;
   }
 }
