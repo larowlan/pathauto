@@ -52,7 +52,7 @@ function _pathauto_alias_exists($alias, $source, $language = '') {
  *   - alias: The URL alias.
  */
 function _pathauto_existing_alias_data($source, $language = '') {
-  return db_fetch_array(db_query_range("SELECT pid, dst AS alias FROM {url_alias} WHERE src = '%s' AND language IN ('%s', '') ORDER BY language DESC, pid DESC", $source, $language, 0, 1));
+  return db_fetch_array(db_query_range("SELECT pid, dst AS alias, language FROM {url_alias} WHERE src = '%s' AND language IN ('%s', '') ORDER BY language DESC, pid DESC", $source, $language, 0, 1));
 }
 
 /**
@@ -460,6 +460,7 @@ function _pathauto_set_alias($path, $existing_alias = NULL, $op = NULL) {
           if (module_exists('path_redirect') && function_exists('path_redirect_save')) {
             $redirect = array(
               'source' => $existing_alias['alias'],
+              'language' => $existing_alias['language'],
               'redirect' => $path['source'],
             );
             path_redirect_save($redirect);
