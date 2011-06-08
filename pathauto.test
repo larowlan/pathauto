@@ -15,6 +15,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
     $modules[] = 'path';
     $modules[] = 'token';
     $modules[] = 'pathauto';
+    $modules[] = 'taxonomy';
     parent::setUp($modules);
 
     // Clear some static caches.
@@ -192,6 +193,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
 
   function assertEntityPattern($entity_type, $bundle, $language = '', $expected) {
     pathauto_pattern_load_by_entity('', '', '', TRUE);
+    $this->refreshVariables();
     $pattern = pathauto_pattern_load_by_entity($entity_type, $bundle, $language);
     $this->assertIdentical($expected, $pattern);
   }
@@ -377,7 +379,7 @@ class PathautoUnitTestCase extends PathautoTestHelper {
     // Delete the vocabulary, which should cause its pattern variable to also
     // be deleted.
     taxonomy_del_vocabulary($vocabulary->vid);
-    variable_set('pathauto_taxonomy_' . $vocabulary->vid . '_pattern', 'base');
+    $this->assertEntityPattern('taxonomy', $vocabulary->vid, '', 'base');
 
     // Create a node type and test that it's pattern variable works.
     $type = $this->addNodeType(array('type' => 'old_name'));
