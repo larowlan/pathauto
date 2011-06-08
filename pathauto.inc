@@ -378,7 +378,7 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     $source = $data;
   }
   elseif (is_array($data) && !isset($data['tokens']) && !isset($data['values'])) {
-    $placeholders = pathauto_get_placeholders(key($data), current($data));
+    $placeholders = pathauto_get_placeholders(key($data), current($data), $pattern);
   }
   else {
     $placeholders = $data;
@@ -608,15 +608,40 @@ function _pathauto_verbose($message = NULL, $op = NULL) {
 /**
  * Generalized function to get tokens across all Pathauto types.
  *
+ * @param $type
+ *   The token type to pass to token_get_values().
  * @param $object
- *   A user, node, or category object.
+ *   The object to pass to token_get_values().
+ * @param $text
+ *   (optional) The string that will be replaced with tokens. If provided
+ *   and the token_scan() function is available it will be used to trim down
+ *   the number of tokens that need to be passed to
+ *   pathauto_clean_token_values().
+ *
  * @return
  *   Tokens for that object formatted in the way that
  *   Pathauto expects to see them.
  */
-function pathauto_get_placeholders($type, $object) {
+function pathauto_get_placeholders($type, $object, $text = '') {
   $options = array('pathauto' => TRUE);
   $full = token_get_values($type, $object, TRUE, $options);
+
+  // Attempt to reduce the tokens to only the ones that will actually be used
+  // before passing into pathauto_clean_token_values().
+  static $token_scan_exists;
+  if (!isset($token_scan_exists)) {
+    $token_scan_exists = function_exists('token_scan');
+  }
+  if ($token_scan_exists && !empty($text)) {
+    $used_tokens = token_scan($text);
+    foreach ($full->tokens as $index => $token) {
+      if (!in_array($token, $used_tokens)) {
+        unset($full->tokens[$index]);
+        unset($full->values[$index]);
+      }
+    }
+  }
+
   $tokens = token_prepare_tokens($full->tokens);
   $values = pathauto_clean_token_values($full, $options);
   return array('tokens' => $tokens, 'values' => $values);
