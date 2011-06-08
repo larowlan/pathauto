@@ -107,3 +107,19 @@ function pathauto_update_6201() {
   variable_del('pathauto_indexaliases_bulkupdate');
   return array();
 }
+
+/**
+ * Remove obsolete variables for removed feed handling.
+ */
+function pathauto_update_6202() {
+  variable_del('pathauto_node_supportsfeeds');
+  variable_del('pathauto_node_applytofeeds');
+  variable_del('pathauto_taxonomy_supportsfeeds');
+  variable_del('pathauto_taxonomy_applytofeeds');
+  variable_del('pathauto_forum_supportsfeeds');
+  variable_del('pathauto_forum_applytofeeds');
+  variable_del('pathauto_user_supportsfeeds');
+  variable_del('pathauto_user_applytofeeds');
+  variable_del('pathauto_blog_supportsfeeds');
+  variable_del('pathauto_blog_applytofeeds');
+}

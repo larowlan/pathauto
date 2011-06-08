@@ -460,25 +460,6 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     'language' => $language,
   );
   _pathauto_set_alias($path, $existing_alias, $op);
-
-  // Also create a related feed alias if requested and supported.
-  $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
-  if (drupal_strlen($feedappend)) {
-    // For forums and taxonomies, the source doesn't always form the base of the RSS feed (i.e. image galleries)
-    if ($module == 'taxonomy' || $module == 'forum' && !empty($entity_id)) {
-      $source = "taxonomy/term/{$entity_id}";
-    }
-
-    // Build the feed path alias array and send it off to be created.
-    $path = array(
-      'source' => "$source/$feedappend",
-      'alias' => "$alias/feed",
-      'language' => $language,
-    );
-    $existing_alias = _pathauto_existing_alias_data($path['source'], $path['language']);
-    _pathauto_set_alias($path, $existing_alias, $op);
-  }
-
   return $alias;
 }
 
@@ -515,7 +496,7 @@ function _pathauto_path_is_callback($path) {
  *   An optional string with the operation being performed.
  *
  * @return
- *   TRUE if the path was saved, or NULL otherwise.
+ *   The saved path from path_save() or NULL if the path was not saved.
  *
  * @see path_set_alias()
  */
@@ -537,13 +518,10 @@ function _pathauto_set_alias($path, $existing_alias = NULL, $op = NULL) {
     return;
   }
 
-  $path += array(
-    'pid' => NULL,
-    'language' => '',
-  );
-
   // Skip replacing the current alias with an identical alias
   if (empty($existing_alias) || $existing_alias['alias'] != $path['alias']) {
+    $path += array('pid' => NULL, 'language' => '');
+
     // If there is already an alias, respect some update actions.
     if (!empty($existing_alias)) {
       switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
@@ -589,7 +567,7 @@ function _pathauto_set_alias($path, $existing_alias = NULL, $op = NULL) {
       }
     }
 
-    return TRUE;
+    return $path;
   }
 }
 
