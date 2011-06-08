@@ -79,7 +79,18 @@ function _pathauto_existing_alias_data($source, $language = '') {
  *   The cleaned string.
  */
 function pathauto_cleanstring($string) {
-  $output = $string;
+  static $strings = array();
+
+  // Empty strings do not need any proccessing.
+  if ($string === '' || $string === NULL) {
+    return '';
+  }
+
+  // Check if the string has already been processed, and if so return the
+  // cached result.
+  if (isset($strings[$string])) {
+    return $strings[$string];
+  }
 
   // Remove all HTML tags from the string. This only works if the token value
   $output = strip_tags($string);
@@ -160,6 +171,9 @@ function pathauto_cleanstring($string) {
   // Enforce the maximum component length.
   $maxlength = min(variable_get('pathauto_max_component_length', 100), _pathauto_get_schema_alias_maxlength());
   $output = drupal_substr($output, 0, $maxlength);
+
+  // Cache this result in the static array.
+  $strings[$string] = $output;
 
   return $output;
 }
