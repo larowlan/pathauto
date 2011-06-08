@@ -59,6 +59,7 @@ function _pathauto_existing_alias_data($source, $language = '') {
  * Clean up a string segment to be used in an URL alias.
  *
  * Performs the following possible alterations:
+ * - Remove all HTML tags.
  * - Process the string through the transliteration module.
  * - Replace or remove punctuation with the separator character.
  * - Remove back-slashes.
@@ -79,6 +80,9 @@ function _pathauto_existing_alias_data($source, $language = '') {
  */
 function pathauto_cleanstring($string) {
   $output = $string;
+
+  // Remove all HTML tags from the string. This only works if the token value
+  $output = strip_tags($string);
 
   // Optionally remove accents and transliterate
   if (variable_get('pathauto_transliterate', FALSE)) {
