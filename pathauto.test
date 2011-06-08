@@ -15,6 +15,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
     $modules[] = 'path';
     $modules[] = 'token';
     $modules[] = 'pathauto';
+    $modules[] = 'taxonomy';
     parent::setUp($modules);
   }
 
@@ -163,6 +164,44 @@ class PathautoTestHelper extends DrupalWebTestCase {
     );
     taxonomy_save_term($term);
     return (object) $term;
+  }
+
+  function addNodeType(array $type) {
+    if (!isset($type['name'])) {
+      $type['name'] = $this->randomName(8);
+    }
+
+    $type += array(
+      'type' => drupal_strtolower($type['name']),
+      'module' => 'node',
+      'description' => $this->randomName(40),
+      'custom' => TRUE,
+      'modified' => TRUE,
+      'locked' => FALSE,
+      'help' => '',
+      'min_word_count' => '',
+    );
+
+    $type = (object) _node_type_set_defaults($type);
+    node_type_save($type);
+    node_types_rebuild();
+    return $type;
+  }
+
+  function assertEntityPattern($entity_type, $bundle, $language = '', $expected) {
+    $this->refreshVariables();
+    $variables = array(
+      "pathauto_{$entity_type}_{$bundle}_{$language}_pattern",
+      "pathauto_{$entity_type}_{$bundle}_pattern",
+      "pathauto_{$entity_type}_pattern",
+    );
+    $pattern = '';
+    foreach ($variables as $variable) {
+      if ($pattern = variable_get($variable, '')) {
+        break;
+      }
+    }
+    $this->assertIdentical($expected, $pattern);
   }
 }
 
@@ -317,6 +356,39 @@ class PathautoUnitTestCase extends PathautoTestHelper {
    */
   //function testPathTokens() {
   //}
+
+  function testEntityBundleRenamingDeleting() {
+    // Create a vocabulary type.
+    $vocabulary = $this->addVocabulary();
+    variable_set('pathauto_taxonomy_pattern', 'base');
+    variable_set('pathauto_taxonomy_' . $vocabulary->vid . '_pattern', 'bundle');
+    $this->assertEntityPattern('taxonomy', $vocabulary->vid, '', 'bundle');
+
+    // Delete the vocabulary, which should cause its pattern variable to also
+    // be deleted.
+    taxonomy_del_vocabulary($vocabulary->vid);
+    $this->assertEntityPattern('taxonomy', $vocabulary->vid, '', 'base');
+
+    // Create a node type and test that it's pattern variable works.
+    $type = $this->addNodeType(array('type' => 'old_name'));
+    variable_set('pathauto_node_pattern', 'base');
+    variable_set("pathauto_node_old_name_pattern", 'bundle');
+    $this->assertEntityPattern('node', 'old_name', '', 'bundle');
+
+    // Rename the node type's machine name, which should cause its pattern
+    // variable to also be renamed.
+    $type->type = 'new_name';
+    $type->old_type = 'old_name';
+    node_type_save($type);
+    node_types_rebuild();
+    $this->assertEntityPattern('node', 'new_name', '', 'bundle');
+    $this->assertEntityPattern('node', 'old_name', '', 'base');
+
+    // Delete the node type, which should cause its pattern variable to also
+    // be deleted.
+    node_type_delete($type->type);
+    $this->assertEntityPattern('node', 'new_name', '', 'base');
+  }
 }
 
 /**
