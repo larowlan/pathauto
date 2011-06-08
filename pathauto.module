@@ -249,6 +249,34 @@ function _pathauto_sql_count($sql) {
   return $sql;
 }
 
+
+/**
+ * Implements hook_field_attach_rename_bundle().
+ *
+ * Respond to machine name changes for pattern variables.
+ */
+function pathauto_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
+  $result = db_query("SELECT name FROM {variable} WHERE name LIKE '%s%%'", "pathauto_{$entity_type}_{$bundle_old}_");
+  while ($variable = db_result($result)) {
+    $value = variable_get($variable, '');
+    variable_del($variable);
+    $variable = strtr($variable, array("{$entity_type}_{$bundle_old}" => "{$entity_type}_{$bundle_new}"));
+    variable_set($variable, $value);
+  }
+}
+
+/**
+ * Implements hook_field_attach_delete_bundle().
+ *
+ * Respond to sub-types being deleted, their patterns can be removed.
+ */
+function pathauto_field_attach_delete_bundle($entity_type, $bundle) {
+  $result = db_query("SELECT name FROM {variable} WHERE name LIKE '%s%%'", "pathauto_{$entity_type}_{$bundle}_");
+  while ($variable = db_result($result)) {
+    variable_del($variable);
+  }
+}
+
 //==============================================================================
 // Some node related functions.
 
@@ -284,6 +312,22 @@ function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
       break;
     case 'delete':
       pathauto_path_delete_all("node/{$node->nid}");
+      break;
+  }
+}
+
+/**
+ * Implements hook_node_type().
+ */
+function pathauto_node_type($op, $info) {
+  switch ($op) {
+    case 'update':
+      if (!empty($info->old_type) && $info->old_type != $info->type) {
+        pathauto_field_attach_rename_bundle('node', $info->old_type, $info->type);
+      }
+      break;
+    case 'delete':
+      pathauto_field_attach_delete_bundle('node', $info->type);
       break;
   }
 }
@@ -456,6 +500,7 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
 
           pathauto_taxonomy_term_update_alias($term, $op);
           break;
+
         case 'delete':
           // If the category is deleted, remove the path aliases
           $term = (object) $object;
@@ -464,6 +509,15 @@ function pathauto_taxonomy($op, $type, $object = NULL) {
           if ($term_path != "taxonomy/term/{$term->tid}") {
             pathauto_path_delete_all("taxonomy/term/{$term->tid}");
           }
+          break;
+      }
+      break;
+
+    case 'vocabulary':
+      $vocabulary = (object) $object;
+      switch ($op) {
+        case 'delete':
+          pathauto_field_attach_delete_bundle('taxonomy', $vocabulary->vid);
           break;
       }
       break;
