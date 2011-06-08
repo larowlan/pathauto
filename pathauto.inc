@@ -194,7 +194,7 @@ function _pathauto_existing_alias_data($source, $language = '') {
 function pathauto_cleanstring($string) {
   $output = $string;
 
-  // Remove all HTML tags from the string. This only works if the token value
+  // Remove all HTML tags from the string.
   $output = strip_tags($string);
 
   // Optionally transliterate (by running through the Transliteration module)
