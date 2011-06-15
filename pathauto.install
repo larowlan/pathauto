@@ -122,4 +122,5 @@ function pathauto_update_6202() {
   variable_del('pathauto_user_applytofeeds');
   variable_del('pathauto_blog_supportsfeeds');
   variable_del('pathauto_blog_applytofeeds');
+  return array();
 }
