@@ -421,14 +421,17 @@ function pathauto_node_update_alias($node, $op, $options = array()) {
     return;
   }
 
+  $options += array(
+    'language' => isset($node->language) ? $node->language : '',
+  );
+
   // Skip processing if the node has no pattern.
-  $language = isset($node->language) ? $node->language : '';
-  if (!pathauto_pattern_load_by_entity('node', $node->type, $language)) {
+  if (!pathauto_pattern_load_by_entity('node', $node->type, $options['language'])) {
     return;
   }
 
   module_load_include('inc', 'pathauto');
-  if ($alias = pathauto_create_alias('node', $op, "node/{$node->nid}", array('node' => $node), $node->nid, $node->type, $language)) {
+  if ($alias = pathauto_create_alias('node', $op, "node/{$node->nid}", array('node' => $node), $node->nid, $node->type, $options['language'])) {
     $node->path = $alias;
   }
 }
@@ -535,7 +538,10 @@ function pathauto_taxonomy_term_update_alias($term, $op, $options = array()) {
     return;
   }
 
-  $options += array('alias children' => FALSE);
+  $options += array(
+    'alias children' => FALSE,
+    'language' => isset($term->language) ? $term->language : '',
+  );
 
   $module = 'taxonomy';
   if (module_exists('forum') && $term->vid == variable_get('forum_nav_vocabulary', '')) {
@@ -543,17 +549,18 @@ function pathauto_taxonomy_term_update_alias($term, $op, $options = array()) {
   }
 
   // Skip processing if the term has no pattern.
-  if (!pathauto_pattern_load_by_entity($module, $term->vid)) {
+  if (!pathauto_pattern_load_by_entity($module, $term->vid, $options['language'])) {
     return;
   }
 
   module_load_include('inc', 'pathauto');
   $source = taxonomy_term_path($term);
-  pathauto_create_alias($module, $op, $source, array('taxonomy' => $term), $term->tid, $term->vid);
+  pathauto_create_alias($module, $op, $source, array('taxonomy' => $term), $term->tid, $term->vid, $options['language']);
 
   if (!empty($options['alias children'])) {
-    // For all children generate new alias.
+    // For all children generate new aliases.
     $options['alias children'] = FALSE;
+    unset($options['language']);
     foreach (taxonomy_get_tree($term->vid, $term->tid) as $subterm) {
       pathauto_taxonomy_term_update_alias($subterm, $op, $options);
     }
@@ -679,15 +686,18 @@ function pathauto_user_update_alias($account, $op, $options = array()) {
     return;
   }
 
-  $options += array('alias blog' => module_exists('blog'));
+  $options += array(
+    'alias blog' => module_exists('blog'),
+    'language' => '',
+  );
 
   // Skip processing if the account has no pattern.
-  if (!pathauto_pattern_load_by_entity('user')) {
+  if (!pathauto_pattern_load_by_entity('user', '', $options['language'])) {
     return;
   }
 
   module_load_include('inc', 'pathauto');
-  pathauto_create_alias('user', $op, "user/{$account->uid}", array('user' => $account), $account->uid);
+  pathauto_create_alias('user', $op, "user/{$account->uid}", array('user' => $account), $account->uid, NULL, $options['language']);
 
   // Because blogs are also associated with users, also generate the blog paths.
   if (!empty($options['alias blog'])) {
@@ -737,9 +747,13 @@ function pathauto_blog_update_alias($account, $op, $options = array()) {
     return;
   }
 
+  $options += array(
+    'language' => '',
+  );
+
   module_load_include('inc', 'pathauto');
   if (node_access('create', 'blog', $account)) {
-    pathauto_create_alias('blog', $op, "blog/{$account->uid}", array('user' => $account), $account->uid);
+    pathauto_create_alias('blog', $op, "blog/{$account->uid}", array('user' => $account), $account->uid, NULL, $options['language']);
   }
   else {
     pathauto_path_delete_all("blog/{$account->uid}");
