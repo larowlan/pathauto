@@ -359,7 +359,7 @@ function _pathauto_clean_separators($string, $separator = NULL) {
  *   The cleaned URL alias.
  */
 function pathauto_clean_alias($alias) {
-  $cache = &drupal_static(__FUNCTION__);
+  $cache = &pathauto_static(__FUNCTION__);
 
   if (!isset($cache)) {
     $cache = array(
