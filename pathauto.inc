@@ -192,7 +192,12 @@ function _pathauto_existing_alias_data($source, $language = '') {
  *   The cleaned string.
  */
 function pathauto_cleanstring($string) {
-  static $cache;
+  // Use the advanced drupal_static() pattern, since this is called very often.
+  static $drupal_static_fast;
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['cache'] = &pathauto_static(__FUNCTION__);
+  }
+  $cache = &$drupal_static_fast['cache'];
 
   // Generate and cache variables used in this function so that on the second
   // call to pathauto_cleanstring() we focus on processing.
@@ -354,6 +359,14 @@ function _pathauto_clean_separators($string, $separator = NULL) {
  *   The cleaned URL alias.
  */
 function pathauto_clean_alias($alias) {
+  $cache = &drupal_static(__FUNCTION__);
+
+  if (!isset($cache)) {
+    $cache = array(
+      'maxlength' => min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength()),
+    );
+  }
+
   $output = $alias;
 
   // Trim duplicate, leading, and trailing back-slashes.
@@ -363,8 +376,7 @@ function pathauto_clean_alias($alias) {
   $output = _pathauto_clean_separators($output);
 
   // Shorten to a logical place based on word boundaries.
-  $maxlength = min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength());
-  $output = pathauto_truncate_utf8($output, $maxlength, TRUE);
+  $output = pathauto_truncate_utf8($output, $cache['maxlength'], TRUE);
 
   return $output;
 }
@@ -511,6 +523,12 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
 function _pathauto_path_is_callback($path) {
   $menu = menu_get_item($path);
   if (isset($menu['path']) && $menu['path'] == $path) {
+    return TRUE;
+  }
+  elseif (is_file('./' . $path) || is_dir('./' . $path)) {
+    // Do not allow existing files or directories to get assigned an automatic
+    // alias. Note that we do not need to use is_link() to check for symbolic
+    // links since this returns TRUE for either is_file() or is_dir() already.
     return TRUE;
   }
   return FALSE;

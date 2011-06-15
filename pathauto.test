@@ -18,8 +18,8 @@ class PathautoTestHelper extends DrupalWebTestCase {
     $modules[] = 'taxonomy';
     parent::setUp($modules);
 
-    // Clear some static caches.
-    pathauto_pattern_load_by_entity('', '', '', TRUE);
+    // Clear static caches.
+    pathauto_static_reset();
   }
 
   function assertToken($type, $object, $token, $expected) {
@@ -192,7 +192,7 @@ class PathautoTestHelper extends DrupalWebTestCase {
   }
 
   function assertEntityPattern($entity_type, $bundle, $language = '', $expected) {
-    pathauto_pattern_load_by_entity('', '', '', TRUE);
+    pathauto_static_reset('pathauto_pattern_load_by_entity');
     $this->refreshVariables();
     $pattern = pathauto_pattern_load_by_entity($entity_type, $bundle, $language);
     $this->assertIdentical($expected, $pattern);
@@ -400,6 +400,31 @@ class PathautoUnitTestCase extends PathautoTestHelper {
     // be deleted.
     node_type_delete($type->type);
     $this->assertEntityPattern('node', 'new_name', '', 'base');
+  }
+
+  function testNoExistingPathAliases() {
+    variable_set('pathauto_node_page_pattern', '[title-raw]');
+    variable_set('pathauto_punctuation_period', PATHAUTO_PUNCTUATION_DO_NOTHING);
+
+    // Check that Pathauto does not create an alias of '/admin'.
+    $node = $this->drupalCreateNode(array('title' => 'Admin', 'type' => 'page'));
+    $this->assertNoEntityAlias('node', $node);
+
+    // Check that Pathauto does not create an alias of '/modules'.
+    $node->title = 'Modules';
+    node_save($node);
+    $this->assertNoEntityAlias('node', $node);
+
+    // Check that Pathauto does not create an alias of '/index.php'.
+    $node->title = 'index.php';
+    node_save($node);
+    $this->assertNoEntityAlias('node', $node);
+
+    // Check that a safe value gets an automatic alias. This is also a control
+    // to ensure the above tests work properly.
+    $node->title = 'Safe value';
+    node_save($node);
+    $this->assertEntityAlias('node', $node, 'safe-value');
   }
 }
 
