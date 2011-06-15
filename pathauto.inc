@@ -506,8 +506,8 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
     'alias' => $alias,
     'language' => $language,
   );
-  _pathauto_set_alias($path, $existing_alias, $op);
-  return $alias;
+  $success = _pathauto_set_alias($path, $existing_alias, $op);
+  return $success ? $alias : NULL;
 }
 
 /**

@@ -428,7 +428,9 @@ function pathauto_node_update_alias($node, $op, $options = array()) {
   }
 
   module_load_include('inc', 'pathauto');
-  pathauto_create_alias('node', $op, "node/{$node->nid}", array('node' => $node), $node->nid, $node->type, $language);
+  if ($alias = pathauto_create_alias('node', $op, "node/{$node->nid}", array('node' => $node), $node->nid, $node->type, $language)) {
+    $node->path = $alias;
+  }
 }
 
 /**
