@@ -392,6 +392,31 @@ class PathautoUnitTestCase extends PathautoTestHelper {
     node_type_delete($type->type);
     $this->assertEntityPattern('node', 'new_name', '', 'base');
   }
+
+  function testNoExistingPathAliases() {
+    variable_set('pathauto_node_page_pattern', '[title-raw]');
+    variable_set('pathauto_punctuation_period', 2); // Do not replace periods.
+
+    // Check that Pathauto does not create an alias of '/admin'.
+    $node = $this->drupalCreateNode(array('title' => 'Admin', 'type' => 'page'));
+    $this->assertNoEntityAlias('node', $node);
+
+    // Check that Pathauto does not create an alias of '/modules'.
+    $node->title = 'Modules';
+    node_save($node);
+    $this->assertNoEntityAlias('node', $node);
+
+    // Check that Pathauto does not create an alias of '/index.php'.
+    $node->title = 'index.php';
+    node_save($node);
+    $this->assertNoEntityAlias('node', $node);
+
+    // Check that a safe value gets an automatic alias. This is also a control
+    // to ensure the above tests work properly.
+    $node->title = 'Safe value';
+    node_save($node);
+    $this->assertEntityAlias('node', $node, 'safe-value');
+  }
 }
 
 /**

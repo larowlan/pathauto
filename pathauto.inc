@@ -379,7 +379,7 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
     'alias' => $alias,
     'language' => $language,
   );
-  _pathauto_set_alias($path, $existing_alias, $op);
+  $success = _pathauto_set_alias($path, $existing_alias, $op);
 
   // Also create a related feed alias if requested and supported.
   $feedappend = trim(variable_get('pathauto_' . $module . '_applytofeeds', ''));
@@ -399,7 +399,7 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
     _pathauto_set_alias($path, $existing_alias, $op);
   }
 
-  return $alias;
+  return $success ? $alias : NULL;
 }
 
 /**
@@ -415,6 +415,12 @@ function pathauto_create_alias($module, $op, $placeholders, $source, $entity_id,
 function _pathauto_path_is_callback($path) {
   $menu = menu_get_item($path);
   if (isset($menu['path']) && $menu['path'] == $path) {
+    return TRUE;
+  }
+  elseif (is_file('./' . $path) || is_dir('./' . $path)) {
+    // Do not allow existing files or directories to get assigned an automatic
+    // alias. Note that we do not need to use is_link() to check for symbolic
+    // links since this returns TRUE for either is_file() or is_dir() already.
     return TRUE;
   }
   return FALSE;

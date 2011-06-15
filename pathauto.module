@@ -294,7 +294,9 @@ function pathauto_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
       if ($pattern) {
         $placeholders = pathauto_get_placeholders('node', $node);
         $src = "node/$node->nid";
-        $node->path = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language);
+        if ($alias = pathauto_create_alias('node', $op, $placeholders, $src, $node->nid, $node->type, $node->language)) {
+          $node->path = $alias;
+        }
       }
       break;
     case 'delete':
@@ -421,7 +423,9 @@ function pathauto_node_operations() {
 function pathauto_node_update_alias($node, $op) {
   module_load_include('inc', 'pathauto');
   $placeholders = pathauto_get_placeholders('node', $node);
-  pathauto_create_alias('node', $op, $placeholders, "node/{$node->nid}", $node->nid, $node->type, $node->language);
+  if ($alias = pathauto_create_alias('node', $op, $placeholders, "node/{$node->nid}", $node->nid, $node->type, $node->language)) {
+    $node->path = $alias;
+  }
 }
 
 /**
