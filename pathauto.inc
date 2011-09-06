@@ -257,7 +257,7 @@ function pathauto_cleanstring($string) {
   }
 
   // Remove all HTML tags from the string.
-  $output = strip_tags($string);
+  $output = strip_tags(decode_entities($string));
 
   // Optionally transliterate (by running through the Transliteration module)
   if ($cache['transliterate']) {
