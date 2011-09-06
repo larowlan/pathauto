@@ -92,8 +92,8 @@ function pathauto_cleanstring($string) {
     return $strings[$string];
   }
 
-  // Remove all HTML tags from the string. This only works if the token value
-  $output = strip_tags($string);
+  // Remove all HTML tags from the string.
+  $output = strip_tags(decode_entities($string));
 
   // Optionally remove accents and transliterate
   if (variable_get('pathauto_transliterate', FALSE)) {
