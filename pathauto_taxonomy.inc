@@ -76,7 +76,7 @@ function taxonomy_pathauto_bulkupdate() {
 
   $count = 0;
   if (!empty($pattern_vids)) {
-    $concat = _pathauto_sql_concat("'taxonomy/term/'", 't.tid');
+    $concat = _pathauto_sql_concat("'taxonomy/term/'", 'td.tid');
     $sql = "SELECT td.tid FROM {term_data} td LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND td.vid IN (" . db_placeholders($pattern_vids, 'int') . ")";
     $query = db_query_range($sql, $pattern_vids, 0, variable_get('pathauto_max_bulk_update', 50));
 
@@ -152,7 +152,7 @@ function forum_pathauto($op) {
  * Generate aliases for all forums and forum containers without aliases.
  */
 function forum_pathauto_bulkupdate() {
-  $concat = _pathauto_sql_concat("'forum/'", 't.tid');
+  $concat = _pathauto_sql_concat("'forum/'", 'td.tid');
   $forum_vid = variable_get('forum_nav_vocabulary', '');
   $sql = "SELECT td.tid FROM {term_data} td LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE ua.src IS NULL AND td.vid = %d";
   $query = db_query_range($sql, $forum_vid, 0, variable_get('pathauto_max_bulk_update', 50));
