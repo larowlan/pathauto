@@ -367,14 +367,15 @@ function pathauto_form_alter(&$form, $form_state, $form_id) {
 
       $form['path']['pathauto_perform_alias'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Automatic alias'),
+        '#title' => t('Generate automatic URL alias'),
         '#default_value' => $node->pathauto_perform_alias,
-        '#description' => t('An alias will be generated for you. If you wish to create your own alias below, uncheck this option.'),
+        '#description' => t('Uncheck this to create a custom alias below.'),
         '#weight' => -1,
       );
 
-      if (user_access('administer pathauto')) {
-        $form['path']['pathauto_perform_alias']['#description'] .= ' ' . t('To control the format of the generated aliases, see the <a href="@url-patterns">URL alias patterns</a>.', array('@url-patterns' => url('admin/build/path/patterns')));
+      // Add a shortcut link to configure URL alias patterns.
+      if (menu_valid_path(array('link_path' => 'admin/build/path/patterns'))) {
+        $form['path']['pathauto_perform_alias']['#description'] .= ' ' . l(t('Configure URL alias patterns.'), 'admin/build/path/patterns');
       }
 
       if ($node->pathauto_perform_alias && !empty($node->old_alias) && empty($node->path)) {
