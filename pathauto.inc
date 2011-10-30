@@ -398,7 +398,8 @@ function pathauto_clean_alias($alias) {
  *   is supported, otherwise you may pass the results from
  *   pathauto_get_placeholders() here.
  * @param $entity_id
- *   The entity ID (node ID, user ID, etc.).
+ *   (deprecated) The entity ID (node ID, user ID, etc.). This parameter is
+ *   deprecated and is not actually used.
  * @param $type
  *   For modules which provided pattern items in hook_pathauto(),
  *   the relevant identifier for the specific item to be aliased
@@ -411,7 +412,7 @@ function pathauto_clean_alias($alias) {
  * @see _pathauto_set_alias()
  * @see pathauto_get_placeholders()
  */
-function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type = NULL, $language = '') {
+function pathauto_create_alias($module, $op, $source, $data, $entity_id = NULL, $type = NULL, $language = '') {
   // Retrieve and apply the pattern for this content type.
   $pattern = pathauto_pattern_load_by_entity($module, $type, $language);
   if (empty($pattern)) {
@@ -461,10 +462,10 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id, $type =
   $context = array(
     'module' => $module,
     'op' => $op,
-    'source' => $source,
-    'entity_id' => $entity_id,
+    'source' => &$source,
+    'data' => $data,
     'type' => $type,
-    'language' => $language,
+    'language' => &$language,
     'pattern' => $pattern,
   );
   drupal_alter('pathauto_alias', $alias, $context);
