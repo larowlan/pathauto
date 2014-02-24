@@ -1,0 +1,416 @@
+diff --git a/pathauto.install b/pathauto.install
+index cd5211c..82edccf 100644
+--- a/pathauto.install
++++ b/pathauto.install
+@@ -8,6 +8,40 @@
+  */
+ 
+ /**
++ * Implements hook_schema().
++ */
++function pathauto_schema() {
++  $schema['pathauto_state'] = array(
++    'description' => 'The status of each entity alias (whether it was automatically generated or not).',
++    'fields' => array(
++      'entity_type' => array(
++        'type' => 'varchar',
++        'length' => 32,
++        'not null' => TRUE,
++        'description' => 'An entity type.',
++      ),
++      'entity_id' => array(
++        'type' => 'varchar',
++        'length' => 255,
++        'not null' => TRUE,
++        'description' => 'An entity ID.',
++      ),
++      'pathauto' => array(
++        'type' => 'int',
++        'size' => 'tiny',
++        'not null' => TRUE,
++        'default' => 0,
++        'description' => 'The automatic alias status of the entity.',
++      ),
++    ),
++    'primary key' => array('entity_type', 'entity_id'),
++  );
++
++  return $schema;
++}
++
++
++/**
+  * Implements hook_install().
+  */
+ function pathauto_install() {
+@@ -39,6 +73,23 @@ function pathauto_uninstall() {
+ }
+ 
+ /**
++ * Implements hook_requirements().
++ */
++function pathauto_requirements($phase) {
++  $requirements = array();
++  $t = get_t();
++  if ($phase == 'runtime' && module_exists('pathauto_persist')) {
++    $requirements['pathauto'] = array(
++      'title' => $t('Pathauto Persist'),
++      'value' => $t('Enabled'),
++      'description' => $t('Pathauto Persist is installed and enabled. As Pathauto Persist has been merged into Pathauto, the Pathauto Persist module can be safely disabled and removed. All Pathauto Persist settings have been migrated to the Pathauto implementation.'),
++      'severity' => REQUIREMENT_INFO,
++    );
++  }
++  return $requirements;
++}
++
++/**
+  * Remove the unsupported user/%/contact and user/%/tracker pattern variables.
+  */
+ function pathauto_update_6200() {
+@@ -169,6 +220,61 @@ function pathauto_update_7005() {
+ }
+ 
+ /**
++ * Create pathauto table, copying data from pathauto_persist if it exists
++ */
++function pathauto_update_7006() {
++  if (!db_table_exists('pathauto_state')) {
++
++    $schema['pathauto_state'] = array(
++      'description' => 'The status of each entity alias (whether it was automatically generated or not).',
++      'fields' => array(
++        'entity_type' => array(
++          'type' => 'varchar',
++          'length' => 32,
++          'not null' => TRUE,
++          'description' => 'An entity type.',
++        ),
++        'entity_id' => array(
++          'type' => 'varchar',
++          'length' => 255,
++          'not null' => TRUE,
++          'description' => 'An entity ID.',
++        ),
++        'pathauto' => array(
++          'type' => 'int',
++          'size' => 'tiny',
++          'not null' => TRUE,
++          'default' => 0,
++          'description' => 'The automatic alias status of the entity.',
++        ),
++      ),
++      'primary key' => array('entity_type', 'entity_id'),
++    );
++
++    if (db_table_exists('pathauto_persist')) {
++      // Rename pathauto_persist's table, then create a new empty one just so
++      // that we can cleanly disable that module.
++      db_rename_table('pathauto_persist', 'pathauto_state');
++      db_create_table('pathauto_persist', $schema['pathauto_state']);
++      // Change the entity_id column to varchar because the entity system does
++      // not assume serial or integer IDs (see [#1823494]).
++      db_drop_primary_key('pathauto_state');
++      db_change_field('pathauto_state', 'entity_id', 'entity_id',
++            array('type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'description' => 'An entity ID.'));
++      db_add_primary_key('pathauto_state', array('entity_type', 'entity_id'));
++      // Disable the module and inform the user.
++      if (module_exists('pathauto_persist')) {
++        module_disable(array('pathauto_persist'));
++      }
++      return t('This version of Pathauto includes the functionality of Pathauto Persist, which has been disabled and can be safely removed. All settings have been copied.');
++    }
++    else {
++      db_create_table('pathauto_state', $schema['pathauto_state']);
++    }
++  }
++}
++
++/**
+  * Build a list of Drupal 6 tokens and their Drupal 7 token names.
+  */
+ function _pathauto_upgrade_token_list() {
+diff --git a/pathauto.module b/pathauto.module
+index fbbdae3..606fd9b 100644
+--- a/pathauto.module
++++ b/pathauto.module
+@@ -349,9 +349,27 @@ function pathauto_field_attach_form($entity_type, $entity, &$form, &$form_state,
+ }
+ 
+ /**
++ * Implements hook_entity_load().
++ */
++function pathauto_entity_load($entities, $type) {
++  $states = pathauto_entity_state_load_multiple($type, array_keys($entities));
++  foreach ($states as $id => $state) {
++    if (!isset($entities[$id]->path['pathauto'])) {
++      $entities[$id]->path['pathauto'] = $state;
++    }
++  }
++}
++
++/**
+  * Implements hook_entity_presave().
+  */
+ function pathauto_entity_presave($entity, $type) {
++  if (isset($entity->path['pathauto']) && is_array($entity->path)) {
++    // We must set an empty alias string for the path to prevent saving an
++    // alias.
++    $entity->path += array('alias' => '');
++  }
++
+   // About to be saved (before insert/update)
+   if (!empty($entity->path['pathauto']) && isset($entity->path['old_alias'])
+       && $entity->path['alias'] == '' && $entity->path['old_alias'] != '') {
+@@ -374,6 +392,99 @@ function pathauto_entity_presave($entity, $type) {
+ }
+ 
+ /**
++ * Implements hook_entity_insert().
++ */
++function pathauto_entity_insert($entity, $type) {
++  if (isset($entity->path['pathauto'])) {
++    pathauto_entity_state_save($type, $entity, $entity->path['pathauto']);
++  }
++}
++
++/**
++ * Implements hook_entity_update().
++ */
++function pathauto_entity_update($entity, $type) {
++  if (isset($entity->path['pathauto'])) {
++    pathauto_entity_state_save($type, $entity, $entity->path['pathauto']);
++  }
++}
++
++/**
++ * Implements hook_entity_delete().
++ */
++function pathauto_entity_delete($entity, $type) {
++  if (isset($entity->path['pathauto'])) {
++    pathauto_entity_state_delete($type, $entity);
++  }
++}
++
++/**
++ * Load a pathauto state for an entity.
++ *
++ * @param $entity_type
++ *   An entity type.
++ * @param $entity_id
++ *   An entity ID.
++ */
++function pathauto_entity_state_load($entity_type, $entity_id) {
++  $pathauto_state = pathauto_entity_state_load_multiple($entity_type, array($entity_id));
++  return !empty($pathauto_state) ? reset($pathauto_state) : FALSE;
++}
++
++/**
++ * Load a pathauto state for multiple entities.
++ *
++ * @param $entity_type
++ *   An entity type.
++ * @param $entity_ids
++ *   An array of entity IDs.
++ */
++function pathauto_entity_state_load_multiple($entity_type, $entity_ids) {
++  $pathauto_state = db_query("SELECT entity_id, pathauto FROM {pathauto_state} WHERE entity_type = :entity_type AND entity_id IN (:entity_ids)", array(':entity_type' => $entity_type, ':entity_ids' => $entity_ids))->fetchAllKeyed();
++  return $pathauto_state;
++}
++
++/**
++ * Save the pathauto state for an entity.
++ *
++ * @param $entity_type
++ *   An entity type.
++ * @param $entity
++ *   The entity object.
++ * @param $pathauto_state
++ *   A boolean flag if TRUE means that Pathauto should keep controlling this
++ *   entity's path in the future. A FALSE value means Pathauto should stay out.
++ */
++function pathauto_entity_state_save($entity_type, $entity, $pathauto_state) {
++  list($entity_id) = entity_extract_ids($entity_type, $entity);
++  db_merge('pathauto_state')
++    ->key(array(
++      'entity_type' => $entity_type,
++      'entity_id' => $entity_id,
++    ))
++    ->fields(array(
++      'pathauto' => $pathauto_state ? 1 : 0,
++    ))
++    ->execute();
++}
++
++/**
++ * Delete the pathauto state for an entity.
++ *
++ * @param $entity_type
++ *   An entity type.
++ * @param $entity
++ *   The entity object.
++ */
++function pathauto_entity_state_delete($entity_type, $entity) {
++  list($entity_id) = entity_extract_ids($entity_type, $entity);
++  db_delete('pathauto_state')
++    ->condition('entity_type', $entity_type)
++    ->condition('entity_id', $entity_id)
++    ->execute();
++}
++
++/**
+  * Implements hook_action_info().
+  */
+ function pathauto_action_info() {
+diff --git a/pathauto.test b/pathauto.test
+index 4bfe2b3..539635d 100644
+--- a/pathauto.test
++++ b/pathauto.test
+@@ -735,11 +735,11 @@ class PathautoBulkUpdateTestCase extends PathautoFunctionalTestHelper {
+     // Add a new node.
+     $new_node = $this->drupalCreateNode(array('path' => array('alias' => '', 'pathauto' => FALSE)));
+ 
+-    // Run the update again which should only run against the new node.
++    // Run the update again which should not run against any nodes.
+     $this->drupalPost('admin/config/search/path/update_bulk', $edit, t('Update'));
+-    $this->assertText('Generated 1 URL alias.'); // 1 node + 0 users
++    $this->assertText('No new URL aliases to generate.');
+ 
+-    $this->assertEntityAliasExists('node', $new_node);
++    $this->assertNoEntityAliasExists('node', $new_node);
+   }
+ }
+ 
+@@ -808,3 +808,133 @@ class PathautoTokenTestCase extends PathautoFunctionalTestHelper {
+     return $return;
+   }
+ }
++
++class PathautoPersistTestCase extends PathautoFunctionalTestHelper {
++  public static function getInfo() {
++    return array(
++      'name' => 'Pathauto persist tests',
++      'description' => 'Tests basic pathauto persist functionality.',
++      'group' => 'Pathauto',
++    );
++  }
++
++  public function setUp(array $modules = array()) {
++    parent::setUp($modules);
++
++    $this->nodeNoAliasUser = $this->drupalCreateUser(array('bypass node access'));
++    $this->nodeAliasUser = $this->drupalCreateUser(array('bypass node access', 'create url aliases'));
++  }
++
++  function assertEntityAlias($entity_type, $entity, $expected_alias, $language = LANGUAGE_NONE) {
++    $uri = entity_uri($entity_type, $entity);
++    $this->assertAlias($uri['path'], $expected_alias, $language);
++  }
++
++  function assertEntityAliasExists($entity_type, $entity) {
++    $uri = entity_uri($entity_type, $entity);
++    return $this->assertAliasExists(array('source' => $uri['path']));
++  }
++
++  function assertNoEntityAlias($entity_type, $entity, $language = LANGUAGE_NONE) {
++    $uri = entity_uri($entity_type, $entity);
++    $this->assertEntityAlias($entity_type, $entity, $uri['path'], $language);
++  }
++
++  function assertNoEntityAliasExists($entity_type, $entity, $alias = NULL) {
++    $uri = entity_uri($entity_type, $entity);
++    $path = array('source' => $uri['path']);
++    if (isset($alias)) {
++      $path['alias'] = $alias;
++    }
++    $this->assertNoAliasExists($path);
++  }
++
++  function assertAlias($source, $expected_alias, $language = LANGUAGE_NONE) {
++    drupal_clear_path_cache($source);
++    $alias = drupal_get_path_alias($source, $language);
++    $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
++  }
++
++  function assertAliasExists($conditions) {
++    $path = path_load($conditions);
++    $this->assertTrue($path, t('Alias with conditions @conditions found.', array('@conditions' => var_export($conditions, TRUE))));
++    return $path;
++  }
++
++  function assertNoAliasExists($conditions) {
++    $alias = path_load($conditions);
++    $this->assertFalse($alias, t('Alias with conditions @conditions not found.', array('@conditions' => var_export($conditions, TRUE))));
++  }
++
++  public function testNodeAPI() {
++    $node = $this->drupalCreateNode(array(
++      'title' => 'Node version one',
++      'type' => 'article',
++      'path' => array(
++        'pathauto' => FALSE,
++      ),
++    ));
++
++    $this->assertNoEntityAlias('node', $node);
++
++    // Set a manual path alias for the node.
++    $node->path['alias'] = 'test-alias';
++    node_save($node);
++
++    // Ensure that the pathauto field was saved to the database.
++    $node = node_load($node->nid, NULL, TRUE);
++    $this->assertFalse($node->path['pathauto']);
++
++    // Ensure that the manual path alias was saved and an automatic alias was not generated.
++    $this->assertEntityAlias('node', $node, 'test-alias');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-one');
++
++    // Save the node as a user who does not have access to path fieldset.
++    $this->drupalLogin($this->nodeNoAliasUser);
++    $this->drupalGet('node/' . $node->nid . '/edit');
++    $this->assertNoFieldByName('path[pathauto]');
++
++    $edit = array('title' => 'Node version two');
++    $this->drupalPost(NULL, $edit, 'Save');
++    $this->assertText('Article Node version two has been updated.');
++
++    $this->assertEntityAlias('node', $node, 'test-alias');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-one');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-two');
++
++    // Load the edit node page and check that the Pathauto checkbox is unchecked.
++    $this->drupalLogin($this->nodeAliasUser);
++    $this->drupalGet('node/' . $node->nid . '/edit');
++    $this->assertNoFieldChecked('edit-path-pathauto');
++
++    // Edit the manual alias and save the node.
++    $edit = array(
++      'title' => 'Node version three',
++      'path[alias]' => 'manually-edited-alias',
++    );
++    $this->drupalPost(NULL, $edit, 'Save');
++    $this->assertText('Article Node version three has been updated.');
++
++    $this->assertEntityAlias('node', $node, 'manually-edited-alias');
++    $this->assertNoEntityAliasExists('node', $node, 'test-alias');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-one');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-two');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-three');
++
++    // Programatically save the node with an automatic alias.
++    $node = node_load($node->nid, NULL, TRUE);
++    $node->path['pathauto'] = TRUE;
++    node_save($node);
++
++    // Ensure that the pathauto field was saved to the database.
++    $node = node_load($node->nid, NULL, TRUE);
++    $this->assertTrue($node->path['pathauto']);
++
++    $this->assertEntityAlias('node', $node, 'content/node-version-three');
++    $this->assertNoEntityAliasExists('node', $node, 'manually-edited-alias');
++    $this->assertNoEntityAliasExists('node', $node, 'test-alias');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-one');
++    $this->assertNoEntityAliasExists('node', $node, 'content/node-version-two');
++
++  }
++}

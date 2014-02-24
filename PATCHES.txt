@@ -1,0 +1,5 @@
+PATCHES
+
+#936222: Merge in pathauto_persist module functionality to prevent losing manual aliases with node_save() calls
+https://drupal.org/node/936222
+pathauto-persist-936222-130-pathauto-state.patch
