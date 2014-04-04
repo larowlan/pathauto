@@ -2,6 +2,8 @@
 
 namespace Drupal\pathauto\Tests\Pathauto;
 
+use Drupal\Core\Language\Language;
+
 class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
@@ -19,7 +21,8 @@ class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
 
     // Add predefined French language and reset the locale cache.
     require_once DRUPAL_ROOT . '/includes/locale.inc';
-    locale_add_language('fr', NULL, NULL, LANGUAGE_LTR, '', 'fr');
+
+    locale_add_language('fr', NULL, NULL, Language::DIRECTION_LTR, '', 'fr');
     drupal_language_initialize();
   }
 
@@ -50,7 +53,7 @@ class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
     $this->saveAlias('node/invalid', 'content/english-node', Language::LANGCODE_NOT_SPECIFIED);
 
     // Update the node, triggering a change in the English alias.
-    $node->path['pathauto'] = TRUE;
+    $node->path->pathauto = TRUE;
     pathauto_node_update($node);
 
     // Check that the new English alias replaced the old one.

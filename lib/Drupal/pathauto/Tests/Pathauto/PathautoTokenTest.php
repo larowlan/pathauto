@@ -39,7 +39,7 @@ class PathautoTokenTestCase extends PathautoFunctionalTestHelper {
    */
   function assertTokens($type, array $data, array $tokens, array $options = array()) {
     $input = $this->mapTokenNames($type, array_keys($tokens));
-    $replacements = token_generate($type, $input, $data, $options);
+    $replacements = \Drupal::token()->generate($type, $input, $data, $options);
     foreach ($tokens as $name => $expected) {
       $token = $input[$name];
       if (!isset($expected)) {

@@ -17,6 +17,7 @@
  */
 
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\taxonomy\TermInterface;
 
@@ -94,50 +95,6 @@ function pathauto_permission() {
       'description' => t('Determines whether or not users are notified.'),
     ),
   );
-}
-
-/**
- * Implements hook_menu().
- */
-function pathauto_menu() {
-  $items['admin/config/search/path/patterns'] = array(
-    'title' => 'Patterns',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('pathauto_patterns_form'),
-    'access arguments' => array('administer pathauto'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 10,
-    'file' => 'pathauto.admin.inc',
-  );
-  $items['admin/config/search/path/settings'] = array(
-    'title' => 'Settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('pathauto_settings_form'),
-    'access arguments' => array('administer pathauto'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 20,
-    'file' => 'pathauto.admin.inc',
-  );
-  $items['admin/config/search/path/update_bulk'] = array(
-    'title' => 'Bulk generate',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('pathauto_bulk_update_form'),
-    'access arguments' => array('administer url aliases'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 30,
-    'file' => 'pathauto.admin.inc',
-  );
-  $items['admin/config/search/path/delete_bulk'] = array(
-    'title' => 'Delete aliases',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('pathauto_admin_delete'),
-    'access arguments' => array('administer url aliases'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 40,
-    'file' => 'pathauto.admin.inc',
-  );
-
-  return $items;
 }
 
 /**
@@ -223,10 +180,9 @@ function pathauto_path_delete_all($source) {
  * @param $default_uri
  *   The optional default uri path for the entity.
  */
-function pathauto_entity_path_delete_all($entity_type, $entity, $default_uri = NULL) {
-  $uri = entity_uri($entity_type, $entity);
-  pathauto_path_delete_all($uri['path']);
-  if (isset($default_uri) && $uri['path'] != $default_uri) {
+function pathauto_entity_path_delete_all(EntityInterface $entity, $default_uri = NULL) {
+  pathauto_path_delete_all($entity->getSystemPath());
+  if (isset($default_uri) && $entity->getSystemPath() != $default_uri) {
     pathauto_path_delete_all($default_uri);
   }
 }
@@ -271,8 +227,7 @@ function pathauto_field_attach_delete_bundle($entity_type, $bundle) {
  *
  * Add the automatic alias form elements to an existing path form fieldset.
  */
-function pathauto_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
-  list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
+function pathauto_field_attach_form(EntityInterface $entity, &$form, &$form_state, $langcode) {
 
   if (!isset($form['path'])) {
     // This entity must be supported by core's path.module first.
@@ -298,21 +253,20 @@ function pathauto_field_attach_form($entity_type, $entity, &$form, &$form_state,
     );
   }
 
-  $pattern = pathauto_pattern_load_by_entity($entity_type, $bundle, $langcode);
+  $pattern = pathauto_pattern_load_by_entity($entity->getEntityType(), $bundle, $langcode);
   if (empty($pattern)) {
     return;
   }
 
-  if (!isset($entity->path['pathauto'])) {
+  if (!isset($entity->path->pathauto)) {
     if (!empty($id)) {
       module_load_include('inc', 'pathauto');
-      $uri = entity_uri($entity_type, $entity);
-      $path = drupal_get_path_alias($uri['path'], $langcode);
-      $pathauto_alias = pathauto_create_alias($entity_type, 'return', $uri['path'], array($entity_type => $entity), $bundle, $langcode);
-      $entity->path['pathauto'] = ($path != $uri['path'] && $path == $pathauto_alias);
+      $path = drupal_get_path_alias($entity->getSystemPath(), $langcode);
+      $pathauto_alias = pathauto_create_alias($entity->getEntityType(), 'return', $entity->getSystemPath(), array($entity->getEntityType() => $entity), $bundle, $langcode);
+      $entity->path->pathauto = ($path != $entity->getSystemPath() && $path == $pathauto_alias);
     }
     else {
-      $entity->path['pathauto'] = TRUE;
+      $entity->path->pathauto = TRUE;
     }
   }
 
@@ -328,7 +282,7 @@ function pathauto_field_attach_form($entity_type, $entity, &$form, &$form_state,
   $form['path']['pathauto'] = array(
     '#type' => 'checkbox',
     '#title' => t('Generate automatic URL alias'),
-    '#default_value' => $entity->path['pathauto'],
+    '#default_value' => $entity->path->pathauto,
     '#description' => t('Uncheck this to create a custom alias below.'),
     '#weight' => -1,
   );
@@ -338,17 +292,17 @@ function pathauto_field_attach_form($entity_type, $entity, &$form, &$form_state,
     $form['path']['pathauto']['#description'] .= ' ' . l(t('Configure URL alias patterns.'), 'admin/config/search/path/patterns');
   }
 
-  if ($entity->path['pathauto'] && !empty($entity->old_alias) && empty($entity->path['alias'])) {
+  if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
     $form['path']['alias']['#default_value'] = $entity->old_alias;
-    $entity->path['alias'] = $entity->old_alias;
+    $entity->path->alias = $entity->old_alias;
   }
 
   // For Pathauto to remember the old alias and prevent the Path module from
   // deleting it when Pathauto wants to preserve it.
-  if (!empty($entity->path['alias'])) {
+  if (!empty($entity->path->alias)) {
     $form['path']['old_alias'] = array(
       '#type' => 'value',
-      '#value' => $entity->path['alias'],
+      '#value' => $entity->path->alias,
     );
   }
 }
@@ -433,7 +387,7 @@ function pathauto_entity_language($entity_type, $entity, $check_language_propert
 }
 
 function pathauto_is_alias_reserved($alias, $source, $langcode = LANGUAGE_NONE) {
-  foreach (module_implements('pathauto_is_alias_reserved') as $module) {
+  foreach (\Drupal::moduleHandler()->getImplementations('pathauto_is_alias_reserved') as $module) {
     $result = module_invoke($module, 'pathauto_is_alias_reserved', $alias, $source, $langcode);
     if (!empty($result)) {
       // As soon as the first module says that an alias is in fact reserved,
@@ -453,7 +407,7 @@ function path_pathauto_is_alias_reserved($alias, $source, $langcode) {
     ':source' => $source,
     ':alias' => $alias,
     ':language' => $langcode,
-    ':language_none' => LANGUAGE_NONE,
+    ':language_none' => Language::LANGCODE_NOT_SPECIFIED,
   ))->fetchField();
 }
 
@@ -485,7 +439,7 @@ function path_field_extra_fields() {
     }
   }
 
-  if (module_exists('taxonomy')) {
+  if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
     $vocabularies = entity_load_multiple('taxonomy_vocabulary');
     foreach ($vocabularies as $vocabulary) {
       if (!isset($info['taxonomy_term'][$vocabulary->machine_name]['form']['path'])) {
@@ -538,7 +492,7 @@ function pathauto_node_delete($node) {
 function pathauto_form_node_form_alter(&$form, &$form_state) {
   $node = $form_state['node'];
   $langcode = pathauto_entity_language('node', $node);
-  pathauto_field_attach_form('node', $node, $form, $form_state, $langcode);
+  pathauto_field_attach_form($node, $form, $form_state, $langcode);
 }
 
 /**
@@ -649,7 +603,7 @@ function pathauto_taxonomy_term_delete($term) {
 function pathauto_form_taxonomy_form_term_alter(&$form, $form_state) {
   $term = $form_state['term'];
   $langcode = pathauto_entity_language('taxonomy_term', $term);
-  pathauto_field_attach_form('taxonomy_term', $term, $form, $form_state, $langcode);
+  pathauto_field_attach_form($term, $form, $form_state, $langcode);
 }
 
 /**
@@ -803,7 +757,7 @@ function pathauto_user_update_alias(stdClass $account, $op, array $options = arr
   }
 
   $options += array(
-    'alias blog' => module_exists('blog'),
+    'alias blog' => \Drupal::moduleHandler()->moduleExists('blog'),
     // $user->language is not the user entity language, thus we need to skip
     // the property fallback check.
     'language' => pathauto_entity_language('user', $account, FALSE),
@@ -875,7 +829,7 @@ function pathauto_blog_update_alias(stdClass $account, $op, array $options = arr
   }
 
   $options += array(
-    'language' => LANGUAGE_NONE,
+    'language' => Language::LANGCODE_NOT_SPECIFIED,
   );
 
   module_load_include('inc', 'pathauto');
