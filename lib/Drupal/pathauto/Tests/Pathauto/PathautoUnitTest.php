@@ -159,50 +159,57 @@ class PathautoUnitTest extends PathautoTestHelper {
    * Test the different update actions in pathauto_create_alias().
    */
   public function testUpdateActions() {
+    $config = \Drupal::configFactory()->get('pathauto.settings');
+
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'insert'.
-    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->set('update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->save();
     $node = $this->drupalCreateNode(array('title' => 'First title'));
-    $this->assertEntityAlias('node', $node, 'content/first-title');
+    $this->assertEntityAlias($node, 'content/first-title');
 
     // Default action is PATHAUTO_UPDATE_ACTION_DELETE.
-    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE);
-    $node->title = 'Second title';
+    $config->set('update_action', PATHAUTO_UPDATE_ACTION_DELETE);
+    $config->save();
+    $node->setTitle('Second title');
     pathauto_node_update($node);
-    $this->assertEntityAlias('node', $node, 'content/second-title');
+    $this->assertEntityAlias($node, 'content/second-title');
     $this->assertNoAliasExists(array('alias' => 'content/first-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_LEAVE
-    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_LEAVE);
-    $node->title = 'Third title';
+    $config->set('update_action', PATHAUTO_UPDATE_ACTION_LEAVE);
+    $config->save();
+    $node->setTitle('Third title');
     pathauto_node_update($node);
-    $this->assertEntityAlias('node', $node, 'content/third-title');
-    $this->assertAliasExists(array('source' => "node/{$node->nid}", 'alias' => 'content/second-title'));
+    $this->assertEntityAlias($node, 'content/third-title');
+    $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
 
-    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE);
-    $node->title = 'Fourth title';
+    $config->set('update_action', PATHAUTO_UPDATE_ACTION_DELETE);
+    $config->save();
+    $node->setTitle('Fourth title');
     pathauto_node_update($node);
-    $this->assertEntityAlias('node', $node, 'content/fourth-title');
+    $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/third-title'));
     // The older second alias is not deleted yet.
-    $older_path = $this->assertAliasExists(array('source' => "node/{$node->nid}", 'alias' => 'content/second-title'));
+    $older_path = $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
-    variable_set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
-    $node->title = 'Fifth title';
+    $config->set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->save();
+    $node->setTitle('Fifth title');
     pathauto_node_update($node);
-    $this->assertEntityAlias('node', $node, 'content/fourth-title');
+    $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/fith-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'update'.
     $this->deleteAllAliases();
     pathauto_node_update($node);
-    $this->assertEntityAlias('node', $node, 'content/fifth-title');
+    $this->assertEntityAlias($node, 'content/fifth-title');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
-    $node->title = 'Sixth title';
+    $node->setTitle('Sixth title');
     pathauto_node_update_alias($node, 'bulkupdate');
-    $this->assertEntityAlias('node', $node, 'content/sixth-title');
+    $this->assertEntityAlias($node, 'content/sixth-title');
   }
 
   /**
@@ -211,7 +218,7 @@ class PathautoUnitTest extends PathautoTestHelper {
    */
   public function testNoTokensNoAlias() {
     $node = $this->drupalCreateNode(array('title' => ''));
-    $this->assertNoEntityAliasExists('node', $node);
+    $this->assertNoEntityAliasExists($node);
 
     $node->setTitle('hello');
     pathauto_node_update($node);

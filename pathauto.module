@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @defgroup pathauto Pathauto: Automatically generates aliases for content
  *
@@ -16,6 +15,10 @@
  *
  * @ingroup pathauto
  */
+
+
+use Drupal\Core\Language\Language;
+use Drupal\taxonomy\TermInterface;
 
 /**
  * The default ignore word list.
@@ -147,7 +150,7 @@ function pathauto_menu() {
  * @param $language
  *   A language code, defaults to the LANGUAGE_NONE constant.
  */
-function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = LANGUAGE_NONE) {
+function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = Language::LANGCODE_NOT_SPECIFIED) {
   $config = \Drupal::configFactory()->get('pathauto.settings');
 
   $patterns = &drupal_static(__FUNCTION__, array());
@@ -155,7 +158,7 @@ function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = LANG
   $pattern_id = "$entity:$bundle:$language";
   if (!isset($patterns[$pattern_id])) {
     $variables = array();
-    if ($language != LANGUAGE_NONE) {
+    if ($language != Language::LANGCODE_NOT_SPECIFIED) {
       $variables[] = "pathauto_{$entity}_{$bundle}_{$language}_pattern";
     }
     if ($bundle) {
@@ -186,7 +189,7 @@ function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = LANG
  */
 function pathauto_path_delete_multiple($pids) {
   foreach ($pids as $pid) {
-    path_delete(array('pid' => $pid));
+    \Drupal::service('path.alias_storage')->delete(array('pid' => $pid));
   }
 }
 
@@ -426,7 +429,7 @@ function pathauto_entity_language($entity_type, $entity, $check_language_propert
     $langcode = $entity->language;
   }
 
-  return !empty($langcode) ? $langcode : LANGUAGE_NONE;
+  return !empty($langcode) ? $langcode : Language::LANGCODE_NOT_SPECIFIED;
 }
 
 function pathauto_is_alias_reserved($alias, $source, $langcode = LANGUAGE_NONE) {
@@ -562,20 +565,19 @@ function pathauto_node_operations() {
  */
 function pathauto_node_update_alias(\Drupal\node\NodeInterface $node, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the node.
-  if (isset($node->path['pathauto']) && empty($node->path['pathauto']) && empty($options['force'])) {
+  if (isset($node->path->pathauto) && empty($node->path->pathauto) && empty($options['force'])) {
     return;
   }
 
   $options += array('language' => pathauto_entity_language('node', $node));
 
   // Skip processing if the node has no pattern.
-  if (!pathauto_pattern_load_by_entity('node', $node->type, $options['language'])) {
+  if (!pathauto_pattern_load_by_entity('node', $node->getType(), $options['language'])) {
     return;
   }
 
   module_load_include('inc', 'pathauto');
-  $uri = entity_uri('node', $node);
-  return pathauto_create_alias('node', $op, $uri['path'], array('node' => $node), $node->type, $options['language']);
+  return pathauto_create_alias('node', $op, $node->getSystemPath(), array('node' => $node), $node->getType(), $options['language']);
 }
 
 /**
@@ -660,15 +662,17 @@ function pathauto_form_taxonomy_form_term_alter(&$form, $form_state) {
  * @param $options
  *   An optional array of additional options.
  */
-function pathauto_taxonomy_term_update_alias(stdClass $term, $op, array $options = array()) {
+function pathauto_taxonomy_term_update_alias(TermInterface $term, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the term.
-  if (isset($term->path['pathauto']) && empty($term->path['pathauto']) && empty($options['force'])) {
+  if (isset($term->path->pathauto) && empty($term->path->pathauto) && empty($options['force'])) {
     return;
   }
 
   $module = 'taxonomy_term';
-  if ($term->vid == variable_get('forum_nav_vocabulary', '')) {
-    if (module_exists('forum')) {
+  $config_forum = \Drupal::configFactory()->get('forum.settings');
+
+  if ($term->getVocabularyId() == $config_forum->get('vocabulary')) {
+    if (\Drupal::moduleHandler()->moduleExists('forum')) {
       $module = 'forum';
     }
     else {
@@ -678,8 +682,8 @@ function pathauto_taxonomy_term_update_alias(stdClass $term, $op, array $options
 
   // Check that the term has its bundle, which is the vocabulary's machine name.
   if (!isset($term->vocabulary_machine_name)) {
-    $vocabulary = taxonomy_vocabulary_load($term->vid);
-    $term->vocabulary_machine_name = $vocabulary->machine_name;
+    $vocabulary = entity_load('taxonomy_vocabulary', $term->getVocabularyId());
+    $term->vocabulary_machine_name = $vocabulary->vid;
   }
 
   $options += array(
@@ -693,14 +697,13 @@ function pathauto_taxonomy_term_update_alias(stdClass $term, $op, array $options
   }
 
   module_load_include('inc', 'pathauto');
-  $uri = entity_uri('taxonomy_term', $term);
-  $result = pathauto_create_alias($module, $op, $uri['path'], array('term' => $term), $term->vocabulary_machine_name, $options['language']);
+  $result = pathauto_create_alias($module, $op, $term->getSystemPath(), array('term' => $term), $term->vocabulary_machine_name, $options['language']);
 
   if (!empty($options['alias children'])) {
     // For all children generate new aliases.
     $options['alias children'] = FALSE;
     unset($options['language']);
-    foreach (taxonomy_get_tree($term->vid, $term->tid) as $subterm) {
+    foreach (taxonomy_get_tree($term->getVocabularyId(), $term->id()) as $subterm) {
       pathauto_taxonomy_term_update_alias($subterm, $op, $options);
     }
   }

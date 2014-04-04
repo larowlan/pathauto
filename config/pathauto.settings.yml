@@ -18,3 +18,4 @@ ignore_words : 'a, an, as, at, before, but, by, for, from, is, in, into, like, o
 taxonomy_term_old_name_pattern : 'bundle'
 node_page_pattern : '[node:title]'
 punctuation_period : 2
+update_action : 2

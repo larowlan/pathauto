@@ -66,7 +66,7 @@ define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
  *
  * @deprecated Use path_pathauto_is_alias_reserved() instead.
  */
-function _pathauto_alias_exists($alias, $source, $langcode = LANGUAGE_NONE) {
+function _pathauto_alias_exists($alias, $source, $langcode = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
   return path_pathauto_is_alias_reserved();
 }
 
@@ -83,7 +83,7 @@ function _pathauto_alias_exists($alias, $source, $langcode = LANGUAGE_NONE) {
  *   - pid: Unique path alias identifier.
  *   - alias: The URL alias.
  */
-function _pathauto_existing_alias_data($source, $language = LANGUAGE_NONE) {
+function _pathauto_existing_alias_data($source, $language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
   $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND language IN (:language, :language_none) ORDER BY language DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => LANGUAGE_NONE))->fetchField();
   return path_load(array('pid' => $pid));
 }
@@ -149,9 +149,11 @@ function pathauto_cleanstring($string, array $options = array()) {
         case PATHAUTO_PUNCTUATION_REMOVE:
           $cache['punctuation'][$details['value']] = '';
           break;
+
         case PATHAUTO_PUNCTUATION_REPLACE:
           $cache['punctuation'][$details['value']] = $cache['separator'];
           break;
+
         case PATHAUTO_PUNCTUATION_DO_NOTHING:
           // Literally do nothing.
           break;
@@ -195,7 +197,7 @@ function pathauto_cleanstring($string, array $options = array()) {
   // Remove all HTML tags from the string.
   $output = strip_tags(decode_entities($string));
 
-  // Optionally transliterate (by running through the Transliteration module)
+  // Optionally transliterate (by running through the Transliteration module).
   if ($cache['transliterate']) {
     // If the reduce strings to letters and numbers is enabled, don't bother
     // replacing unknown characters with a question mark. Use an empty string
@@ -203,15 +205,15 @@ function pathauto_cleanstring($string, array $options = array()) {
     $output = transliteration_get($output, $cache['reduce_ascii'] ? '' : '?', $langcode);
   }
 
-  // Replace or drop punctuation based on user settings
+  // Replace or drop punctuation based on user settings.
   $output = strtr($output, $cache['punctuation']);
 
-  // Reduce strings to letters and numbers
+  // Reduce strings to letters and numbers.
   if ($cache['reduce_ascii']) {
     $output = preg_replace('/[^a-zA-Z0-9\/]+/', $cache['separator'], $output);
   }
 
-  // Get rid of words that are on the ignore list
+  // Get rid of words that are on the ignore list.
   if ($cache['ignore_words_regex']) {
     $words_removed = $cache['ignore_words_callback']($cache['ignore_words_regex'], '', $output);
     if (drupal_strlen(trim($words_removed)) > 0) {
@@ -299,10 +301,11 @@ function _pathauto_clean_separators($string, $separator = NULL) {
  */
 function pathauto_clean_alias($alias) {
   $cache = &drupal_static(__FUNCTION__);
+  $config = \Drupal::configFactory()->get('pathauto.settings');
 
   if (!isset($cache)) {
     $cache = array(
-      'maxlength' => min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength()),
+      'maxlength' => min($config->get('max_length'), _pathauto_get_schema_alias_maxlength()),
     );
   }
 
@@ -351,7 +354,7 @@ function pathauto_clean_alias($alias) {
  * @see _pathauto_set_alias()
  * @see token_replace()
  */
-function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $language = LANGUAGE_NONE) {
+function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
   // Retrieve and apply the pattern for this content type.
   $pattern = pathauto_pattern_load_by_entity($module, $type, $language);
 

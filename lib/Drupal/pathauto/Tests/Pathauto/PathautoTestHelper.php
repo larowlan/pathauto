@@ -57,7 +57,7 @@ class PathautoTestHelper extends WebTestBase {
   }
 
   public function assertAlias($source, $expected_alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    \Drupal::service('path.alias_manager')->clearCache($source);
+    \Drupal::service('path.alias_manager')->cacheClear($source);
     $alias = \Drupal::request()->attributes->get($source);
     $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
   }
@@ -75,7 +75,7 @@ class PathautoTestHelper extends WebTestBase {
 
   public function deleteAllAliases() {
     db_delete('url_alias')->execute();
-    \Drupal::service('path.alias_manager')->clearCache();
+    \Drupal::service('path.alias_manager')->cacheClear();
   }
 
   /**
