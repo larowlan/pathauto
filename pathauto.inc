@@ -119,6 +119,9 @@ function _pathauto_existing_alias_data($source, $language = LANGUAGE_NONE) {
 function pathauto_cleanstring($string, array $options = array()) {
   // Use the advanced drupal_static() pattern, since this is called very often.
   static $drupal_static_fast;
+
+  $config = \Drupal::configFactory()->get('pathauto.settings');
+
   if (!isset($drupal_static_fast)) {
     $drupal_static_fast['cache'] = &drupal_static(__FUNCTION__);
   }
@@ -128,20 +131,20 @@ function pathauto_cleanstring($string, array $options = array()) {
   // call to pathauto_cleanstring() we focus on processing.
   if (!isset($cache)) {
     $cache = array(
-      'separator' => variable_get('pathauto_separator', '-'),
+      'separator' => $config->get('pathauto_separator'),
       'strings' => array(),
-      'transliterate' => variable_get('pathauto_transliterate', FALSE) && module_exists('transliteration'),
+      'transliterate' => $config->get('transliterate') && \Drupal::moduleHandler()->moduleExists('transliteration'),
       'punctuation' => array(),
-      'reduce_ascii' => (bool) variable_get('pathauto_reduce_ascii', FALSE),
+      'reduce_ascii' => (bool) $config->get('reduce_ascii'),
       'ignore_words_regex' => FALSE,
-      'lowercase' => (bool) variable_get('pathauto_case', PATHAUTO_CASE_LOWER),
-      'maxlength' => min(variable_get('pathauto_max_component_length', 100), _pathauto_get_schema_alias_maxlength()),
+      'lowercase' => (bool) $config->get('case'),
+      'maxlength' => min($config->get('max_component_length'), _pathauto_get_schema_alias_maxlength()),
     );
 
     // Generate and cache the punctuation replacements for strtr().
     $punctuation = pathauto_punctuation_chars();
     foreach ($punctuation as $name => $details) {
-      $action = variable_get('pathauto_punctuation_' . $name, PATHAUTO_PUNCTUATION_REMOVE);
+      $action = $config->get('pathauto_punctuation_' . $name);
       switch ($action) {
         case PATHAUTO_PUNCTUATION_REMOVE:
           $cache['punctuation'][$details['value']] = '';
@@ -156,7 +159,7 @@ function pathauto_cleanstring($string, array $options = array()) {
     }
 
     // Generate and cache the ignored words regular expression.
-    $ignore_words = variable_get('pathauto_ignore_words', PATHAUTO_IGNORE_WORDS);
+    $ignore_words = $config->get('ignore_words');
     $ignore_words_regex = preg_replace(array('/^[,\s]+|[,\s]+$/', '/[,\s]+/'), array('', '\b|\b'), $ignore_words);
     if ($ignore_words_regex) {
       $cache['ignore_words_regex'] = '\b' . $ignore_words_regex . '\b';
@@ -251,10 +254,11 @@ function pathauto_cleanstring($string, array $options = array()) {
  */
 function _pathauto_clean_separators($string, $separator = NULL) {
   static $default_separator;
+  $config = \Drupal::configFactory()->get('separator');
 
   if (!isset($separator)) {
     if (!isset($default_separator)) {
-      $default_separator = variable_get('pathauto_separator', '-');
+      $default_separator = $config->get('separator');
     }
     $separator = $default_separator;
   }
@@ -636,8 +640,16 @@ function pathauto_punctuation_chars() {
   $punctuation = &drupal_static(__FUNCTION__);
 
   if (!isset($punctuation)) {
-    $cid = 'pathauto:punctuation:' . $GLOBALS['language']->language;
-    if ($cache = cache_get($cid)) {
+
+    if (isset($GLOBALS['language'])) {
+      $lang = $GLOBALS['language']->language;
+    }
+    else {
+      $lang = 'en';
+    }
+
+    $cid = 'pathauto:punctuation:' . $lang;
+    if ($cache = \Drupal::cache()->get($cid)) {
       $punctuation = $cache->data;
     }
     else {
@@ -676,8 +688,8 @@ function pathauto_punctuation_chars() {
       $punctuation['back_slash']         = array('value' => '\\', 'name' => t('Backslash'));
 
       // Allow modules to alter the punctuation list and cache the result.
-      drupal_alter('pathauto_punctuation_chars', $punctuation);
-      cache_set($cid, $punctuation);
+      \Drupal::moduleHandler()->alter('pathauto_punctuation_chars', $punctuation);
+      \Drupal::cache()->set($cid, $punctuation);
     }
   }
 

@@ -219,13 +219,13 @@ function _pathauto_validate_numeric_element($element, &$form_state) {
   $value = $element['#value'];
 
   if (!is_numeric($value)) {
-    form_error($element, t('The field %name is not a valid number.', array('%name' => $element['#title'])));
+    \Drupal::formBuilder()->setError($element, t('The field %name is not a valid number.', array('%name' => $element['#title'])));
   }
   elseif (isset($element['#max_value']) && $value > $element['#max_value']) {
-    form_error($element, t('The field %name cannot be greater than @max.', array('%name' => $element['#title'], '@max' => $element['#max_value'])));
+    \Drupal::formBuilder()->setError($element, t('The field %name cannot be greater than @max.', array('%name' => $element['#title'], '@max' => $element['#max_value'])));
   }
   elseif (isset($element['#min_value']) && $value < $element['#min_value']) {
-    form_error($element, t('The field %name cannot be less than @min.', array('%name' => $element['#title'], '@min' => $element['#min_value'])));
+    \Drupal::formBuilder()->setError($element, t('The field %name cannot be less than @min.', array('%name' => $element['#title'], '@min' => $element['#min_value'])));
   }
 }
 
@@ -237,7 +237,7 @@ function pathauto_settings_form_validate($form, &$form_state) {
 
   // Perform a basic check for HTML characters in the strings to remove field.
   if (strip_tags($form_state['values']['pathauto_ignore_words']) != $form_state['values']['pathauto_ignore_words']) {
-    form_set_error('pathauto_ignore_words', t('The <em>Strings to remove</em> field must not contain HTML. Make sure to disable any WYSIWYG editors for this field.'));
+    \Drupal::formBuilder()->setError('pathauto_ignore_words', t('The <em>Strings to remove</em> field must not contain HTML. Make sure to disable any WYSIWYG editors for this field.'));
   }
 
   // Validate that the separator is not set to be removed per http://drupal.org/node/184119
@@ -347,7 +347,7 @@ function pathauto_bulk_update_batch_finished($success, $results, $operations) {
     $results['count_after'] = db_select('url_alias')->countQuery()->execute()->fetchField();
     $results['count_changed'] = max($results['count_after'] - $results['count_before'], 0);
     if ($results['count_changed']) {
-      drupal_set_message(format_plural($results['count_changed'], 'Generated 1 URL alias.', 'Generated @count URL aliases.'));
+      drupal_set_message(\Drupal::translation()->formatPlural($results['count_changed'], 'Generated 1 URL alias.', 'Generated @count URL aliases.'));
     }
     else {
       drupal_set_message(t('No new URL aliases to generate.'));

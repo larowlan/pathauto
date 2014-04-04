@@ -59,7 +59,7 @@ function node_pathauto($op) {
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
 
       $languages = array();
-      if (module_exists('locale')) {
+      if (\Drupal::moduleHandler()->moduleExists('locale')) {
         $languages = array(LANGUAGE_NONE => t('language neutral')) + locale_language_list('name');
       }
 
@@ -137,15 +137,16 @@ function taxonomy_pathauto($op) {
       $settings['batch_update_callback'] = 'taxonomy_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
 
-      $vocabularies = taxonomy_get_vocabularies();
+      $vocabularies = entity_load_multiple('taxonomy_vocabulary');
       if (count($vocabularies)) {
         $settings['patternitems'] = array();
         foreach ($vocabularies as $vid => $vocabulary) {
-          if ($vid == variable_get('forum_nav_vocabulary', '')) {
+          /*if ($vid == variable_get('forum_nav_vocabulary', '')) {
             // Skip the forum vocabulary.
             continue;
-          }
-          $settings['patternitems'][$vocabulary->machine_name] = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabulary->name));
+          }*/
+
+          $settings['patternitems'][$vocabulary->vid] = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabulary->name));
         }
       }
       return (object) $settings;

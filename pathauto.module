@@ -148,6 +148,8 @@ function pathauto_menu() {
  *   A language code, defaults to the LANGUAGE_NONE constant.
  */
 function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = LANGUAGE_NONE) {
+  $config = \Drupal::configFactory()->get('pathauto.settings');
+
   $patterns = &drupal_static(__FUNCTION__, array());
 
   $pattern_id = "$entity:$bundle:$language";
@@ -162,7 +164,7 @@ function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = LANG
     $variables[] = "pathauto_{$entity}_pattern";
 
     foreach ($variables as $variable) {
-      if ($pattern = trim(variable_get($variable, ''))) {
+      if ($pattern = trim($config->get($variable))) {
         break;
       }
     }
@@ -286,7 +288,7 @@ function pathauto_field_attach_form($entity_type, $entity, &$form, &$form_state,
       '#attributes' => array(
         'class' => array('path-form'),
       ),
-      '#access' => user_access('create url aliases') || user_access('administer url aliases'),
+      '#access' => \Drupal::currentUser()->hasPermission('create url aliases') || \Drupal::currentUser()->hasPermission('administer url aliases'),
       '#weight' => 30,
       '#tree' => TRUE,
       '#element_validate' => array('path_form_element_validate'),
@@ -481,7 +483,7 @@ function path_field_extra_fields() {
   }
 
   if (module_exists('taxonomy')) {
-    $vocabularies = taxonomy_get_vocabularies();
+    $vocabularies = entity_load_multiple('taxonomy_vocabulary');
     foreach ($vocabularies as $vocabulary) {
       if (!isset($info['taxonomy_term'][$vocabulary->machine_name]['form']['path'])) {
         $info['taxonomy_term'][$vocabulary->machine_name]['form']['path'] = array(
@@ -558,7 +560,7 @@ function pathauto_node_operations() {
  * @param $options
  *   An optional array of additional options.
  */
-function pathauto_node_update_alias(stdClass $node, $op, array $options = array()) {
+function pathauto_node_update_alias(\Drupal\node\NodeInterface $node, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the node.
   if (isset($node->path['pathauto']) && empty($node->path['pathauto']) && empty($options['force'])) {
     return;
@@ -726,7 +728,7 @@ function pathauto_taxonomy_term_update_alias_multiple(array $tids, $op, array $o
   }
 
   if (!empty($options['message'])) {
-    drupal_set_message(format_plural(count($tids), 'Updated URL alias for 1 term.', 'Updated URL aliases for @count terms.'));
+    drupal_set_message(\Drupal::translation()->formatPlural(count($tids), 'Updated URL alias for 1 term.', 'Updated URL aliases for @count terms.'));
   }
 }
 
@@ -841,7 +843,7 @@ function pathauto_user_update_alias_multiple(array $uids, $op, array $options = 
   }
 
   if (!empty($options['message'])) {
-    drupal_set_message(format_plural(count($uids), 'Updated URL alias for 1 user account.', 'Updated URL aliases for @count user accounts.'));
+    drupal_set_message(\Drupal::translation()->formatPlural(count($uids), 'Updated URL alias for 1 user account.', 'Updated URL aliases for @count user accounts.'));
   }
 }
 
@@ -885,3 +887,21 @@ function pathauto_blog_update_alias(stdClass $account, $op, array $options = arr
 /**
  * @} End of "name pathauto_user".
  */
+
+/**
+ * Implements hook_menu_link_defaults().
+ */
+function pathauto_menu_link_defaults() {
+  $links = array();
+
+  $links['admin/config/search/path/settings'] = array(
+    'description' => '',
+    'link_title' => 'Settings',
+    'parent' => 'system.admin.config',
+    'route_name' => 'pathauto.settings.form',
+  );
+
+
+
+  return $links;
+}
