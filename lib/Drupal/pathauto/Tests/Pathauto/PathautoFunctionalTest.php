@@ -32,12 +32,12 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Create node for testing by previewing and saving the node form.
     $title = ' Testing: node title [';
     $automatic_alias = 'content/testing-node-title';
-    $this->drupalPost(NULL, array('title' => $title), 'Preview');
-    $this->drupalPost(NULL, array(), 'Save');
+    //$this->drupalPost(NULL, '', array('title' => $title), array('Preview'));
+    $this->drupalPost('node/add/page', '', array('title' => $title), array('Save'));
     $node = $this->drupalGetNodeByTitle($title);
 
     // Look for alias generated in the form.
-    $this->drupalGet("{$node->nid}/edit");
+    $this->drupalGet("{$node->id()}/edit");
     $this->assertFieldChecked('edit-path-pathauto');
     $this->assertFieldByName('path[alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
 
@@ -46,16 +46,16 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->assertText($title, 'Node accessible through automatic alias.');
 
     // Manually set the node's alias.
-    $manual_alias = 'content/' . $node->nid;
+    $manual_alias = 'content/' . $node->id();
     $edit = array(
       'path[pathauto]' => FALSE,
       'path[alias]' => $manual_alias,
     );
-    $this->drupalPost("node/{$node->nid}/edit", $edit, t('Save'));
+    $this->drupalPost("{$node->getSystemPath()}/edit", $edit, t('Save'));
     $this->assertText("Basic page $title has been updated.");
 
     // Check that the automatic alias checkbox is now unchecked by default.
-    $this->drupalGet("node/{$node->nid}/edit");
+    $this->drupalGet("node/{$node->id()}/edit");
     $this->assertNoFieldChecked('edit-path-pathauto');
     $this->assertFieldByName('path[alias]', $manual_alias);
 
@@ -85,7 +85,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->drupalGet($node->getSystemPath() . '/edit');
     $this->assertNoFieldById('edit-path-pathauto');
     $this->assertFieldByName('path[alias]', '');
-    $this->assertNoEntityAlias('node', $node);
+    $this->assertNoEntityAlias($node);
   }
 
   /**

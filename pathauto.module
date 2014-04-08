@@ -19,6 +19,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -618,7 +619,7 @@ function pathauto_form_taxonomy_form_term_alter(&$form, $form_state) {
  */
 function pathauto_taxonomy_term_update_alias(TermInterface $term, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the term.
-  if (isset($term->path->pathauto) && empty($term->path->pathauto) && empty($options['force'])) {
+  if (isset($term->path['pathauto']) && empty($term->path['pathauto']) && empty($options['force'])) {
     return;
   }
 
@@ -637,7 +638,7 @@ function pathauto_taxonomy_term_update_alias(TermInterface $term, $op, array $op
   // Check that the term has its bundle, which is the vocabulary's machine name.
   if (!isset($term->vocabulary_machine_name)) {
     $vocabulary = entity_load('taxonomy_vocabulary', $term->getVocabularyId());
-    $term->vocabulary_machine_name = $vocabulary->vid;
+    $term->vocabulary_machine_name = $vocabulary->id();
   }
 
   $options += array(
@@ -769,8 +770,7 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
   }
 
   module_load_include('inc', 'pathauto');
-  $uri = entity_uri('user', $account);
-  $return = pathauto_create_alias('user', $op, $uri['path'], array('user' => $account), NULL, $options['language']);
+  $return = pathauto_create_alias('user', $op, $account->getSystemPath(), array('user' => $account), NULL, $options['language']);
 
   // Because blogs are also associated with users, also generate the blog paths.
   if (!empty($options['alias blog'])) {
@@ -822,7 +822,7 @@ function pathauto_user_update_action($account, $context = array()) {
  * @param $options
  *   An optional array of additional options.
  */
-function pathauto_blog_update_alias(stdClass $account, $op, array $options = array()) {
+function pathauto_blog_update_alias(EntityInterface $account, $op, array $options = array()) {
   // Skip processing if the blog has no pattern.
   if (!pathauto_pattern_load_by_entity('blog')) {
     return;
@@ -834,10 +834,10 @@ function pathauto_blog_update_alias(stdClass $account, $op, array $options = arr
 
   module_load_include('inc', 'pathauto');
   if (node_access('create', 'blog', $account)) {
-    return pathauto_create_alias('blog', $op, "blog/{$account->uid}", array('user' => $account), NULL, $options['language']);
+    return pathauto_create_alias('blog', $op, "blog/{$account->id()}", array('user' => $account), NULL, $options['language']);
   }
   else {
-    pathauto_path_delete_all("blog/{$account->uid}");
+    pathauto_path_delete_all("blog/{$account->id()}");
   }
 }
 
