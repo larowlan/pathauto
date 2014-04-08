@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\pathauto\Tests\Pathauto;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * Test basic pathauto functionality.
@@ -22,7 +23,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $config = \Drupal::configFactory()->get('pathauto.settings');
 
     // Delete the default node pattern. Only the page content type will have a pattern.
-    variable_del('pathauto_node_pattern');
+    $config->clear('node_pattern');
 
     // Ensure that the Pathauto checkbox is checked by default on the node add form.
     $this->drupalGet('node/add/page');
@@ -36,7 +37,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $node = $this->drupalGetNodeByTitle($title);
 
     // Look for alias generated in the form.
-    $this->drupalGet("node/{$node->nid}/edit");
+    $this->drupalGet("{$node->nid}/edit");
     $this->assertFieldChecked('edit-path-pathauto');
     $this->assertFieldByName('path[alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
 
@@ -81,7 +82,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $node = $this->drupalGetNodeByTitle($edit['title']);
 
     // Pathauto checkbox should still not exist.
-    $this->drupalGet('node/' . $node->nid . '/edit');
+    $this->drupalGet($node->getSystemPath() . '/edit');
     $this->assertNoFieldById('edit-path-pathauto');
     $this->assertFieldByName('path[alias]', '');
     $this->assertNoEntityAlias('node', $node);
@@ -99,13 +100,13 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     $edit = array(
       'operation' => 'pathauto_update_alias',
-      "nodes[{$node1->nid}]" => TRUE,
+      "nodes[{$node1->id()}]" => TRUE,
     );
     $this->drupalPost('admin/content', $edit, t('Update'));
     $this->assertText('Updated URL alias for 1 node.');
 
-    $this->assertEntityAlias('node', $node1, 'content/' . $node1->title);
-    $this->assertEntityAlias('node', $node2, 'node/' . $node2->nid);
+    $this->assertEntityAlias($node1, 'content/' . $node1->getTitle());
+    $this->assertEntityAlias($node2, 'node/' . $node2->id());
   }
 
   /**
@@ -163,7 +164,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
    */
   function testUserEditing() {
     // There should be no Pathauto checkbox on user forms.
-    $this->drupalGet('user/' . $this->admin_user->uid . '/edit');
+    $this->drupalGet('user/' . $this->adminUser->uid . '/edit');
     $this->assertNoFieldById('edit-path-pathauto');
   }
 
@@ -178,13 +179,13 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     $edit = array(
       'operation' => 'pathauto_update_alias',
-      "accounts[{$account->uid}]" => TRUE,
+      "accounts[{$account->id()}]" => TRUE,
     );
     $this->drupalPost('admin/people', $edit, t('Update'));
     $this->assertText('Updated URL alias for 1 user account.');
 
-    $this->assertEntityAlias('user', $account, 'users/' . drupal_strtolower($account->name));
-    $this->assertEntityAlias('user', $this->admin_user, 'user/' . $this->admin_user->uid);
+    $this->assertEntityAlias($account, 'users/' . drupal_strtolower($account->getName()));
+    $this->assertEntityAlias($this->adminUser, 'user/' . $this->adminUser->id());
   }
 
   function testSettingsValidation() {
@@ -248,7 +249,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $edit['pass']   = user_password();
     $edit['path'] = array('pathauto' => TRUE);
     $edit['status'] = 1;
-    $account = user_save(new AnonymousUserSession(), $edit);
-    $this->assertEntityAlias('user', $account, 'users/test-user');
+    $account = entity_create('user', $edit);
+    $this->assertEntityAlias($account, 'users/test-user');
   }
 }

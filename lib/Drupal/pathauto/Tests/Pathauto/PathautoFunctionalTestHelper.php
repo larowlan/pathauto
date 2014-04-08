@@ -9,12 +9,12 @@ class PathautoFunctionalTestHelper extends PathautoTestHelper {
   protected $adminUser;
 
   function setUp(array $modules = array()) {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
+    //$config = \Drupal::configFactory()->get('pathauto.settings');
 
     parent::setUp($modules);
 
     // Set pathauto settings we assume to be as-is in this test.
-    $config->set('node_page_pattern', 'content/[node:title]');
+    //$config->set('node_page_pattern', 'content/[node:title]');
 
     // Allow other modules to add additional permissions for the admin user.
     $permissions = array(

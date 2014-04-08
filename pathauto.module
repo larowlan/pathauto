@@ -495,7 +495,7 @@ function pathauto_form_node_form_alter(&$form, &$form_state) {
   pathauto_field_attach_form($node, $form, $form_state, $langcode);
 }
 
-/**
+/**pathauto_user_insert
  * Implements hook_node_operations().
  */
 function pathauto_node_operations() {
@@ -708,7 +708,7 @@ function pathauto_taxonomy_term_update_action($term, $context = array()) {
 /**
  * Implements hook_user_insert().
  */
-function pathauto_user_insert(&$edit, $account, $category) {
+function pathauto_user_insert($account) {
   pathauto_user_update_alias($account, 'insert');
 }
 
@@ -750,7 +750,7 @@ function pathauto_user_operations() {
  * @param $options
  *   An optional array of additional options.
  */
-function pathauto_user_update_alias(stdClass $account, $op, array $options = array()) {
+function pathauto_user_update_alias(EntityInterface $account, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the account.
   if (isset($account->path['pathauto']) && empty($account->path['pathauto']) && empty($options['force'])) {
     return;

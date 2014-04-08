@@ -47,19 +47,19 @@ class PathautoLocaleTest extends PathautoFunctionalTestHelper {
 
     // Also save a French alias that should not be left alone, even though
     // it is the newer alias.
-    $this->saveEntityAlias('node', $node, 'french-node', 'fr');
+    $this->saveEntityAlias($node, 'french-node', 'fr');
 
     // Add an alias with the soon-to-be generated alias, causing the upcoming
     // alias update to generate a unique alias with the '-0' suffix.
     $this->saveAlias('node/invalid', 'content/english-node', Language::LANGCODE_NOT_SPECIFIED);
 
     // Update the node, triggering a change in the English alias.
-    $node->path->pathauto = TRUE;
+    $node->path['pathauto'] = TRUE;
     pathauto_node_update($node);
 
     // Check that the new English alias replaced the old one.
-    $this->assertEntityAlias('node', $node, 'content/english-node-0', 'en');
-    $this->assertEntityAlias('node', $node, 'french-node', 'fr');
+    $this->assertEntityAlias($node, 'content/english-node-0', 'en');
+    $this->assertEntityAlias($node, 'french-node', 'fr');
     $this->assertAliasExists(array('pid' => $english_alias['pid'], 'alias' => 'content/english-node-0'));
   }
 }
