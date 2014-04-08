@@ -5,10 +5,14 @@ namespace Drupal\pathauto\Tests\Pathauto;
 /**
  * Bulk update functionality tests.
  */
-class PathautoBulkUpdateTestCase extends PathautoFunctionalTestHelper {
+class PathautoBulkUpdateTest extends PathautoFunctionalTestHelper {
   private $nodes;
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
+
     return array(
       'name' => 'Pathauto bulk updating',
       'description' => 'Tests bulk updating of URL aliases.',

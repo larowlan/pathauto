@@ -5,7 +5,7 @@ namespace Drupal\pathauto\Tests\Pathauto;
 /**
  * Token functionality tests.
  */
-class PathautoTokenTestCase extends PathautoFunctionalTestHelper {
+class PathautoTokenTest extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto tokens',
@@ -15,7 +15,7 @@ class PathautoTokenTestCase extends PathautoFunctionalTestHelper {
     );
   }
 
-  function testPathautoTokens() {
+  public function testPathautoTokens() {
     $array = array(
       'test first arg',
       'The Array / value',
@@ -37,7 +37,7 @@ class PathautoTokenTestCase extends PathautoFunctionalTestHelper {
   /**
    * Function copied from TokenTestHelper::assertTokens().
    */
-  function assertTokens($type, array $data, array $tokens, array $options = array()) {
+  public function assertTokens($type, array $data, array $tokens, array $options = array()) {
     $input = $this->mapTokenNames($type, array_keys($tokens));
     $replacements = \Drupal::token()->generate($type, $input, $data, $options);
     foreach ($tokens as $name => $expected) {
@@ -59,7 +59,7 @@ class PathautoTokenTestCase extends PathautoFunctionalTestHelper {
     return $replacements;
   }
 
-  function mapTokenNames($type, array $tokens = array()) {
+  public function mapTokenNames($type, array $tokens = array()) {
     $return = array();
     foreach ($tokens as $token) {
       $return[$token] = "[$type:$token]";

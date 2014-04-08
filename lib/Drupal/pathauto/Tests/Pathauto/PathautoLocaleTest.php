@@ -4,7 +4,7 @@ namespace Drupal\pathauto\Tests\Pathauto;
 
 use Drupal\Core\Language\Language;
 
-class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
+class PathautoLocaleTest extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto localization tests',
@@ -17,6 +17,7 @@ class PathautoLocaleTestCase extends PathautoFunctionalTestHelper {
   function setUp(array $modules = array()) {
     $modules[] = 'locale';
     $modules[] = 'translation';
+    debug($modules);
     parent::setUp($modules, array('administer languages'));
 
     // Add predefined French language and reset the locale cache.

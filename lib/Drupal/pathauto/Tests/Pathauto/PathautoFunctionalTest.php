@@ -5,7 +5,7 @@ namespace Drupal\pathauto\Tests\Pathauto;
 /**
  * Test basic pathauto functionality.
  */
-class PathautoFunctionalTestCase extends PathautoFunctionalTestHelper {
+class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
   public static function getInfo() {
     return array(
       'name' => 'Pathauto basic tests',
@@ -237,11 +237,11 @@ class PathautoFunctionalTestCase extends PathautoFunctionalTestHelper {
    */
   function testProgrammaticEntityCreation() {
     $node = $this->drupalCreateNode(array('title' => 'Test node', 'path' => array('pathauto' => TRUE)));
-    $this->assertEntityAlias('node', $node, 'content/test-node');
+    $this->assertEntityAlias($node, 'content/test-node');
 
     $vocabulary = $this->addVocabulary(array('name' => 'Tags'));
     $term = $this->addTerm($vocabulary, array('name' => 'Test term', 'path' => array('pathauto' => TRUE)));
-    $this->assertEntityAlias('taxonomy_term', $term, 'tags/test-term');
+    $this->assertEntityAlias($term, 'tags/test-term');
 
     $edit['name'] = 'Test user';
     $edit['mail'] = 'test-user@example.com';
