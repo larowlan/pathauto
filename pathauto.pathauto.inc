@@ -15,13 +15,13 @@
 function pathauto_path_alias_types() {
   $objects['user/'] = t('Users');
   $objects['node/'] = t('Content');
-  if (module_exists('blog')) {
+  if (\Drupal::moduleHandler()->moduleExists('blog')) {
     $objects['blog/'] = t('User blogs');
   }
-  if (module_exists('taxonomy')) {
+  if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
     $objects['taxonomy/term/'] = t('Taxonomy terms');
   }
-  if (module_exists('forum')) {
+  if (\Drupal::moduleHandler()->moduleExists('forum')) {
     $objects['forum/'] = t('Forums');
   }
   return $objects;
@@ -75,6 +75,7 @@ function node_pathauto($op) {
         }
       }
       return (object) $settings;
+
     default:
       break;
   }
@@ -150,6 +151,7 @@ function taxonomy_pathauto($op) {
         }
       }
       return (object) $settings;
+
     default:
       break;
   }
@@ -279,6 +281,7 @@ function user_pathauto($op) {
       $settings['batch_update_callback'] = 'user_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
       return (object) $settings;
+
     default:
       break;
   }
@@ -341,6 +344,7 @@ function blog_pathauto($op) {
       $settings['batch_update_callback'] = 'blog_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
       return (object) $settings;
+
     default:
       break;
   }

@@ -93,8 +93,9 @@ class PathautoUnitTest extends PathautoTestHelper {
     $config = \Drupal::configFactory()->get('pathauto.settings');
 
     $tests = array();
-    $config->set('pathauto_ignore_words', ', in, is,that, the  , this, with, ');
-    $config->set('pathauto_max_component_length', 35);
+    $config->set('ignore_words', ', in, is,that, the  , this, with, ');
+    $config->set('max_component_length', 35);
+    $config->save();
 
     // Test the 'ignored words' removal.
     $tests['this'] = 'this';

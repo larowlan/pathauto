@@ -131,7 +131,7 @@ function pathauto_cleanstring($string, array $options = array()) {
   // call to pathauto_cleanstring() we focus on processing.
   if (!isset($cache)) {
     $cache = array(
-      'separator' => $config->get('pathauto_separator'),
+      'separator' => $config->get('separator'),
       'strings' => array(),
       'transliterate' => $config->get('transliterate') && \Drupal::moduleHandler()->moduleExists('transliteration'),
       'punctuation' => array(),
@@ -144,7 +144,7 @@ function pathauto_cleanstring($string, array $options = array()) {
     // Generate and cache the punctuation replacements for strtr().
     $punctuation = pathauto_punctuation_chars();
     foreach ($punctuation as $name => $details) {
-      $action = $config->get('pathauto_punctuation_' . $name);
+      $action = $config->get('punctuation_' . $name);
       switch ($action) {
         case PATHAUTO_PUNCTUATION_REMOVE:
           $cache['punctuation'][$details['value']] = '';
@@ -367,7 +367,7 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
     'type' => $type,
     'language' => &$language,
   );
-  drupal_alter('pathauto_pattern', $pattern, $context);
+  \Drupal::moduleHandler()->alter('pathauto_pattern', $pattern, $context);
 
   if (empty($pattern)) {
     // No pattern? Do nothing (otherwise we may blow away existing aliases...)
@@ -380,15 +380,17 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
     if ($existing_alias = _pathauto_existing_alias_data($source, $language)) {
       switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
         case PATHAUTO_UPDATE_ACTION_NO_NEW:
-          // If an alias already exists, and the update action is set to do nothing,
+          // If an alias already exists,
+          // and the update action is set to do nothing,
           // then gosh-darn it, do nothing.
           return '';
       }
     }
   }
 
-  // Replace any tokens in the pattern. Uses callback option to clean replacements. No sanitization.
-  $alias = token_replace($pattern, $data, array(
+  // Replace any tokens in the pattern.
+  // Uses callback option to clean replacements. No sanitization.
+  $alias = \Drupal::token()->replace($pattern, $data, array(
     'sanitize' => FALSE,
     'clear' => TRUE,
     'callback' => 'pathauto_clean_token_values',
@@ -409,7 +411,7 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
   // Allow other modules to alter the alias.
   $context['source'] = &$source;
   $context['pattern'] = $pattern;
-  drupal_alter('pathauto_alias', $alias, $context);
+  \Drupal::moduleHandler()->alter('pathauto_alias', $alias, $context);
 
   // If we have arrived at an empty string, discontinue.
   if (!drupal_strlen($alias)) {
@@ -457,13 +459,15 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
  *   A string with a language code.
  */
 function pathauto_alias_uniquify(&$alias, $source, $langcode) {
+  $config = \Drupal::configFactory()->get('pathauto.settings');
+
   if (!pathauto_is_alias_reserved($alias, $source, $langcode)) {
     return;
   }
 
-  // If the alias already exists, generate a new, hopefully unique, variant
-  $maxlength = min(variable_get('pathauto_max_length', 100), _pathauto_get_schema_alias_maxlength());
-  $separator = variable_get('pathauto_separator', '-');
+  // If the alias already exists, generate a new, hopefully unique, variant.
+  $maxlength = min($config->get('max_length'), _pathauto_get_schema_alias_maxlength());
+  $separator = $config->get('separator');
   $original_alias = $alias;
 
   $i = 0;
@@ -530,7 +534,7 @@ function _pathauto_path_is_callback($path) {
 function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
   $verbose = _pathauto_verbose(NULL, $op);
 
-  // Alert users if they are trying to create an alias that is the same as the internal path
+  // Alert users if they are trying to create an alias that is the same as the internal path.
   if ($path['source'] == $path['alias']) {
     if ($verbose) {
       _pathauto_verbose(t('Ignoring alias %alias because it is the same as the internal path.', array('%alias' => $path['alias'])));
@@ -538,7 +542,7 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
     return;
   }
 
-  // Skip replacing the current alias with an identical alias
+  // Skip replacing the current alias with an identical alias.
   if (empty($existing_alias) || $existing_alias['alias'] != $path['alias']) {
     $path += array('pathauto' => TRUE, 'original' => $existing_alias);
 
@@ -593,9 +597,10 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
  */
 function _pathauto_verbose($message = NULL, $op = NULL) {
   static $verbose;
+  $config = \Drupal::configFactory()->get('pathauto.settings');
 
   if (!isset($verbose)) {
-    $verbose = variable_get('pathauto_verbose', FALSE) && user_access('notify of path changes');
+    $verbose = $config->get('verbose') && \Drupal::currentUser()->hasPermission('notify of path changes');
   }
 
   if (!$verbose || (isset($op) && in_array($op, array('bulkupdate', 'return')))) {

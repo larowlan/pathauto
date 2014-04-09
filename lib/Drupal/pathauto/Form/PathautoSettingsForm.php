@@ -50,7 +50,7 @@ class PathautoSettingsForm extends ConfigFormBase {
     $form['pathauto_case'] = array(
       '#type' => 'radios',
       '#title' => t('Character case'),
-      /*'#default_value' => variable_get('pathauto_case', PATHAUTO_CASE_LOWER),*/
+      '#default_value' => $config->get('case'),
       '#options' => array(
         PATHAUTO_CASE_LEAVE_ASIS => t('Leave case the same as source token values.'),
         PATHAUTO_CASE_LOWER => t('Change to lower case'),

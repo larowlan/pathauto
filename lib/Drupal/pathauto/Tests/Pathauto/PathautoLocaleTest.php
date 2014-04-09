@@ -20,10 +20,14 @@ class PathautoLocaleTest extends PathautoFunctionalTestHelper {
     parent::setUp($modules, array('administer languages'));
 
     // Add predefined French language and reset the locale cache.
-    require_once DRUPAL_ROOT . '/includes/locale.inc';
+    /*require_once DRUPAL_ROOT . '/includes/locale.inc';
 
     locale_add_language('fr', NULL, NULL, Language::DIRECTION_LTR, '', 'fr');
-    drupal_language_initialize();
+    drupal_language_initialize();*/
+
+    $language = new Language(array('id' => 'fr'));
+    language_save($language);
+
   }
 
   /**

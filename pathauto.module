@@ -50,7 +50,7 @@ function pathauto_module_implements_alter(&$implementations, $hook) {
   if (in_array($hook, array('pathauto', 'path_alias_types'))) {
     $modules = array('node', 'taxonomy', 'user', 'forum', 'blog');
     foreach ($modules as $module) {
-      if (module_exists($module)) {
+      if (\Drupal::moduleHandler()->moduleExists($module)) {
         $implementations[$module] = TRUE;
       }
     }
@@ -76,6 +76,7 @@ function pathauto_help($path, $arg) {
       $output .= '<dd>' . t('The <strong>maximum alias length</strong> and <strong>maximum component length</strong> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "alias" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "alias" column it will cause problems in situations where the system needs to append additional words to the aliased URL. You should enter a value that is the length of the "alias" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => _pathauto_get_schema_alias_maxlength())) . '</dd>';
       $output .= '</dl>';
       return $output;
+
     case 'admin/config/search/path/update_bulk':
       $output = '<p>' . t('Bulk generation will only generate URL aliases for items that currently have no aliases. This is typically used when installing Pathauto on a site that has existing un-aliased content that needs to be aliased in bulk.') . '</p>';
       return $output;
@@ -117,12 +118,12 @@ function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = Lang
   if (!isset($patterns[$pattern_id])) {
     $variables = array();
     if ($language != Language::LANGCODE_NOT_SPECIFIED) {
-      $variables[] = "pathauto_{$entity}_{$bundle}_{$language}_pattern";
+      $variables[] = "{$entity}_{$bundle}_{$language}_pattern";
     }
     if ($bundle) {
-      $variables[] = "pathauto_{$entity}_{$bundle}_pattern";
+      $variables[] = "{$entity}_{$bundle}_pattern";
     }
-    $variables[] = "pathauto_{$entity}_pattern";
+    $variables[] = "{$entity}_pattern";
 
     foreach ($variables as $variable) {
       if ($pattern = trim($config->get($variable))) {
@@ -254,20 +255,20 @@ function pathauto_field_attach_form(EntityInterface $entity, &$form, &$form_stat
     );
   }
 
-  $pattern = pathauto_pattern_load_by_entity($entity->getEntityType(), $bundle, $langcode);
+  $pattern = pathauto_pattern_load_by_entity($entity->id(), $entity->bundle(), $langcode);
   if (empty($pattern)) {
     return;
   }
 
-  if (!isset($entity->path->pathauto)) {
+  if (!isset($entity->path['pathauto'])) {
     if (!empty($id)) {
       module_load_include('inc', 'pathauto');
-      $path = drupal_get_path_alias($entity->getSystemPath(), $langcode);
+      $path = Drupal::service('path.alias_manager.cached')->getPathAlias($entity->getSystemPath(), $langcode);
       $pathauto_alias = pathauto_create_alias($entity->getEntityType(), 'return', $entity->getSystemPath(), array($entity->getEntityType() => $entity), $bundle, $langcode);
-      $entity->path->pathauto = ($path != $entity->getSystemPath() && $path == $pathauto_alias);
+      $entity->path['pathauto'] = ($path != $entity->getSystemPath() && $path == $pathauto_alias);
     }
     else {
-      $entity->path->pathauto = TRUE;
+      $entity->path['pathauto'] = TRUE;
     }
   }
 
@@ -374,11 +375,11 @@ function pathauto_action_info() {
  *   $entity->language if the entity_language() function failed or does not
  *   exist. Default is TRUE.
  */
-function pathauto_entity_language($entity_type, $entity, $check_language_property = TRUE) {
+function pathauto_entity_language(EntityInterface $entity, $check_language_property = TRUE) {
   $langcode = NULL;
 
   if (function_exists('entity_language')) {
-    $langcode = entity_language($entity_type, $entity);
+    $langcode = entity_language($entity->getEntityType(), $entity);
   }
   elseif ($check_language_property && !empty($entity->language)) {
     $langcode = $entity->language;
@@ -491,8 +492,8 @@ function pathauto_node_delete($node) {
  * Add the Pathauto settings to the node form.
  */
 function pathauto_form_node_form_alter(&$form, &$form_state) {
-  $node = $form_state['node'];
-  $langcode = pathauto_entity_language('node', $node);
+  $node = $form_state['controller']->getEntity();
+  $langcode = pathauto_entity_language($node);
   pathauto_field_attach_form($node, $form, $form_state, $langcode);
 }
 
@@ -555,7 +556,7 @@ function pathauto_node_update_alias_multiple(array $nids, $op, array $options = 
   }
 
   if (!empty($options['message'])) {
-    drupal_set_message(format_plural(count($nids), 'Updated URL alias for 1 node.', 'Updated URL aliases for @count nodes.'));
+    drupal_set_message(\Drupal::translation()->formatPlural(count($nids), 'Updated URL alias for 1 node.', 'Updated URL aliases for @count nodes.'));
   }
 }
 
