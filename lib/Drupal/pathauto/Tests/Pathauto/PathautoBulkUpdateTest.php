@@ -37,7 +37,7 @@ class PathautoBulkUpdateTest extends PathautoFunctionalTestHelper {
       'update[node_pathauto_bulk_update_batch_process]' => TRUE,
       'update[user_pathauto_bulk_update_batch_process]' => TRUE,
     );
-    $this->drupalPost('admin/config/search/path/update_bulk', '', $edit, array('Update'));
+    $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, array('Update'));
     $this->assertText('Generated 7 URL aliases.'); // 5 nodes + 2 users
 
     // Check that aliases have actually been created.
@@ -50,7 +50,7 @@ class PathautoBulkUpdateTest extends PathautoFunctionalTestHelper {
     $new_node = $this->drupalCreateNode(array('path' => array('alias' => '', 'pathauto' => FALSE)));
 
     // Run the update again which should only run against the new node.
-    $this->drupalPost('admin/config/search/path/update_bulk', '', $edit, array('Update'));
+    $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, array('Update'));
     $this->assertText('Generated 1 URL alias.'); // 1 node + 0 users
 
     $this->assertEntityAliasExists($new_node);

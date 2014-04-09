@@ -1,4 +1,5 @@
 <?php
+use Drupal\Core\Language\Language;
 
 /**
  * @file
@@ -86,7 +87,7 @@ function hook_pathauto_alias_alter(&$alias, array &$context) {
   $alias .= '.html';
 
   // Force all aliases to be saved as language neutral.
-  $context['language'] = LANGUAGE_NONE;
+  $context['language'] = Language::LANGCODE_NOT_SPECIFIED;
 }
 
 /**

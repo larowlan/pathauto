@@ -37,7 +37,7 @@ function pathauto_path_alias_types() {
  * exist, than this file will not get included and the core implementations
  * will never get run.
  *
- * @see pathauto_module_implements_alter().
+ * @see pathauto_module_implements_alter()
  */
 function pathauto_pathauto() {
   // Empty hook; see the above comment.
@@ -218,6 +218,7 @@ function forum_pathauto($op) {
       $settings['batch_update_callback'] = 'forum_pathauto_bulk_update_batch_process';
       $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
       return (object) $settings;
+
     default:
       break;
   }

@@ -11,6 +11,7 @@
  *
  * @ingroup pathauto
  */
+use Drupal\Core\Language\Language;
 
 /**
  * Case should be left as is in the generated path.
@@ -84,7 +85,7 @@ function _pathauto_alias_exists($alias, $source, $langcode = \Drupal\Core\Langua
  *   - alias: The URL alias.
  */
 function _pathauto_existing_alias_data($source, $language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
-  $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND language IN (:language, :language_none) ORDER BY language DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => LANGUAGE_NONE))->fetchField();
+  $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND language IN (:language, :language_none) ORDER BY language DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => Language::LANGCODE_NOT_SPECIFIED))->fetchField();
   return path_load(array('pid' => $pid));
 }
 
@@ -355,6 +356,8 @@ function pathauto_clean_alias($alias) {
  * @see token_replace()
  */
 function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
+  $config = \Drupal::configFactory()->get('pathauto.settings');
+
   // Retrieve and apply the pattern for this content type.
   $pattern = pathauto_pattern_load_by_entity($module, $type, $language);
 
@@ -378,7 +381,7 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
   $existing_alias = NULL;
   if ($op == 'update' || $op == 'bulkupdate') {
     if ($existing_alias = _pathauto_existing_alias_data($source, $language)) {
-      switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
+      switch ($config->get('update_action')) {
         case PATHAUTO_UPDATE_ACTION_NO_NEW:
           // If an alias already exists,
           // and the update action is set to do nothing,
@@ -515,7 +518,7 @@ function _pathauto_path_is_callback($path) {
 /**
  * Private function for Pathauto to create an alias.
  *
- * @param $path
+ * @param array $path
  *   An associative array containing the following keys:
  *   - source: The internal system path.
  *   - alias: The URL alias.
@@ -527,12 +530,12 @@ function _pathauto_path_is_callback($path) {
  *   An optional string with the operation being performed.
  *
  * @return
- *   The saved path from path_save() or NULL if the path was not saved.
+ *   The saved path or NULL if the path was not saved.
  *
- * @see path_save()
  */
 function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
   $verbose = _pathauto_verbose(NULL, $op);
+  $config = \Drupal::configFactory()->get('pathauto.settings');
 
   // Alert users if they are trying to create an alias that is the same as the internal path.
   if ($path['source'] == $path['alias']) {
@@ -548,14 +551,16 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
 
     // If there is already an alias, respect some update actions.
     if (!empty($existing_alias)) {
-      switch (variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE)) {
+      switch ($config->get('update_action')) {
         case PATHAUTO_UPDATE_ACTION_NO_NEW:
           // Do not create the alias.
           return;
+
         case PATHAUTO_UPDATE_ACTION_LEAVE:
           // Create a new alias instead of overwriting the existing by leaving
           // $path['pid'] empty.
           break;
+
         case PATHAUTO_UPDATE_ACTION_DELETE:
           // The delete actions should overwrite the existing alias.
           $path['pid'] = $existing_alias['pid'];
@@ -564,7 +569,7 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
     }
 
     // Save the path array.
-    path_save($path);
+    Drupal::service('path.alias_storage')->save($path);
 
     if ($verbose) {
       if (!empty($existing_alias['pid'])) {
@@ -617,11 +622,12 @@ function _pathauto_verbose($message = NULL, $op = NULL) {
 /**
  * Clean tokens so they are URL friendly.
  *
- * @param $replacements
- *   An array of token replacements that need to be "cleaned" for use in the URL.
- * @param $data
+ * @param array $replacements
+ *   An array of token replacements
+ *   that need to be "cleaned" for use in the URL.
+ * @param array $data
  *   An array of objects used to generate the replacements.
- * @param $options
+ * @param array $options
  *   An array of options used to generate the replacements.
  */
 function pathauto_clean_token_values(&$replacements, $data = array(), $options = array()) {
@@ -640,7 +646,7 @@ function pathauto_clean_token_values(&$replacements, $data = array(), $options =
  * the value and a textual description.
  * Can and should be expanded to include "all" non text punctuation values.
  *
- * @return
+ * @return array
  *   An array of arrays for punctuation values keyed by a name, including the
  *   value and a textual description.
  */

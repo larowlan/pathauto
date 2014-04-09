@@ -32,8 +32,8 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Create node for testing by previewing and saving the node form.
     $title = ' Testing: node title [';
     $automatic_alias = 'content/testing-node-title';
-    //$this->drupalPost(NULL, '', array('title' => $title), array('Preview'));
-    $this->drupalPost('node/add/page', '', array('title' => $title), array('Save'));
+    $this->drupalPostForm(NULL, array('title' => $title), array('Preview'));
+    $this->drupalPostForm(NULL, array(), 'Save');
     $node = $this->drupalGetNodeByTitle($title);
 
     // Look for alias generated in the form.
@@ -51,7 +51,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
       'path[pathauto]' => FALSE,
       'path[alias]' => $manual_alias,
     );
-    $this->drupalPost("{$node->getSystemPath()}/edit", $edit, t('Save'));
+    $this->drupalPostForm("{$node->getSystemPath()}/edit", $edit, t('Save'));
     $this->assertText("Basic page $title has been updated.");
 
     // Check that the automatic alias checkbox is now unchecked by default.
@@ -60,7 +60,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->assertFieldByName('path[alias]', $manual_alias);
 
     // Submit the node form with the default values.
-    $this->drupalPost(NULL, array(), t('Save'));
+    $this->drupalPostForm(NULL, array(), t('Save'));
     $this->assertText("Basic page $title has been updated.");
 
     // Test that the old (automatic) alias has been deleted and only accessible
@@ -78,7 +78,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     $edit = array();
     $edit['title'] = 'My test article';
-    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save'));
     $node = $this->drupalGetNodeByTitle($edit['title']);
 
     // Pathauto checkbox should still not exist.
@@ -102,7 +102,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
       'operation' => 'pathauto_update_alias',
       "nodes[{$node1->id()}]" => TRUE,
     );
-    $this->drupalPost('admin/content', $edit, t('Update'));
+    $this->drupalPostForm('admin/content', $edit, t('Update'));
     $this->assertText('Updated URL alias for 1 node.');
 
     $this->assertEntityAlias($node1, 'content/' . $node1->getTitle());
@@ -119,7 +119,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Create term for testing.
     $name = ' Testing: term name [ ';
     $automatic_alias = 'tags/testing-term-name';
-    $this->drupalPost('admin/structure/taxonomy/tags/add', array('name' => $name), 'Save');
+    $this->drupalPostForm('admin/structure/taxonomy/tags/add', array('name' => $name), 'Save');
     $name = trim($name);
     $this->assertText("Created new term $name.");
     $term = $this->drupalGetTermByName($name);
@@ -139,7 +139,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
       'path[pathauto]' => FALSE,
       'path[alias]' => $manual_alias,
     );
-    $this->drupalPost("taxonomy/term/{$term->tid}/edit", $edit, t('Save'));
+    $this->drupalPostForm("taxonomy/term/{$term->tid}/edit", $edit, t('Save'));
     $this->assertText("Updated term $name.");
 
     // Check that the automatic alias checkbox is now unchecked by default.
@@ -148,7 +148,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->assertFieldByName('path[alias]', $manual_alias);
 
     // Submit the term form with the default values.
-    $this->drupalPost(NULL, array(), t('Save'));
+    $this->drupalPostForm(NULL, array(), t('Save'));
     $this->assertText("Updated term $name.");
 
     // Test that the old (automatic) alias has been deleted and only accessible
@@ -181,7 +181,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
       'operation' => 'pathauto_update_alias',
       "accounts[{$account->id()}]" => TRUE,
     );
-    $this->drupalPost('admin/people', $edit, t('Update'));
+    $this->drupalPostForm('admin/people', $edit, t('Update'));
     $this->assertText('Updated URL alias for 1 user account.');
 
     $this->assertEntityAlias($account, 'users/' . drupal_strtolower($account->getName()));
@@ -192,28 +192,28 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $edit = array();
     $edit['pathauto_max_length'] = 'abc';
     $edit['pathauto_max_component_length'] = 'abc';
-    $this->drupalPost('admin/config/search/path/settings', $edit, 'Save configuration');
+    $this->drupalPostForm('admin/config/search/path/settings', $edit, 'Save configuration');
     $this->assertText('The field Maximum alias length is not a valid number.');
     $this->assertText('The field Maximum component length is not a valid number.');
     $this->assertNoText('The configuration options have been saved.');
 
     $edit['pathauto_max_length'] = '0';
     $edit['pathauto_max_component_length'] = '0';
-    $this->drupalPost('admin/config/search/path/settings', $edit, 'Save configuration');
+    $this->drupalPostForm('admin/config/search/path/settings', $edit, 'Save configuration');
     $this->assertText('The field Maximum alias length cannot be less than 1.');
     $this->assertText('The field Maximum component length cannot be less than 1.');
     $this->assertNoText('The configuration options have been saved.');
 
     $edit['pathauto_max_length'] = '999';
     $edit['pathauto_max_component_length'] = '999';
-    $this->drupalPost('admin/config/search/path/settings', $edit, 'Save configuration');
+    $this->drupalPostForm('admin/config/search/path/settings', $edit, 'Save configuration');
     $this->assertText('The field Maximum alias length cannot be greater than 255.');
     $this->assertText('The field Maximum component length cannot be greater than 255.');
     $this->assertNoText('The configuration options have been saved.');
 
     $edit['pathauto_max_length'] = '50';
     $edit['pathauto_max_component_length'] = '50';
-    $this->drupalPost('admin/config/search/path/settings', $edit, 'Save configuration');
+    $this->drupalPostForm('admin/config/search/path/settings', $edit, 'Save configuration');
     $this->assertText('The configuration options have been saved.');
   }
 
@@ -221,7 +221,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $edit = array();
     $edit['pathauto_node_pattern'] = '[node:title]/[user:name]/[term:name]';
     $edit['pathauto_node_page_pattern'] = 'page';
-    $this->drupalPost('admin/config/search/path/patterns', $edit, 'Save configuration');
+    $this->drupalPostForm('admin/config/search/path/patterns', $edit, 'Save configuration');
     $this->assertText('The Default path pattern (applies to all content types with blank patterns below) is using the following invalid tokens: [user:name], [term:name].');
     $this->assertText('The Pattern for all Basic page paths cannot contain fewer than one token.');
     $this->assertNoText('The configuration options have been saved.');
@@ -229,7 +229,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $edit['pathauto_node_pattern'] = '[node:title]';
     $edit['pathauto_node_page_pattern'] = 'page/[node:title]';
     $edit['pathauto_node_article_pattern'] = '';
-    $this->drupalPost('admin/config/search/path/patterns', $edit, 'Save configuration');
+    $this->drupalPostForm('admin/config/search/path/patterns', $edit, 'Save configuration');
     $this->assertText('The configuration options have been saved.');
   }
 
