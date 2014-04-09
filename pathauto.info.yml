@@ -6,3 +6,8 @@ type: module
 dependencies:
 - path
 - token
+
+configure: pathauto.patterns.form
+
+recommends:
+- redirect
