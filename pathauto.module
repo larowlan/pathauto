@@ -387,7 +387,14 @@ function pathauto_entity_language(EntityInterface $entity, $check_language_prope
 
 function pathauto_is_alias_reserved($alias, $source, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
   foreach (\Drupal::moduleHandler()->getImplementations('pathauto_is_alias_reserved') as $module) {
-    $result = module_invoke($module, 'pathauto_is_alias_reserved', $alias, $source, $langcode);
+    $args = array(
+      $alias,
+      $source,
+      $langcode,
+    );
+
+    $result = \Drupal::moduleHandler()->invoke($module, 'pathauto_is_alias_reserved', $args);
+
     if (!empty($result)) {
       // As soon as the first module says that an alias is in fact reserved,
       // then there is no point in checking the rest of the modules.
@@ -516,7 +523,7 @@ function pathauto_node_operations() {
  */
 function pathauto_node_update_alias(NodeInterface $node, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the node.
-  if (isset($node->path->pathauto) && empty($node->path->pathauto) && empty($options['force'])) {
+  if (isset($node->path['pathauto']) && empty($node->path['pathauto']) && empty($options['force'])) {
     return;
   }
 

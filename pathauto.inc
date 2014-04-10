@@ -54,38 +54,21 @@ define('PATHAUTO_PUNCTUATION_REPLACE', 1);
 define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
 
 /**
- * Check to see if there is already an alias pointing to a different item.
- *
- * @param $alias
- *   A string alias.
- * @param $source
- *   A string that is the internal path.
- * @param $langcode
- *   A string indicating the path's language.
- * @return
- *   TRUE if an alias exists, FALSE if not.
- *
- * @deprecated Use path_pathauto_is_alias_reserved() instead.
- */
-function _pathauto_alias_exists($alias, $source, $langcode = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
-  return path_pathauto_is_alias_reserved();
-}
-
-/**
  * Fetches an existing URL alias given a path and optional language.
  *
- * @param $source
+ * @param string $source
  *   An internal Drupal path.
- * @param $language
+ * @param string $language
  *   An optional language code to look up the path in.
- * @return
+ *
+ * @return bool|array
  *   FALSE if no alias was found or an associative array containing the
  *   following keys:
  *   - pid: Unique path alias identifier.
  *   - alias: The URL alias.
  */
-function _pathauto_existing_alias_data($source, $language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
-  $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND language IN (:language, :language_none) ORDER BY language DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => Language::LANGCODE_NOT_SPECIFIED))->fetchField();
+function _pathauto_existing_alias_data($source, $language = Language::LANGCODE_NOT_SPECIFIED) {
+  $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND langcode IN (:language, :language_none) ORDER BY langcode DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => Language::LANGCODE_NOT_SPECIFIED))->fetchField();
   return path_load(array('pid' => $pid));
 }
 
@@ -107,14 +90,14 @@ function _pathauto_existing_alias_data($source, $language = \Drupal\Core\Languag
  * This function should *not* be called on URL alias or path strings because it
  * is assumed that they are already clean.
  *
- * @param $string
+ * @param string $string
  *   A string to clean.
  * @param array $options
  *   (optional) A keyed array of settings and flags to control the Pathauto
  *   clean string replacement process. Supported options are:
  *   - langcode: A language code to be used when translating strings.
  *
- * @return
+ * @return string
  *   The cleaned string.
  */
 function pathauto_cleanstring($string, array $options = array()) {
@@ -245,11 +228,12 @@ function pathauto_cleanstring($string, array $options = array()) {
 /**
  * Trims duplicate, leading, and trailing separators from a string.
  *
- * @param $string
+ * @param string $string
  *   The string to clean path separators from.
- * @param $separator
+ * @param string $separator
  *   The path separator to use when cleaning.
- * @return
+ *
+ * @return string
  *   The cleaned version of the string.
  *
  * @see pathauto_cleanstring()
@@ -295,9 +279,10 @@ function _pathauto_clean_separators($string, $separator = NULL) {
  * - Trim duplicate, leading, and trailing separators.
  * - Shorten to a desired length and logical position based on word boundaries.
  *
- * @param $alias
+ * @param string $alias
  *   A string with the URL alias to clean up.
- * @return
+ *
+ * @return string
  *   The cleaned URL alias.
  */
 function pathauto_clean_alias($alias) {
@@ -330,32 +315,32 @@ function pathauto_clean_alias($alias) {
 /**
  * Apply patterns to create an alias.
  *
- * @param $module
+ * @param string $module
  *   The name of your module (e.g., 'node').
- * @param $op
+ * @param string $op
  *   Operation being performed on the content being aliased
  *   ('insert', 'update', 'return', or 'bulkupdate').
- * @param $source
+ * @param string $source
  *   An internal Drupal path to be aliased.
- * @param $data
+ * @param array $data
  *   An array of keyed objects to pass to token_replace(). For simple
  *   replacement scenarios 'node', 'user', and others are common keys, with an
  *   accompanying node or user object being the value. Some token types, like
  *   'site', do not require any explicit information from $data and can be
  *   replaced even if it is empty.
- * @param $type
+ * @param string $type
  *   For modules which provided pattern items in hook_pathauto(),
  *   the relevant identifier for the specific item to be aliased
  *   (e.g., $node->type).
- * @param $language
+ * @param string $language
  *   A string specify the path's language.
- * @return
+ *
+ * @return array|string
  *   The alias that was created.
  *
  * @see _pathauto_set_alias()
- * @see token_replace()
  */
-function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED) {
+function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $language = Language::LANGCODE_NOT_SPECIFIED) {
   $config = \Drupal::configFactory()->get('pathauto.settings');
 
   // Retrieve and apply the pattern for this content type.
@@ -454,11 +439,11 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
  * exists, the function will change the alias to 'content/test-0' and will
  * increase the number suffix until it finds a unique alias.
  *
- * @param $alias
+ * @param string $alias
  *   A string with the alias. Can be altered by reference.
- * @param $source
+ * @param string $source
  *   A string with the path source.
- * @param $langcode
+ * @param string $langcode
  *   A string with a language code.
  */
 function pathauto_alias_uniquify(&$alias, $source, $langcode) {
@@ -487,26 +472,36 @@ function pathauto_alias_uniquify(&$alias, $source, $langcode) {
  *
  * Taken from menu_execute_active_handler().
  *
- * @param $path
+ * @param string $path
  *   A string containing a relative path.
- * @return
+ *
+ * @return bool
  *   TRUE if the path already exists.
  */
 function _pathauto_path_is_callback($path) {
   // We need to use a try/catch here because of a core bug which will throw an
   // exception if $path is something like 'node/foo/bar'.
   // @todo Remove when http://drupal.org/node/1003788 is fixed in core.
-  try {
+  /*try {
     $menu = menu_get_item($path);
   }
   catch (Exception $e) {
     return FALSE;
-  }
+  }*/
 
-  if (isset($menu['path']) && $menu['path'] == $path) {
+  /*try {
+    $result = \Drupal::service('router')->match($path);
+    $result;
+  }
+  catch (ResourceNotFoundException $e) {
+    //throw new MatchingRouteNotFoundException(sprintf('No matching route could be found for the path "%s"', $path), 0, $e);
+    return FALSE;
+  }*/
+
+  /*if (isset($menu['path']) && $menu['path'] == $path) {
     return TRUE;
   }
-  elseif (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
+  else*/if (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
     // Do not allow existing files or directories to get assigned an automatic
     // alias. Note that we do not need to use is_link() to check for symbolic
     // links since this returns TRUE for either is_file() or is_dir() already.
@@ -524,14 +519,13 @@ function _pathauto_path_is_callback($path) {
  *   - alias: The URL alias.
  *   - pid: (optional) Unique path alias identifier.
  *   - language: (optional) The language of the alias.
- * @param $existing_alias
+ * @param array|bool $existing_alias
  *   (optional) An associative array of the existing path alias.
- * @param $op
+ * @param string $op
  *   An optional string with the operation being performed.
  *
- * @return
+ * @return array|bool
  *   The saved path or NULL if the path was not saved.
- *
  */
 function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
   $verbose = _pathauto_verbose(NULL, $op);
@@ -569,11 +563,20 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
     }
 
     // Save the path array.
-    Drupal::service('path.alias_storage')->save($path);
+    Drupal::service('path.alias_storage')->save($path['source'], $path['alias']);
 
     if ($verbose) {
       if (!empty($existing_alias['pid'])) {
-        _pathauto_verbose(t('Created new alias %alias for %source, replacing %old_alias.', array('%alias' => $path['alias'], '%source' => $path['source'], '%old_alias' => $existing_alias['alias'])));
+        _pathauto_verbose(
+          t(
+            'Created new alias %alias for %source, replacing %old_alias.',
+            array(
+              '%alias' => $path['alias'],
+              '%source' => $path['source'],
+              '%old_alias' => $existing_alias['alias'],
+            )
+          )
+        );
       }
       else {
         _pathauto_verbose(t('Created new alias %alias for %source.', array('%alias' => $path['alias'], '%source' => $path['source'])));
@@ -592,12 +595,13 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
  * - The current user has the 'notify of path changes' permission.
  * - The $op parameter is anything but 'bulkupdate' or 'return'.
  *
- * @param $message
+ * @param string $message
  *   An optional string of the verbose message to display. This string should
  *   already be run through t().
- * @param $op
+ * @param string $op
  *   An optional string with the operation being performed.
- * @return
+ *
+ * @return bool
  *   TRUE if verbose output is enabled, or FALSE otherwise.
  */
 function _pathauto_verbose($message = NULL, $op = NULL) {
@@ -713,7 +717,7 @@ function pathauto_punctuation_chars() {
 /**
  * Fetch the maximum length of the {url_alias}.alias field from the schema.
  *
- * @return
+ * @return int
  *   An integer of the maximum URL alias length allowed by the database.
  */
 function _pathauto_get_schema_alias_maxlength() {
