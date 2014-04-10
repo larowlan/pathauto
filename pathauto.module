@@ -727,8 +727,9 @@ function pathauto_user_update(&$edit, $account, $category) {
  * Implements hook_user_delete().
  */
 function pathauto_user_delete($account) {
-  pathauto_entity_path_delete_all('user', $account, "user/{$account->uid}");
-  pathauto_path_delete_all("blog/{$account->uid}");
+  pathauto_entity_path_delete_all($account, $account->getSystemPath());
+  $id = $account->id();
+  pathauto_path_delete_all("blog/" . $account->id());
 }
 
 /**
