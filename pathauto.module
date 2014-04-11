@@ -311,7 +311,7 @@ function pathauto_field_attach_form(EntityInterface $entity, &$form, &$form_stat
 /**
  * Implements hook_entity_presave().
  */
-function pathauto_entity_presave($entity, $type) {
+function pathauto_entity_presave($entity) {
   // About to be saved (before insert/update)
   if (!empty($entity->path['pathauto']) && isset($entity->path['old_alias'])
       && $entity->path['alias'] == '' && $entity->path['old_alias'] != '') {
@@ -371,6 +371,9 @@ function pathauto_action_info() {
  *   A boolean if TRUE, will attempt to fetch the language code from
  *   $entity->language if the entity_language() function failed or does not
  *   exist. Default is TRUE.
+ *
+ * @return null|string
+ *   Returns the language code.
  */
 function pathauto_entity_language(EntityInterface $entity, $check_language_property = TRUE) {
   $langcode = NULL;
@@ -596,7 +599,7 @@ function pathauto_taxonomy_term_update($term) {
  * Implements hook_taxonomy_term_delete().
  */
 function pathauto_taxonomy_term_delete($term) {
-  pathauto_entity_path_delete_all('taxonomy_term', $term, "taxonomy/term/{$term->tid}");
+  pathauto_entity_path_delete_all($term, "taxonomy/term/{$term->tid}");
 }
 
 /**
@@ -728,7 +731,6 @@ function pathauto_user_update(&$edit, $account, $category) {
  */
 function pathauto_user_delete($account) {
   pathauto_entity_path_delete_all($account, $account->getSystemPath());
-  $id = $account->id();
   pathauto_path_delete_all("blog/" . $account->id());
 }
 
