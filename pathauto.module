@@ -850,21 +850,3 @@ function pathauto_blog_update_alias(EntityInterface $account, $op, array $option
 /**
  * @} End of "name pathauto_user".
  */
-
-/**
- * Implements hook_menu_link_defaults().
- */
-function pathauto_menu_link_defaults() {
-  $links = array();
-
-  $links['admin/config/search/path/settings'] = array(
-    'description' => '',
-    'link_title' => 'Settings',
-    'parent' => 'system.admin.config',
-    'route_name' => 'pathauto.settings.form',
-  );
-
-
-
-  return $links;
-}

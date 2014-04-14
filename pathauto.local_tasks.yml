@@ -1,0 +1,19 @@
+pathauto.patterns.form:
+  route_name: pathauto.patterns.form
+  base_route: path.admin_overview
+  title: 'Patterns'
+
+pathauto.settings.form:
+  route_name: pathauto.settings.form
+  base_route: path.admin_overview
+  title: 'Settings'
+
+pathauto.bulk.update.form:
+  route_name: pathauto.bulk.update.form
+  base_route: path.admin_overview
+  title: 'Bulk generate'
+
+pathauto.admin.delete:
+  route_name: pathauto.admin.delete
+  base_route: path.admin_overview
+  title: 'Delete aliases'
