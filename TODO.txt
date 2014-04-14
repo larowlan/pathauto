@@ -1,10 +1,3 @@
-- patterns: pathauto.pattern.yml
-  Use nesting to make it better readable:
-  node:
-    _default: ...
-    article:
-     _default: ...
-  Then access as $config->get('node.article._default')
 - Update: pathauto_field_attach_rename_bundle => hook_entity_bundle_rename()
 
 - delete: pathauto_entity_language(), use $entity->language() instead

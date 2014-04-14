@@ -1,7 +1,3 @@
-node_pattern : 'content/[node:title]'
-taxonomy_term_pattern : '[term:vocabulary]/[term:name]'
-forum_pattern : '[term:vocabulary]/[term:name]'
-user_pattern : 'users/[user:name]'
 blog_pattern : 'blogs/[user:name]'
 punctuation_hyphen : 1
 verbose : FALSE
@@ -10,12 +6,8 @@ max_length : 100
 max_component_length: 100
 transliterate : FALSE
 reduce_ascii : FALSE
-node_story_en_pattern : ' story/en/[node:title] '
-node_story_pattern : 'story/[node:title]'
 ignore_words : ', in, is,that, the  , this, with, '
 case : 1
 ignore_words : 'a, an, as, at, before, but, by, for, from, is, in, into, like, of, off, on, onto, per, since, than, the, this, that, to, up, via, with'
-taxonomy_term_old_name_pattern : 'bundle'
-node_page_pattern : '[node:title]'
 punctuation_period : 2
 update_action : 2

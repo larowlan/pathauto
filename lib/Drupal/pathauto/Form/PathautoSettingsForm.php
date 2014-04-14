@@ -94,7 +94,7 @@ class PathautoSettingsForm extends ConfigFormBase {
     $form['pathauto_update_action'] = array(
       '#type' => 'radios',
       '#title' => t('Update action'),
-      /*'#default_value' => variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE),*/
+      '#default_value' => $config->get('update_action'),
       '#options' => array(
         PATHAUTO_UPDATE_ACTION_NO_NEW => t('Do nothing. Leave the old alias intact.'),
         PATHAUTO_UPDATE_ACTION_LEAVE => t('Create a new alias. Leave the existing alias functioning.'),

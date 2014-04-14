@@ -230,8 +230,8 @@ class PathautoUnitTest extends PathautoTestHelper {
    * Test the handling of path vs non-path tokens in pathauto_clean_token_values().
    */
   public function testPathTokens() {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
-    $config->set('taxonomy_term_pattern', '[term:parent:url:path]/[term:name]');
+    $config = \Drupal::configFactory()->get('pathauto.pattern');
+    $config->set('taxonomy_term._default', '[term:parent:url:path]/[term:name]');
     $config->save();
 
     $vocab = $this->addVocabulary();
@@ -248,12 +248,12 @@ class PathautoUnitTest extends PathautoTestHelper {
   }
 
   public function testEntityBundleRenamingDeleting() {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
+    $config = \Drupal::configFactory()->get('pathauto.pattern');
 
     // Create a vocabulary and test that it's pattern variable works.
     $vocab = $this->addVocabulary(array('machine_name' => 'old_name'));
-    $config->set('taxonomy_term_pattern', 'base');
-    $config->set("taxonomy_term_old_name_pattern", 'bundle');
+    $config->set('taxonomy_term._default', 'base');
+    $config->set("taxonomy_term.old_name", 'bundle');
     $config->save();
 
     $this->assertEntityPattern('taxonomy_term', 'old_name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
@@ -274,7 +274,7 @@ class PathautoUnitTest extends PathautoTestHelper {
   function testNoExistingPathAliases() {
     $config = \Drupal::configFactory()->get('pathauto.settings');
 
-    $config->set('node_page_pattern', '[node:title]');
+    $config->set('node.page._default', '[node:title]');
     $config->set('punctuation_period', PATHAUTO_PUNCTUATION_DO_NOTHING);
 
     // Check that Pathauto does not create an alias of '/admin'.

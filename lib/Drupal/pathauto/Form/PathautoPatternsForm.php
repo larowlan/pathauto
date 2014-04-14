@@ -25,7 +25,7 @@ class PathautoPatternsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $config = $this->configFactory->get('pathauto.settings');
+    $config = $this->configFactory->get('pathauto.pattern');
 
     $form = array();
 
@@ -45,11 +45,11 @@ class PathautoPatternsForm extends ConfigFormBase {
       );
 
       // Prompt for the default pattern for this module.
-      $variable = 'pathauto_' . $module . '_pattern';
+      $variable = $module . '._default';
       $form[$module][$variable] = array(
         '#type' => 'textfield',
         '#title' => $patterndescr,
-        // '#default_value' => variable_get($variable, $patterndefault),
+        '#default_value' => $config->get($variable),
         '#size' => 65,
         '#maxlength' => 1280,
         '#element_validate' => array('token_element_validate'),
@@ -63,7 +63,7 @@ class PathautoPatternsForm extends ConfigFormBase {
       // them up here.
       if (isset($settings->patternitems)) {
         foreach ($settings->patternitems as $itemname => $itemlabel) {
-          $variable = 'pathauto_' . $module . '_' . $itemname . '_pattern';
+          $variable = $module . '_' . $itemname . '._default';
           $form[$module][$variable] = array(
             '#type' => 'textfield',
             '#title' => $itemlabel,

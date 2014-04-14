@@ -1,0 +1,17 @@
+node:
+  _default: 'content/[node:title]'
+  page:
+    _default: '[node:title]'
+  story:
+    _default: 'story/[node:title]'
+    en: 'story/en/[node:title]'
+
+taxonomy_term:
+  _default: '[term:vocabulary]/[term:name]'
+  old_name:
+
+forum:
+  _default: '[term:vocabulary]/[term:name]'
+
+user:
+  _default: 'users/[user:name]'

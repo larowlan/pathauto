@@ -111,7 +111,7 @@ function pathauto_permission() {
  *   A language code, defaults to the LANGUAGE_NONE constant.
  */
 function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = Language::LANGCODE_NOT_SPECIFIED) {
-  $config = \Drupal::configFactory()->get('pathauto.settings');
+  $config = \Drupal::configFactory()->get('pathauto.pattern');
 
   $patterns = &drupal_static(__FUNCTION__, array());
 
@@ -119,12 +119,12 @@ function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = Lang
   if (!isset($patterns[$pattern_id])) {
     $variables = array();
     if ($language != Language::LANGCODE_NOT_SPECIFIED) {
-      $variables[] = "{$entity}_{$bundle}_{$language}_pattern";
+      $variables[] = "{$entity}.{$bundle}.{$language}";
     }
     if ($bundle) {
-      $variables[] = "{$entity}_{$bundle}_pattern";
+      $variables[] = "{$entity}.{$bundle}._default";
     }
-    $variables[] = "{$entity}_pattern";
+    $variables[] = "{$entity}._default";
 
     foreach ($variables as $variable) {
       if ($pattern = trim($config->get($variable))) {
