@@ -1,0 +1,50 @@
+- UI: Define local_tasks.yml, remove pathauto_menu_link_defaults()
+- patterns: pathauto.pattern.yml
+  Use nesting to make it better readable:
+  node:
+    _default: ...
+    article:
+     _default: ...
+  Then access as $config->get('node.article._default')
+- Update: pathauto_field_attach_rename_bundle => hook_entity_bundle_rename()
+
+- delete: pathauto_entity_language(), use $entity->language() instead
+- delete: path_field_extra_fields
+- delete: pathauto_*_operations()
+- delete: references to blog module, pathauto_blog_update_alias
+
+- Convert Unit tests to DrupalUnitTestBase
+
+- transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists
+  Add a test
+
+- Create pathauto.manager => \Drupal\pathauto\PathAutoManager
+  pathauto_cleanstring() => public cleanString()
+  _pathauto_clean_separators => protected getCleanSeparators()
+  pathauto_clean_alias() => public cleanAlias()
+  pathauto_create_alias() => createAlias()
+
+- Update: pathauto_entity_presave, use $entity->path->...
+
+- pathauto_field_attach_form => Widget
+  https://drupal.org/node/2201051
+  PathAutoWidget
+  hook_entity_base_field_info_alter()
+  Remove pathauto_form_node_form_alter()
+
+- pathauto_action_info() => Plugin
+  \Drupal\node\Plugin\Action\PromoteNode
+
+- Convert node/term hooks/functions to entity
+  *_entity_* instead of *_node_*
+  if ($entity instanceof ContentEntityInterface && $entity->hasfield('path'))
+  Tests need to be updated
+
+- INSTALL.txt: Update
+- Settings forms: implement submitForm()
+
+Later:
+- Move functions that do sql to alias storage sub-class/service?
+- pathauto_path_alias_types() => Plugins
+
+
