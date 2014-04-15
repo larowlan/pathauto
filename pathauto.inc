@@ -11,6 +11,7 @@
  *
  * @ingroup pathauto
  */
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Language\Language;
 
 /**
@@ -200,7 +201,7 @@ function pathauto_cleanstring($string, array $options = array()) {
   // Get rid of words that are on the ignore list.
   if ($cache['ignore_words_regex']) {
     $words_removed = $cache['ignore_words_callback']($cache['ignore_words_regex'], '', $output);
-    if (drupal_strlen(trim($words_removed)) > 0) {
+    if (Unicode::strlen(trim($words_removed)) > 0) {
       $output = $words_removed;
     }
   }
@@ -213,7 +214,7 @@ function pathauto_cleanstring($string, array $options = array()) {
 
   // Optionally convert to lower case.
   if ($cache['lowercase']) {
-    $output = drupal_strtolower($output);
+    $output = Unicode::strtolower($output);
   }
 
   // Shorten to a logical place based on word boundaries.
@@ -402,7 +403,7 @@ function pathauto_create_alias($module, $op, $source, $data, $type = NULL, $lang
   \Drupal::moduleHandler()->alter('pathauto_alias', $alias, $context);
 
   // If we have arrived at an empty string, discontinue.
-  if (!drupal_strlen($alias)) {
+  if (!Unicode::strlen($alias)) {
     return '';
   }
 
@@ -462,7 +463,7 @@ function pathauto_alias_uniquify(&$alias, $source, $langcode) {
   do {
     // Append an incrementing numeric suffix until we find a unique alias.
     $unique_suffix = $separator . $i;
-    $alias = truncate_utf8($original_alias, $maxlength - drupal_strlen($unique_suffix, TRUE)) . $unique_suffix;
+    $alias = truncate_utf8($original_alias, $maxlength - Unicode::strlen($unique_suffix, TRUE)) . $unique_suffix;
     $i++;
   } while (pathauto_is_alias_reserved($alias, $source, $langcode));
 }
