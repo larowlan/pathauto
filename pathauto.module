@@ -313,7 +313,7 @@ function pathauto_field_attach_form(EntityInterface $entity, &$form, &$form_stat
  */
 function pathauto_entity_presave($entity) {
   // About to be saved (before insert/update)
-  if (!empty($entity->path['pathauto']) && isset($entity->path['old_alias'])
+  if (!empty($entity->path->pathauto) && isset($entity->path['old_alias'])
       && $entity->path['alias'] == '' && $entity->path['old_alias'] != '') {
     /*
      * There was an old alias, but when pathauto_perform_alias was checked
@@ -328,7 +328,7 @@ function pathauto_entity_presave($entity) {
   // path['alias'] as an empty string.
   // @see http://drupal.org/node/1328180
   // @see http://drupal.org/node/1576552
-  if (isset($entity->path['pathauto']) && !isset($entity->path['alias'])) {
+  if (isset($entity->path->pathauto) && !isset($entity->path['alias'])) {
     $entity->path['alias'] = '';
   }
 }
@@ -526,7 +526,7 @@ function pathauto_node_operations() {
  */
 function pathauto_node_update_alias(NodeInterface $node, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the node.
-  if (isset($node->path['pathauto']) && empty($node->path['pathauto']) && empty($options['force'])) {
+  if (isset($node->path->pathauto) && empty($node->path->pathauto) && empty($options['force'])) {
     return;
   }
 
@@ -625,7 +625,7 @@ function pathauto_form_taxonomy_form_term_alter(&$form, $form_state) {
  */
 function pathauto_taxonomy_term_update_alias(TermInterface $term, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the term.
-  if (isset($term->path['pathauto']) && empty($term->path['pathauto']) && empty($options['force'])) {
+  if (isset($term->path->pathauto) && empty($term->path->pathauto) && empty($options['force'])) {
     return;
   }
 
@@ -759,7 +759,7 @@ function pathauto_user_operations() {
  */
 function pathauto_user_update_alias(EntityInterface $account, $op, array $options = array()) {
   // Skip processing if the user has disabled pathauto for the account.
-  if (isset($account->path['pathauto']) && empty($account->path['pathauto']) && empty($options['force'])) {
+  if (isset($account->path->pathauto) && empty($account->path->pathauto) && empty($options['force'])) {
     return;
   }
 
