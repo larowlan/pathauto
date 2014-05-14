@@ -188,22 +188,19 @@ function pathauto_entity_path_delete_all(EntityInterface $entity, $default_uri =
   }
 }
 
+
 /**
- * Implements hook_field_attach_rename_bundle().
- *
- * Respond to machine name changes for pattern variables.
+ * Implements hook_entity_bundle_rename().
  */
-function pathauto_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
-  $variables = db_select('variable', 'v')
-    ->fields('v', array('name'))
-    ->condition('name', db_like("pathauto_{$entity_type}_{$bundle_old}_") . '%', 'LIKE')
-    ->execute()
-    ->fetchCol();
-  foreach ($variables as $variable) {
-    $value = variable_get($variable, '');
-    variable_del($variable);
-    $variable = strtr($variable, array("{$entity_type}_{$bundle_old}" => "{$entity_type}_{$bundle_new}"));
-    variable_set($variable, $value);
+function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new) {
+  $config = \Drupal::configFactory()->get('pathauto.pattern');
+  $bundle_settings = $config->get($entity_type_id);
+
+  if (isset($bundle_settings[$bundle_old])) {
+    $bundle_settings[$bundle_new] = $bundle_settings[$bundle_old];
+    unset($bundle_settings[$bundle_old]);
+    $config->set($entity_type_id, $bundle_settings);
+    $config->save();
   }
 }
 
