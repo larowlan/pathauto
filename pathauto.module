@@ -356,34 +356,6 @@ function pathauto_action_info() {
   return $info;
 }
 
-/**
- * Returns the language code of the given entity.
- *
- * Backward compatibility layer to ensure that installations running an older
- * version of core where entity_language() is not avilable do not break.
- *
- * @param EntityInterface $entity
- *   An entity object.
- * @param bool $check_language_property
- *   A boolean if TRUE, will attempt to fetch the language code from
- *   $entity->language if the entity_language() function failed or does not
- *   exist. Default is TRUE.
- *
- * @return null|string
- *   Returns the language code.
- */
-function pathauto_entity_language(EntityInterface $entity, $check_language_property = TRUE) {
-  $langcode = NULL;
-
-  if (function_exists('entity_language')) {
-    $langcode = entity_language($entity->getEntityType(), $entity);
-  }
-  elseif ($check_language_property && !empty($entity->language)) {
-    $langcode = $entity->language;
-  }
-
-  return !empty($langcode) ? $langcode : Language::LANGCODE_NOT_SPECIFIED;
-}
 
 function pathauto_is_alias_reserved($alias, $source, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
   foreach (\Drupal::moduleHandler()->getImplementations('pathauto_is_alias_reserved') as $module) {
@@ -459,7 +431,7 @@ function pathauto_node_delete($node) {
  */
 function pathauto_form_node_form_alter(&$form, &$form_state) {
   $node = $form_state['controller']->getEntity();
-  $langcode = pathauto_entity_language($node);
+  $langcode = $node->language();
   pathauto_field_attach_form($node, $form, $form_state, $langcode);
 }
 
@@ -491,7 +463,7 @@ function pathauto_node_update_alias(NodeInterface $node, $op, array $options = a
     return;
   }
 
-  $options += array('language' => pathauto_entity_language($node));
+  $options += array('language' => $node->language());
 
   // Skip processing if the node has no pattern.
   if (!pathauto_pattern_load_by_entity('node', $node->getType(), $options['language'])) {
@@ -570,7 +542,7 @@ function pathauto_taxonomy_term_delete($term) {
  */
 function pathauto_form_taxonomy_form_term_alter(&$form, $form_state) {
   $term = $form_state['controller']->getEntity();
-  $langcode = pathauto_entity_language($term);
+  $langcode = $term->language();
   pathauto_field_attach_form($term, $form, $form_state, $langcode);
 }
 
@@ -610,7 +582,7 @@ function pathauto_taxonomy_term_update_alias(TermInterface $term, $op, array $op
 
   $options += array(
     'alias children' => FALSE,
-    'language' => pathauto_entity_language($term),
+    'language' => $term->language(),
   );
 
   // Skip processing if the term has no pattern.
@@ -726,7 +698,7 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
   $options += array(
     // $user->language is not the user entity language, thus we need to skip
     // the property fallback check.
-    'language' => pathauto_entity_language($account, FALSE),
+    'language' => $account->language(),
   );
 
   // Skip processing if the account has no pattern.
