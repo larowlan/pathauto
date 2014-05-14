@@ -2,7 +2,6 @@
 
 - delete: pathauto_entity_language(), use $entity->language() instead
 - delete: pathauto_*_operations()
-- delete: references to blog module, pathauto_blog_update_alias
 
 - Convert Unit tests to DrupalUnitTestBase
 

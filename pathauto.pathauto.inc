@@ -15,9 +15,6 @@
 function pathauto_path_alias_types() {
   $objects['user/'] = t('Users');
   $objects['node/'] = t('Content');
-  if (\Drupal::moduleHandler()->moduleExists('blog')) {
-    $objects['blog/'] = t('User blogs');
-  }
   if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
     $objects['taxonomy/term/'] = t('Taxonomy terms');
   }
@@ -320,77 +317,10 @@ function user_pathauto_bulk_update_batch_process(&$context) {
   $query->range(0, 25);
   $uids = $query->execute()->fetchCol();
 
-  pathauto_user_update_alias_multiple($uids, 'bulkupdate', array('alias blog' => FALSE));
+  pathauto_user_update_alias_multiple($uids, 'bulkupdate', array());
   $context['sandbox']['count'] += count($uids);
   $context['sandbox']['current'] = max($uids);
   $context['message'] = t('Updated alias for user @uid.', array('@uid' => end($uids)));
-
-  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
-    $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
-  }
-}
-
-/**
- * Implements hook_pathauto().
- */
-function blog_pathauto($op) {
-  switch ($op) {
-    case 'settings':
-      $settings = array();
-      $settings['module'] = 'blog';
-      $settings['token_type'] = 'user';
-      $settings['groupheader'] = t('Blog paths');
-      $settings['patterndescr'] = t('Pattern for blog page paths');
-      $settings['patterndefault'] = 'blogs/[user:name]';
-      $settings['batch_update_callback'] = 'blog_pathauto_bulk_update_batch_process';
-      $settings['batch_file'] = drupal_get_path('module', 'pathauto') . '/pathauto.pathauto.inc';
-      return (object) $settings;
-
-    default:
-      break;
-  }
-}
-
-/**
- * Batch processing callback; Generate aliases for blogs.
- */
-function blog_pathauto_bulk_update_batch_process(&$context) {
-  if (!isset($context['sandbox']['current'])) {
-    $context['sandbox']['count'] = 0;
-    $context['sandbox']['current'] = 0;
-  }
-
-  $query = db_select('users', 'u');
-  $query->leftJoin('url_alias', 'ua', "CONCAT('blog/', u.uid) = ua.source");
-  $query->addField('u', 'uid');
-  $query->isNull('ua.source');
-  $query->condition('u.uid', $context['sandbox']['current'], '>');
-  $query->orderBy('u.uid');
-  $query->addTag('pathauto_bulk_update');
-  $query->addMetaData('entity', 'user');
-
-  // Get the total amount of items to process.
-  if (!isset($context['sandbox']['total'])) {
-    $context['sandbox']['total'] = $query->countQuery()->execute()->fetchField();
-
-    // If there are no nodes to update, the stop immediately.
-    if (!$context['sandbox']['total']) {
-      $context['finished'] = 1;
-      return;
-    }
-  }
-
-  $query->range(0, 25);
-  $uids = $query->execute()->fetchCol();
-
-  $accounts = user_load_multiple($uids);
-  foreach ($accounts as $account) {
-    pathauto_blog_update_alias($account, 'bulkupdate');
-  }
-
-  $context['sandbox']['count'] += count($uids);
-  $context['sandbox']['current'] = max($uids);
-  $context['message'] = t('Updated alias for blog user @uid.', array('@uid' => end($uids)));
 
   if ($context['sandbox']['count'] != $context['sandbox']['total']) {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];

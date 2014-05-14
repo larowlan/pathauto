@@ -49,7 +49,7 @@ function pathauto_hook_info() {
  */
 function pathauto_module_implements_alter(&$implementations, $hook) {
   if (in_array($hook, array('pathauto', 'path_alias_types'))) {
-    $modules = array('node', 'taxonomy', 'user', 'forum', 'blog');
+    $modules = array('node', 'taxonomy', 'user', 'forum');
     foreach ($modules as $module) {
       if (\Drupal::moduleHandler()->moduleExists($module)) {
         $implementations[$module] = TRUE;
@@ -672,7 +672,7 @@ function pathauto_taxonomy_term_update_action($term, $context = array()) {
  */
 
 /**
- * @name pathauto_user Pathauto integration for the core user and blog modules.
+ * @name pathauto_user Pathauto integration for the core user module.
  * @{
  */
 
@@ -695,7 +695,6 @@ function pathauto_user_update(&$edit, $account, $category) {
  */
 function pathauto_user_delete($account) {
   pathauto_entity_path_delete_all($account, $account->getSystemPath());
-  pathauto_path_delete_all("blog/" . $account->id());
 }
 
 /**
@@ -728,7 +727,6 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
   }
 
   $options += array(
-    'alias blog' => \Drupal::moduleHandler()->moduleExists('blog'),
     // $user->language is not the user entity language, thus we need to skip
     // the property fallback check.
     'language' => pathauto_entity_language($account, FALSE),
@@ -741,11 +739,6 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
 
   module_load_include('inc', 'pathauto');
   $return = pathauto_create_alias('user', $op, $account->getSystemPath(), array('user' => $account), NULL, $options['language']);
-
-  // Because blogs are also associated with users, also generate the blog paths.
-  if (!empty($options['alias blog'])) {
-    pathauto_blog_update_alias($account, $op, $options);
-  }
 
   return $return;
 }
@@ -779,36 +772,6 @@ function pathauto_user_update_alias_multiple(array $uids, $op, array $options = 
  */
 function pathauto_user_update_action($account, $context = array()) {
   pathauto_user_update_alias($account, 'bulkupdate', array('message' => TRUE));
-}
-
-/**
- * Update the blog URL aliases for an individual user account.
- *
- * @param EntityInterface $account
- *   A user account object.
- * @param string $op
- *   Operation being performed on the blog ('insert', 'update' or
- *   'bulkupdate').
- * @param array $options
- *   An optional array of additional options.
- */
-function pathauto_blog_update_alias(EntityInterface $account, $op, array $options = array()) {
-  // Skip processing if the blog has no pattern.
-  if (!pathauto_pattern_load_by_entity('blog')) {
-    return;
-  }
-
-  $options += array(
-    'language' => Language::LANGCODE_NOT_SPECIFIED,
-  );
-
-  module_load_include('inc', 'pathauto');
-  if (node_access('create', 'blog', $account)) {
-    return pathauto_create_alias('blog', $op, "blog/{$account->id()}", array('user' => $account), NULL, $options['language']);
-  }
-  else {
-    pathauto_path_delete_all("blog/{$account->id()}");
-  }
 }
 
 /**

@@ -1,4 +1,3 @@
-blog_pattern : 'blogs/[user:name]'
 punctuation_hyphen : 1
 verbose : FALSE
 separator : '-'
