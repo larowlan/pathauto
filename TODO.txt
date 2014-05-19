@@ -9,8 +9,6 @@
   pathauto_clean_alias() => public cleanAlias()
   pathauto_create_alias() => createAlias()
 
-- Update: pathauto_entity_presave, use $entity->path->...
-
 - pathauto_action_info() => Plugin
   \Drupal\node\Plugin\Action\PromoteNode
 

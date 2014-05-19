@@ -228,23 +228,23 @@ function pathauto_field_attach_delete_bundle($entity_type, $bundle) {
  */
 function pathauto_entity_presave($entity) {
   // About to be saved (before insert/update)
-  if (!empty($entity->path->pathauto) && isset($entity->path['old_alias'])
-      && $entity->path['alias'] == '' && $entity->path['old_alias'] != '') {
+  if (!empty($entity->path->pathauto) && isset($entity->path->old_alias)
+      && $entity->path->alias == '' && $entity->path->old_alias != '') {
     /*
      * There was an old alias, but when pathauto_perform_alias was checked
      * the javascript disabled the textbox which led to an empty value being
      * submitted. Restoring the old path-value here prevents the Path module
      * from deleting any old alias before Pathauto gets control.
      */
-    $entity->path['alias'] = $entity->path['old_alias'];
+    $entity->path->alias = $entity->path->old_alias;
   }
 
   // Help prevent errors with progromatically creating entities by defining
   // path['alias'] as an empty string.
   // @see http://drupal.org/node/1328180
   // @see http://drupal.org/node/1576552
-  if (isset($entity->path->pathauto) && !isset($entity->path['alias'])) {
-    $entity->path['alias'] = '';
+  if (isset($entity->path->pathauto) && !isset($entity->path->alias)) {
+    $entity->path->alias = '';
   }
 }
 
