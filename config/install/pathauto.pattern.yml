@@ -2,13 +2,13 @@ node:
   _default: 'content/[node:title]'
   page:
     _default: '[node:title]'
-  story:
-    _default: 'story/[node:title]'
-    en: 'story/en/[node:title]'
+  article:
+    _default: 'article/[node:title]'
+    en: 'article/en/[node:title]'
 
 taxonomy_term:
   _default: '[term:vocabulary]/[term:name]'
-  old_name:
+  old_name: ''
 
 forum:
   _default: '[term:vocabulary]/[term:name]'

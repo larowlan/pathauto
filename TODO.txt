@@ -13,12 +13,6 @@
 
 - Update: pathauto_entity_presave, use $entity->path->...
 
-- pathauto_field_attach_form => Widget
-  https://drupal.org/node/2201051
-  PathAutoWidget
-  hook_entity_base_field_info_alter()
-  Remove pathauto_form_node_form_alter()
-
 - pathauto_action_info() => Plugin
   \Drupal\node\Plugin\Action\PromoteNode
 

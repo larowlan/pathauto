@@ -18,10 +18,12 @@
 
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * The default ignore word list.
@@ -220,90 +222,6 @@ function pathauto_field_attach_delete_bundle($entity_type, $bundle) {
   }
 }
 
-/**
- * Implements hook_field_attach_form().
- *
- * Add the automatic alias form elements to an existing path form fieldset.
- */
-function pathauto_field_attach_form(EntityInterface $entity, &$form, &$form_state, $langcode) {
-
-  if (!isset($form['path'])) {
-    // This entity must be supported by core's path.module first.
-    // @todo Investigate removing this and supporting all fieldable entities.
-    return;
-  }
-  else {
-    // Taxonomy terms do not have an actual fieldset for path settings.
-    // Merge in the defaults.
-    $form['path'] += array(
-      '#type' => 'fieldset',
-      '#title' => t('URL path settings'),
-      '#collapsible' => TRUE,
-      '#collapsed' => empty($form['path']['alias']),
-      '#group' => 'additional_settings',
-      '#attributes' => array(
-        'class' => array('path-form'),
-      ),
-      '#access' => \Drupal::currentUser()->hasPermission('create url aliases') || \Drupal::currentUser()->hasPermission('administer url aliases'),
-      '#weight' => 30,
-      '#tree' => TRUE,
-      '#element_validate' => array('path_form_element_validate'),
-    );
-  }
-
-  $pattern = pathauto_pattern_load_by_entity($entity->id(), $entity->bundle(), $langcode);
-  if (empty($pattern)) {
-    return;
-  }
-
-  if (!isset($entity->path['pathauto'])) {
-    if (!empty($id)) {
-      module_load_include('inc', 'pathauto');
-      $path = Drupal::service('path.alias_manager.cached')->getPathAlias($entity->getSystemPath(), $langcode);
-      $pathauto_alias = pathauto_create_alias($entity->getEntityType(), 'return', $entity->getSystemPath(), array($entity->getEntityType() => $entity), $entity->bundle(), $langcode);
-      $entity->path['pathauto'] = ($path != $entity->getSystemPath() && $path == $pathauto_alias);
-    }
-    else {
-      $entity->path['pathauto'] = TRUE;
-    }
-  }
-
-  // Add JavaScript that will disable the path textfield when the automatic
-  // alias checkbox is checked.
-  $form['path']['alias']['#states']['!enabled']['input[name="path[pathauto]"]'] = array('checked' => TRUE);
-
-  // Override path.module's vertical tabs summary.
-  $form['path']['#attached']['js'] = array(
-    'vertical-tabs' => drupal_get_path('module', 'pathauto') . '/pathauto.js',
-  );
-
-  $form['path']['pathauto'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Generate automatic URL alias'),
-    '#default_value' => $entity->path->pathauto,
-    '#description' => t('Uncheck this to create a custom alias below.'),
-    '#weight' => -1,
-  );
-
-  // Add a shortcut link to configure URL alias patterns.
-  if (drupal_valid_path('admin/config/search/path/patterns')) {
-    $form['path']['pathauto']['#description'] .= ' ' . l(t('Configure URL alias patterns.'), 'admin/config/search/path/patterns');
-  }
-
-  if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
-    $form['path']['alias']['#default_value'] = $entity->old_alias;
-    $entity->path->alias = $entity->old_alias;
-  }
-
-  // For Pathauto to remember the old alias and prevent the Path module from
-  // deleting it when Pathauto wants to preserve it.
-  if (!empty($entity->path->alias)) {
-    $form['path']['old_alias'] = array(
-      '#type' => 'value',
-      '#value' => $entity->path->alias,
-    );
-  }
-}
 
 /**
  * Implements hook_entity_presave().
@@ -424,16 +342,6 @@ function pathauto_node_delete($node) {
   pathauto_entity_path_delete_all($node, "node/{$node->id()}");
 }
 
-/**
- * Implements hook_form_BASE_FORM_ID_alter().
- *
- * Add the Pathauto settings to the node form.
- */
-function pathauto_form_node_form_alter(&$form, &$form_state) {
-  $node = $form_state['controller']->getEntity();
-  $langcode = $node->language();
-  pathauto_field_attach_form($node, $form, $form_state, $langcode);
-}
 
 /**pathauto_user_insert
  * Implements hook_node_operations().
@@ -535,16 +443,6 @@ function pathauto_taxonomy_term_delete($term) {
   pathauto_entity_path_delete_all($term, "taxonomy/term/{$term->tid}");
 }
 
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * Add the Pathauto settings to the taxonomy term form.
- */
-function pathauto_form_taxonomy_form_term_alter(&$form, $form_state) {
-  $term = $form_state['controller']->getEntity();
-  $langcode = $term->language();
-  pathauto_field_attach_form($term, $form, $form_state, $langcode);
-}
 
 /**
  * Update the URL aliases for an individual taxonomy term.
@@ -746,3 +644,16 @@ function pathauto_user_update_action($account, $context = array()) {
 /**
  * @} End of "name pathauto_user".
  */
+
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function pathauto_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
+  if (isset($fields['path']) && $fields['path']->getType() == 'path') {
+    $fields['path']->setDisplayOptions('form', array(
+      'type' => 'pathauto',
+      'weight' => 30,
+    ));
+  }
+}
