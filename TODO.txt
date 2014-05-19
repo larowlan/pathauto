@@ -1,5 +1,3 @@
-- delete: pathauto_*_operations()
-
 - Convert Unit tests to DrupalUnitTestBase
 
 - transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists

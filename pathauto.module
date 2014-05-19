@@ -343,18 +343,6 @@ function pathauto_node_delete($node) {
 }
 
 
-/**pathauto_user_insert
- * Implements hook_node_operations().
- */
-function pathauto_node_operations() {
-  $operations['pathauto_update_alias'] = array(
-    'label' => t('Update URL alias'),
-    'callback' => 'pathauto_node_update_alias_multiple',
-    'callback arguments' => array('bulkupdate', array('message' => TRUE)),
-  );
-  return $operations;
-}
-
 /**
  * Update the URL aliases for an individual node.
  *
@@ -564,17 +552,6 @@ function pathauto_user_delete($account) {
   pathauto_entity_path_delete_all($account, $account->getSystemPath());
 }
 
-/**
- * Implements hook_user_operations().
- */
-function pathauto_user_operations() {
-  $operations['pathauto_update_alias'] = array(
-    'label' => t('Update URL alias'),
-    'callback' => 'pathauto_user_update_alias_multiple',
-    'callback arguments' => array('bulkupdate', array('message' => TRUE)),
-  );
-  return $operations;
-}
 
 /**
  * Update the URL aliases for an individual user account.
