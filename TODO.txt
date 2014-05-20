@@ -3,12 +3,6 @@
 - transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists
   Add a test
 
-- Create pathauto.manager => \Drupal\pathauto\PathAutoManager
-  pathauto_cleanstring() => public cleanString()
-  _pathauto_clean_separators => protected getCleanSeparators()
-  pathauto_clean_alias() => public cleanAlias()
-  pathauto_create_alias() => createAlias()
-
 - pathauto_action_info() => Plugin
   \Drupal\node\Plugin\Action\PromoteNode
 

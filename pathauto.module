@@ -18,9 +18,7 @@
 
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -43,6 +41,7 @@ function pathauto_hook_info() {
   );
   return array_fill_keys($hooks, array('group' => 'pathauto'));
 }
+
 
 /**
  * Implements hook_module_implements_alter().
@@ -367,7 +366,7 @@ function pathauto_node_update_alias(NodeInterface $node, $op, array $options = a
   }
 
   module_load_include('inc', 'pathauto');
-  return pathauto_create_alias('node', $op, $node->getSystemPath(), array('node' => $node), $node->getType(), $options['language']);
+  return \Drupal::service('pathauto.manager')->createAlias('node', $op, $node->getSystemPath(), array('node' => $node), $node->getType(), $options['language']);
 }
 
 /**
@@ -477,7 +476,7 @@ function pathauto_taxonomy_term_update_alias(TermInterface $term, $op, array $op
   }
 
   module_load_include('inc', 'pathauto');
-  $result = pathauto_create_alias($module, $op, $term->getSystemPath(), array('term' => $term), $term->vocabulary_machine_name, $options['language']);
+  $result = \Drupal::service('pathauto.manager')->createAlias($module, $op, $term->getSystemPath(), array('term' => $term), $term->vocabulary_machine_name, $options['language']);
 
   if (!empty($options['alias children'])) {
     // For all children generate new aliases.
@@ -582,7 +581,7 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
   }
 
   module_load_include('inc', 'pathauto');
-  $return = pathauto_create_alias('user', $op, $account->getSystemPath(), array('user' => $account), NULL, $options['language']);
+  $return = \Drupal::service('pathauto.manager')->createAlias('user', $op, $account->getSystemPath(), array('user' => $account), NULL, $options['language']);
 
   return $return;
 }

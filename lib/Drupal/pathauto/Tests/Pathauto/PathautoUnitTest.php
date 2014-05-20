@@ -110,8 +110,8 @@ class PathautoUnitTest extends PathautoTestHelper {
     $tests[String::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
 
     foreach ($tests as $input => $expected) {
-      $output = pathauto_cleanstring($input);
-      $this->assertEqual($output, $expected, t("pathauto_cleanstring('@input') expected '@expected', actual '@output'", array(
+      $output = \Drupal::service('pathauto.manager')->cleanString($input);
+      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.manager')->cleanString('@input') expected '@expected', actual '@output'", array(
         '@input' => $input,
         '@expected' => $expected,
         '@output' => $output,
@@ -131,8 +131,8 @@ class PathautoUnitTest extends PathautoTestHelper {
     $tests['one/-//three--/four'] = 'one/three/four';
 
     foreach ($tests as $input => $expected) {
-      $output = pathauto_clean_alias($input);
-      $this->assertEqual($output, $expected, t("pathauto_clean_alias('@input') expected '@expected', actual '@output'", array(
+      $output = \Drupal::service('pathauto.manager')->cleanAlias($input);
+      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.manager')->cleanAlias('@input') expected '@expected', actual '@output'", array(
         '@input' => $input,
         '@expected' => $expected,
         '@output' => $output,
@@ -157,7 +157,7 @@ class PathautoUnitTest extends PathautoTestHelper {
   }
 
   /**
-   * Test the different update actions in pathauto_create_alias().
+   * Test the different update actions in \Drupal::service('pathauto.manager')->createAlias().
    */
   public function testUpdateActions() {
     $config = \Drupal::configFactory()->get('pathauto.settings');
@@ -214,7 +214,7 @@ class PathautoUnitTest extends PathautoTestHelper {
   }
 
   /**
-   * Test that pathauto_create_alias() will not create an alias for a pattern
+   * Test that \Drupal::service('pathauto.manager')->createAlias() will not create an alias for a pattern
    * that does not get any tokens replaced.
    */
   public function testNoTokensNoAlias() {

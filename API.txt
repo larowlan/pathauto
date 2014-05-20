@@ -64,11 +64,11 @@ bulkdescr - For modules which support a bulk update operation, a
 
 
 ==================
-2 - $alias = pathauto_create_alias($module, $op, $placeholders, $src, $type=NULL)
+2 - $alias = \Drupal::service('pathauto.manager')->createAlias($module, $op, $placeholders, $src, $type=NULL)
 ==================
 
 At the appropriate time (usually when a new item is being created for
-which a generated alias is desired), call pathauto_create_alias() to
+which a generated alias is desired), call \Drupal::service('pathauto.manager')->createAlias() to
 generate and create the alias.  See the user, taxonomy, and nodeapi hook
 implementations in pathauto.module for examples.
 
@@ -77,19 +77,19 @@ $op - Operation being performed on the item ('insert', 'update', or
   'bulkupdate')
 $placeholders - An array whose keys consist of the translated placeholders
   which appear in patterns and values are the "clean" values to be
-  substituted into the pattern. Call pathauto_cleanstring() on any
+  substituted into the pattern. Call \Drupal::service('pathauto.manager')->cleanString() on any
   values which you do not know to be purely alphanumeric, to substitute
   any non-alphanumerics with the user's designated separator. Note that
   if the pattern has multiple slash-separated components (e.g., [term:path]),
-  pathauto_cleanstring() should be called for each component, not the
+  \Drupal::service('pathauto.manager')->cleanString() should be called for each component, not the
   complete string.
-  Example: $placeholders[t('[title]')] = pathauto_cleanstring($node->title);
+  Example: $placeholders[t('[title]')] = \Drupal::service('pathauto.manager')->cleanString($node->title);
 $src - The "real" URI of the content to be aliased (e.g., "node/$node->nid")
 $type - For modules which provided patternitems in hook_autopath(),
   the relevant identifier for the specific item to be aliased (e.g.,
   $node->type)
 
-pathauto_create_alias() returns the alias that was created.
+\Drupal::service('pathauto.manager')->createAlias() returns the alias that was created.
 
 
 ==================
@@ -103,7 +103,7 @@ checkbox is selected and the settings page submitted:
 function <module>_pathauto_bulkupdate()
 
 The function should iterate over the content items controlled by the
-module, calling pathauto_create_alias() for each one. It is
+module, calling \Drupal::service('pathauto.manager')->createAlias() for each one. It is
 recommended that the function report on its success (e.g., with a
 count of created aliases) via drupal_set_message().
 
@@ -143,7 +143,7 @@ $op = 'placeholders' - return an array keyed on placeholder strings
 event starts.')).
 $op = 'values' - return an array keyed on placeholder strings, valued
 with the "clean" actual value for the passed node or category (e.g.,
-pathauto_cleanstring(date('M', $eventstart)));
+\Drupal::service('pathauto.manager')->cleanString(date('M', $eventstart)));
 
 See contrib/pathauto_node_event.inc for an example of extending node
 patterns.

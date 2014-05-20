@@ -6,6 +6,7 @@
  *
  * @ingroup pathauto
  */
+use Drupal\Core\Language\Language;
 
 /**
  * Implements hook_path_alias_types().
@@ -57,7 +58,7 @@ function node_pathauto($op) {
 
       $languages = array();
       if (\Drupal::moduleHandler()->moduleExists('locale')) {
-        $languages = array(LANGUAGE_NONE => t('language neutral')) + locale_language_list('name');
+        $languages = array(Language::LANGCODE_NOT_SPECIFIED => t('language neutral')) + \Drupal::languageManager()->getLanguages('name');
       }
 
       foreach (node_type_get_names() as $node_type => $node_name) {

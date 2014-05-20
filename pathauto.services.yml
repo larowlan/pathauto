@@ -1,0 +1,3 @@
+services:
+  pathauto.manager:
+    class: Drupal\pathauto\PathautoManager

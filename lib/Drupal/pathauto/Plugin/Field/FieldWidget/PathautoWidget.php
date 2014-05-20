@@ -31,7 +31,7 @@ class PathautoWidget extends PathWidget {
 
     // Taxonomy terms do not have an actual fieldset for path settings.
     // Merge in the defaults.
-    // @todo Inpossible to do this in widget, use another solution
+    // @todo Impossible to do this in widget, use another solution
     /*
     $form['path'] += array(
       '#type' => 'fieldset',
@@ -60,7 +60,7 @@ class PathautoWidget extends PathWidget {
       if (!empty($id)) {
         module_load_include('inc', 'pathauto');
         $path = \Drupal::service('path.alias_manager.cached')->getPathAlias($entity->getSystemPath(), $entity->language()->getId());
-        $pathauto_alias = pathauto_create_alias($entity->getEntityType(), 'return', $entity->getSystemPath(), array($entity->getEntityType() => $entity), $entity->bundle(), $entity->language()->getId());
+        $pathauto_alias = \Drupal::service('pathauto.manager')->createAlias($entity->getEntityType(), 'return', $entity->getSystemPath(), array($entity->getEntityType() => $entity), $entity->bundle(), $entity->language()->getId());
         $entity->path->pathauto = ($path != $entity->getSystemPath() && $path == $pathauto_alias);
       }
       else {
