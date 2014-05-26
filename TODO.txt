@@ -11,6 +11,8 @@
 - INSTALL.txt: Update
 - Settings forms: implement submitForm()
 
+- Update hook_help(): https://drupal.org/node/2250345
+
 Later:
 - Move functions that do sql to alias storage sub-class/service?
 - pathauto_path_alias_types() => Plugins
