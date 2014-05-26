@@ -41,41 +41,40 @@ class PathautoPatternsForm extends ConfigFormBase {
         '#title' => $groupheader,
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
+        '#tree' => TRUE,
       );
 
       // Prompt for the default pattern for this module.
-      $variable = $module . '._default';
+      $key = '_default';
 
-      $form[$module][$variable] = array(
+      $form[$module][$key] = array(
         '#type' => 'textfield',
         '#title' => $patterndescr,
-        '#default_value' => $config->get($variable),
+        '#default_value' => $config->get($module . '.' . $key),
         '#size' => 65,
         '#maxlength' => 1280,
         '#element_validate' => array('token_element_validate'),
         '#after_build' => array('token_element_validate'),
         '#token_types' => array($settings->token_type),
         '#min_tokens' => 1,
-        '#parents' => array($variable),
       );
 
       // If the module supports a set of specialized patterns, set
       // them up here.
       if (isset($settings->patternitems)) {
         foreach ($settings->patternitems as $itemname => $itemlabel) {
-          $variable = $module . '.' . $itemname . '._default';
+          $key = '_default';
 
-          $form[$module][$variable] = array(
+          $form[$module][$itemname][$key] = array(
             '#type' => 'textfield',
             '#title' => $itemlabel,
-            '#default_value' => $config->get($variable),
+            '#default_value' => $config->get($module . '.' . $itemname . '.' . $key),
             '#size' => 65,
             '#maxlength' => 1280,
             '#element_validate' => array('token_element_validate'),
             '#after_build' => array('token_element_validate'),
             '#token_types' => array($settings->token_type),
             '#min_tokens' => 1,
-            '#parents' => array($variable),
           );
         }
       }
