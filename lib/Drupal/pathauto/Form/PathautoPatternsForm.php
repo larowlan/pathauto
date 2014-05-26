@@ -25,7 +25,7 @@ class PathautoPatternsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $config = \Drupal::configFactory()->get('pathauto.pattern');
+    $config = $this->configFactory()->get('pathauto.pattern');
 
     $form = array();
 
@@ -101,19 +101,16 @@ class PathautoPatternsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, array &$form_state) {
 
-    $config = \Drupal::configFactory()->get('pathauto.pattern');
+    $config = $this->configFactory()->get('pathauto.pattern');
 
-    kint($form_state);
+    $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
 
-    foreach ($form_state['values'] as $key => $value) {
-      //if ($key != 'submit' && $key != 'form_build_id' && $key != 'form_token' && $key != 'form_id' && $key != 'op') {
-
-        //$config->set($key, $value);
-     // }
+    foreach ($all_settings as $settings) {
+      $module = $settings->module;
+      $config->set($module, $form_state['values'][$module]);
     }
 
     $config->save();
-    exit();
 
     parent::submitForm($form, $form_state);
   }
