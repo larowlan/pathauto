@@ -3,9 +3,6 @@
 - transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists
   Add a test
 
-- pathauto_action_info() => Plugin
-  \Drupal\node\Plugin\Action\PromoteNode
-
 - Convert node/term hooks/functions to entity
   *_entity_* instead of *_node_*
   if ($entity instanceof ContentEntityInterface && $entity->hasfield('path'))

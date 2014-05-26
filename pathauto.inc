@@ -70,7 +70,7 @@ define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
  */
 function _pathauto_existing_alias_data($source, $language = Language::LANGCODE_NOT_SPECIFIED) {
   $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND langcode IN (:language, :language_none) ORDER BY langcode DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => Language::LANGCODE_NOT_SPECIFIED))->fetchField();
-  return path_load(array('pid' => $pid));
+  return \Drupal::service('path.alias_storage')->load(array('pid' => $pid));
 }
 
 
@@ -143,7 +143,8 @@ function _pathauto_path_is_callback($path) {
   /*if (isset($menu['path']) && $menu['path'] == $path) {
     return TRUE;
   }
-  else*/if (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
+  else*/
+  if (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
     // Do not allow existing files or directories to get assigned an automatic
     // alias. Note that we do not need to use is_link() to check for symbolic
     // links since this returns TRUE for either is_file() or is_dir() already.
@@ -173,7 +174,8 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
   $verbose = _pathauto_verbose(NULL, $op);
   $config = \Drupal::configFactory()->get('pathauto.settings');
 
-  // Alert users if they are trying to create an alias that is the same as the internal path.
+  // Alert users if they are trying to create an alias
+  // that is the same as the internal path.
   if ($path['source'] == $path['alias']) {
     if ($verbose) {
       _pathauto_verbose(t('Ignoring alias %alias because it is the same as the internal path.', array('%alias' => $path['alias'])));
