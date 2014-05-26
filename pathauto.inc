@@ -307,7 +307,7 @@ function pathauto_punctuation_chars() {
       $lang = $GLOBALS['language']->language;
     }
     else {
-      $lang = 'en';
+      $lang = Language::LANGCODE_NOT_SPECIFIED;
     }
 
     $cid = 'pathauto:punctuation:' . $lang;

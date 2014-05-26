@@ -37,7 +37,7 @@ class PathautoBulkUpdateForm extends ConfigFormBase {
       '#default_value' => array(),
     );
 
-    $pathauto_settings = module_invoke_all('pathauto', 'settings');
+    $pathauto_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
 
     foreach ($pathauto_settings as $settings) {
       if (!empty($settings->batch_update_callback)) {
@@ -61,6 +61,7 @@ class PathautoBulkUpdateForm extends ConfigFormBase {
   public function submitForm(array &$form, array &$form_state) {
 
     parent::submitForm($form, $form_state);
+
   }
 
 }

@@ -27,18 +27,18 @@ class PathautoSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, array &$form_state) {
     module_load_include('inc', 'pathauto');
-    $config = $this->configFactory->get('pathauto.settings');
+    $config = $this->configFactory()->get('pathauto.settings');
 
     $form = array();
 
-    $form['pathauto_verbose'] = array(
+    $form['verbose'] = array(
       '#type' => 'checkbox',
       '#title' => t('Verbose'),
       '#default_value' => $config->get('verbose'),
       '#description' => t('Display alias changes (except during bulk updates).'),
     );
 
-    $form['pathauto_separator'] = array(
+    $form['separator'] = array(
       '#type' => 'textfield',
       '#title' => t('Separator'),
       '#size' => 1,
@@ -47,7 +47,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#description' => t('Character used to separate words in titles. This will replace any spaces and punctuation characters. Using a space or + character can cause unexpected results.'),
     );
 
-    $form['pathauto_case'] = array(
+    $form['case'] = array(
       '#type' => 'radios',
       '#title' => t('Character case'),
       '#default_value' => $config->get('case'),
@@ -59,28 +59,26 @@ class PathautoSettingsForm extends ConfigFormBase {
 
     $max_length = _pathauto_get_schema_alias_maxlength();
 
-    $form['pathauto_max_length'] = array(
-      '#type' => 'textfield',
+    $form['max_length'] = array(
+      '#type' => 'number',
       '#title' => t('Maximum alias length'),
       '#size' => 3,
       '#maxlength' => 3,
       '#default_value' => $config->get('max_length'),
-      '#min_value' => 1,
-      '#max_value' => $max_length,
+      '#min' => 1,
+      '#max' => $max_length,
       '#description' => t('Maximum length of aliases to generate. 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'), '@max' => $max_length)),
-      '#element_validate' => array('_pathauto_validate_numeric_element'),
     );
 
-    $form['pathauto_max_component_length'] = array(
-      '#type' => 'textfield',
+    $form['max_component_length'] = array(
+      '#type' => 'number',
       '#title' => t('Maximum component length'),
       '#size' => 3,
       '#maxlength' => 3,
       '#default_value' => $config->get('max_component_length'),
-      '#min_value' => 1,
-      '#max_value' => $max_length,
+      '#min' => 1,
+      '#max' => $max_length,
       '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'), '@max' => $max_length)),
-      '#element_validate' => array('_pathauto_validate_numeric_element'),
     );
 
     $description = t('What should Pathauto do when updating an existing content item which already has an alias?');
@@ -91,7 +89,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       $description .= ' ' . t('Considering installing the <a href="!url">Redirect module</a> to get redirects when your aliases change.', array('!url' => 'http://drupal.org/project/redirect'));
     }
 
-    $form['pathauto_update_action'] = array(
+    $form['update_action'] = array(
       '#type' => 'radios',
       '#title' => t('Update action'),
       '#default_value' => $config->get('update_action'),
@@ -103,7 +101,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#description' => $description,
     );
 
-    $form['pathauto_transliterate'] = array(
+    $form['transliterate'] = array(
       '#type' => 'checkbox',
       '#title' => t('Transliterate prior to creating alias'),
       '#default_value' => $config->get('transliterate') && \Drupal::moduleHandler()->moduleExists('transliteration'),
@@ -111,17 +109,17 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#access' => \Drupal::moduleHandler()->moduleExists('transliteration'),
     );
 
-    $form['pathauto_reduce_ascii'] = array(
+    $form['reduce_ascii'] = array(
       '#type' => 'checkbox',
       '#title' => t('Reduce strings to letters and numbers'),
       '#default_value' => $config->get('reduce_ascii'),
       '#description' => t('Filters the new alias to only letters and numbers found in the ASCII-96 set.'),
     );
 
-    $form['pathauto_ignore_words'] = array(
+    $form['ignore_words'] = array(
       '#type' => 'textarea',
       '#title' => t('Strings to Remove'),
-      /*'#default_value' => variable_get('pathauto_ignore_words', PATHAUTO_IGNORE_WORDS),*/
+      '#default_value' => $config->get('ignore_words'),
       '#description' => t('Words to strip out of the URL alias, separated by commas. Do not use this to remove punctuation.'),
       '#wysiwyg' => FALSE,
     );
@@ -140,7 +138,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       if ($details['value'] == $config->get('separator')) {
         $details['default'] = PATHAUTO_PUNCTUATION_REPLACE;
       }
-      $form['punctuation']['pathauto_punctuation_' . $name] = array(
+      $form['punctuation']['punctuation_' . $name] = array(
         '#type' => 'select',
         '#title' => $details['name'] . ' (<code>' . String::checkPlain($details['value']) . '</code>)',
         '#default_value' => $details['default'],
@@ -159,6 +157,16 @@ class PathautoSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
+
+    $config = $this->configFactory()->get('pathauto.settings');
+
+    foreach ($form_state['values'] as $key => $value) {
+      if ($key != 'submit' && $key != 'form_build_id' && $key != 'form_token' && $key != 'form_id' && $key != 'op') {
+        $config->set($key, $value);
+      }
+    }
+
+    $config->save();
 
     parent::submitForm($form, $form_state);
   }

@@ -25,16 +25,15 @@ class PathautoPatternsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $config = $this->configFactory->get('pathauto.pattern');
+    $config = \Drupal::configFactory()->get('pathauto.pattern');
 
     $form = array();
 
-    $all_settings = module_invoke_all('pathauto', 'settings');
+    $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
 
     foreach ($all_settings as $settings) {
       $module = $settings->module;
       $patterndescr = $settings->patterndescr;
-      $patterndefault = $settings->patterndefault;
       $groupheader = $settings->groupheader;
 
       $form[$module] = array(
@@ -46,6 +45,7 @@ class PathautoPatternsForm extends ConfigFormBase {
 
       // Prompt for the default pattern for this module.
       $variable = $module . '._default';
+
       $form[$module][$variable] = array(
         '#type' => 'textfield',
         '#title' => $patterndescr,
@@ -63,11 +63,12 @@ class PathautoPatternsForm extends ConfigFormBase {
       // them up here.
       if (isset($settings->patternitems)) {
         foreach ($settings->patternitems as $itemname => $itemlabel) {
-          $variable = $module . '_' . $itemname . '._default';
+          $variable = $module . '.' . $itemname . '._default';
+
           $form[$module][$variable] = array(
             '#type' => 'textfield',
             '#title' => $itemlabel,
-            // '#default_value' => variable_get($variable, ''),
+            '#default_value' => $config->get($variable),
             '#size' => 65,
             '#maxlength' => 1280,
             '#element_validate' => array('token_element_validate'),
@@ -101,6 +102,19 @@ class PathautoPatternsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, array &$form_state) {
 
+    $config = \Drupal::configFactory()->get('pathauto.pattern');
+
+    kint($form_state);
+
+    foreach ($form_state['values'] as $key => $value) {
+      //if ($key != 'submit' && $key != 'form_build_id' && $key != 'form_token' && $key != 'form_id' && $key != 'op') {
+
+        //$config->set($key, $value);
+     // }
+    }
+
+    $config->save();
+    exit();
 
     parent::submitForm($form, $form_state);
   }
