@@ -206,19 +206,11 @@ function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new
 }
 
 /**
- * Implements hook_field_attach_delete_bundle().
- *
- * Respond to sub-types being deleted, their patterns can be removed.
+ * Implements hook__entity_bundle_delete().
  */
-function pathauto_field_attach_delete_bundle($entity_type, $bundle) {
-  $variables = db_select('variable', 'v')
-    ->fields('v', array('name'))
-    ->condition('name', db_like("pathauto_{$entity_type}_{$bundle}_") . '%', 'LIKE')
-    ->execute()
-    ->fetchCol();
-  foreach ($variables as $variable) {
-    variable_del($variable);
-  }
+function pathauto_entity_bundle_delete($entity_type, $bundle) {
+  $config = \Drupal::configFactory()->get('pathauto.pattern');
+  $config->clear($entity_type . '.' . $bundle);
 }
 
 
