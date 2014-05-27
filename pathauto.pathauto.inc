@@ -62,7 +62,7 @@ function node_pathauto($op) {
       }
 
       foreach (node_type_get_names() as $node_type => $node_name) {
-        if (count($languages) && variable_get('language_content_type_' . $node_type, 0)) {
+        if (count($languages) && \Drupal::moduleHandler()->moduleExists('content_translation') && content_translation_enabled('node', $node_type)) {
           $settings['patternitems'][$node_type] = t('Default path pattern for @node_type (applies to all @node_type content types with blank patterns below)', array('@node_type' => $node_name));
           foreach ($languages as $lang_code => $lang_name) {
             $settings['patternitems'][$node_type . '_' . $lang_code] = t('Pattern for all @language @node_type paths', array('@node_type' => $node_name, '@language' => $lang_name));
@@ -170,7 +170,7 @@ function taxonomy_pathauto_bulk_update_batch_process(&$context) {
   $query->isNull('ua.source');
   $query->condition('td.tid', $context['sandbox']['current'], '>');
   // Exclude the forums terms.
-  if ($forum_vid = variable_get('forum_nav_vocabulary', '')) {
+  if ($forum_vid = 'forums') {
     $query->condition('td.vid', $forum_vid, '<>');
   }
   $query->orderBy('td.tid');
@@ -236,7 +236,7 @@ function forum_pathauto_bulk_update_batch_process(&$context) {
   $query->addField('td', 'tid');
   $query->isNull('ua.source');
   $query->condition('td.tid', $context['sandbox']['current'], '>');
-  $query->condition('td.vid', variable_get('forum_nav_vocabulary', ''));
+  $query->condition('td.vid', 'forums');
   $query->orderBy('td.tid');
   $query->addTag('pathauto_bulk_update');
   $query->addMetaData('entity', 'taxonomy_term');
