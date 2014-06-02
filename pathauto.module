@@ -211,6 +211,7 @@ function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new
 function pathauto_entity_bundle_delete($entity_type, $bundle) {
   $config = \Drupal::configFactory()->get('pathauto.pattern');
   $config->clear($entity_type . '.' . $bundle);
+  $config->save();
 }
 
 

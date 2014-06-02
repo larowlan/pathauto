@@ -63,13 +63,13 @@ class PathautoTestHelper extends WebTestBase {
   }
 
   public function assertAliasExists($conditions) {
-    $path = path_load($conditions);
+    $path = \Drupal::service('path.alias_storage')->load($conditions);
     $this->assertTrue($path, t('Alias with conditions @conditions found.', array('@conditions' => var_export($conditions, TRUE))));
     return $path;
   }
 
   public function assertNoAliasExists($conditions) {
-    $alias = path_load($conditions);
+    $alias =  \Drupal::service('path.alias_storage')->load($conditions);
     $this->assertFalse($alias, t('Alias with conditions @conditions not found.', array('@conditions' => var_export($conditions, TRUE))));
   }
 

@@ -41,6 +41,7 @@ class PathautoManager {
    *   The cleaned string.
    */
   public function cleanString($string, array $options = array()) {
+
     // Use the advanced drupal_static() pattern, since this is called very often.
     static $drupal_static_fast;
     $config = \Drupal::configFactory()->get('pathauto.settings');
@@ -57,7 +58,7 @@ class PathautoManager {
       $cache = array(
         'separator' => $config->get('separator'),
         'strings' => array(),
-        'transliterate' => $config->get('transliterate') && \Drupal::moduleHandler()->moduleExists('transliteration'),
+        'transliterate' => $config->get('transliterate'),
         'punctuation' => array(),
         'reduce_ascii' => (bool) $config->get('reduce_ascii'),
         'ignore_words_regex' => FALSE,
@@ -121,7 +122,7 @@ class PathautoManager {
     // Remove all HTML tags from the string.
     $output = strip_tags(decode_entities($string));
 
-    // Optionally transliterate (by running through the Transliteration module).
+    // Optionally transliterate.
     if ($cache['transliterate']) {
       // If the reduce strings to letters and numbers is enabled, don't bother
       // replacing unknown characters with a question mark. Use an empty string

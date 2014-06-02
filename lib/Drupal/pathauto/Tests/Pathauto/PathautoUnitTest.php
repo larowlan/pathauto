@@ -38,19 +38,19 @@ class PathautoUnitTest extends PathautoTestHelper {
     $tests = array(
       array(
         'entity' => 'node',
-        'bundle' => 'story',
+        'bundle' => 'article',
         'language' => 'fr',
         'expected' => 'story/[node:title]',
       ),
       array(
         'entity' => 'node',
-        'bundle' => 'story',
+        'bundle' => 'article',
         'language' => 'en',
         'expected' => 'story/en/[node:title]',
       ),
       array(
         'entity' => 'node',
-        'bundle' => 'story',
+        'bundle' => 'article',
         'language' => Language::LANGCODE_NOT_SPECIFIED,
         'expected' => 'story/[node:title]',
       ),

@@ -104,9 +104,8 @@ class PathautoSettingsForm extends ConfigFormBase {
     $form['transliterate'] = array(
       '#type' => 'checkbox',
       '#title' => t('Transliterate prior to creating alias'),
-      '#default_value' => $config->get('transliterate') && \Drupal::moduleHandler()->moduleExists('transliteration'),
+      '#default_value' => $config->get('transliterate'),
       '#description' => t('When a pattern includes certain characters (such as those with accents) should Pathauto attempt to transliterate them into the US-ASCII alphabet? Transliteration is handled by the Transliteration module.'),
-      '#access' => \Drupal::moduleHandler()->moduleExists('transliteration'),
     );
 
     $form['reduce_ascii'] = array(
