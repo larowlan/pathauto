@@ -530,12 +530,12 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
   );
 
   // Skip processing if the account has no pattern.
-  if (!pathauto_pattern_load_by_entity('user', '', $options['language'])) {
+  if (!pathauto_pattern_load_by_entity('user', '', $options['language']->id)) {
     return;
   }
 
   module_load_include('inc', 'pathauto');
-  $return = \Drupal::service('pathauto.manager')->createAlias('user', $op, $account->getSystemPath(), array('user' => $account), NULL, $options['language']);
+  $return = \Drupal::service('pathauto.manager')->createAlias('user', $op, $account->getSystemPath(), array('user' => $account), NULL, $options['language']->id);
 
   return $return;
 }
