@@ -40,7 +40,7 @@ class PathautoLocaleTest extends PathautoFunctionalTestHelper {
       ),
     );
     $node = $this->drupalCreateNode($node);
-    $english_alias = path_load(array('alias' => 'english-node', 'language' => 'en'));
+    $english_alias = \Drupal::service('path.alias_storage')->load(array('alias' => 'english-node', 'language' => 'en'));
     $this->assertTrue($english_alias, 'Alias created with proper language.');
 
     // Also save a French alias that should not be left alone, even though

@@ -22,6 +22,7 @@ use Drupal\Core\Language\Language;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\Entity\User;
 
 /**
  * The default ignore word list.
@@ -554,7 +555,7 @@ function pathauto_user_update_alias(EntityInterface $account, $op, array $option
 function pathauto_user_update_alias_multiple(array $uids, $op, array $options = array()) {
   $options += array('message' => FALSE);
 
-  $accounts = user_load_multiple($uids);
+  $accounts = User::loadMultiple($uids);
   foreach ($accounts as $account) {
     pathauto_user_update_alias($account, $op, $options);
   }
