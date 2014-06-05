@@ -302,7 +302,7 @@ class PathautoManager {
 
     if (empty($pattern)) {
       // No pattern? Do nothing (otherwise we may blow away existing aliases...)
-      return '';
+      return NULL;
     }
 
     // Special handling when updating an item which is already aliased.
@@ -314,7 +314,7 @@ class PathautoManager {
             // If an alias already exists,
             // and the update action is set to do nothing,
             // then gosh-darn it, do nothing.
-            return '';
+            return NULL;
         }
       }
     }
@@ -334,7 +334,7 @@ class PathautoManager {
     // @see token_scan()
     $pattern_tokens_removed = preg_replace('/\[[^\s\]:]*:[^\s\]]*\]/', '', $pattern);
     if ($alias === $pattern_tokens_removed) {
-      return '';
+      return NULL;
     }
 
     $alias = $this->cleanAlias($alias);
@@ -346,7 +346,7 @@ class PathautoManager {
 
     // If we have arrived at an empty string, discontinue.
     if (!Unicode::strlen($alias)) {
-      return '';
+      return NULL;
     }
 
     // If the alias already exists, generate a new, hopefully unique, variant.
