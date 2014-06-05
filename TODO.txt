@@ -3,11 +3,6 @@
 - transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists
   Add a test
 
-- Convert node/term hooks/functions to entity
-  *_entity_* instead of *_node_*
-  if ($entity instanceof ContentEntityInterface && $entity->hasfield('path'))
-  Tests need to be updated
-
 - INSTALL.txt: Update
 - Settings forms: implement submitForm()
 

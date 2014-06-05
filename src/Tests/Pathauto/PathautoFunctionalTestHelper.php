@@ -11,6 +11,8 @@ class PathautoFunctionalTestHelper extends PathautoTestHelper {
   function setUp(array $modules = array()) {
     parent::setUp($modules);
 
+    $this->drupalCreateContentType(array('type' => 'page'));
+
     $config = \Drupal::configFactory()->get('pathauto.pattern');
     // Set pathauto settings we assume to be as-is in this test.
     $config->set('node.page._default', 'content/[node:title]');
