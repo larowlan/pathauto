@@ -24,7 +24,7 @@ class PathautoTestHelper extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('path','token','pathauto','taxonomy');
+  public static $modules = array('path', 'token', 'pathauto', 'taxonomy', 'views');
 
   public function assertToken($type, $object, $token, $expected) {
     $tokens = \Drupal::token()->generate($type, array($token => $token), array($type => $object));

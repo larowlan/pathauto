@@ -149,10 +149,10 @@ function pathauto_settings_form($form) {
   else {
     $description .= ' ' . t('Considering installing the <a href="!url">Redirect module</a> to get redirects when your aliases change.', array('!url' => 'http://drupal.org/project/redirect'));
   }
-  $form['pathauto_update_action'] = array(
+  $form['pathauto_update_alias'] = array(
     '#type' => 'radios',
     '#title' => t('Update action'),
-    '#default_value' => variable_get('pathauto_update_action', PATHAUTO_UPDATE_ACTION_DELETE),
+    '#default_value' => variable_get('pathauto_update_alias', PATHAUTO_UPDATE_ACTION_DELETE),
     '#options' => array(
       PATHAUTO_UPDATE_ACTION_NO_NEW => t('Do nothing. Leave the old alias intact.'),
       PATHAUTO_UPDATE_ACTION_LEAVE => t('Create a new alias. Leave the existing alias functioning.'),

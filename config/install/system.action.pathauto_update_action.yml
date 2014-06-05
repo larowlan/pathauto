@@ -1,0 +1,9 @@
+id: pathauto_update_alias
+label: 'Update URL-Alias of an entity'
+status: true
+langcode: en
+type: node
+plugin: pathauto_update_alias
+dependencies:
+  module:
+    - node

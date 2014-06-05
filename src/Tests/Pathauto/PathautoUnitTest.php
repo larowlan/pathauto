@@ -194,7 +194,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     $older_path = $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
-    $config->set('pathauto_update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->set('pathauto_update_alias', PATHAUTO_UPDATE_ACTION_NO_NEW);
     $config->save();
     $node->setTitle('Fifth title');
     pathauto_node_update($node);

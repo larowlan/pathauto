@@ -12,4 +12,14 @@ Later:
 - Move functions that do sql to alias storage sub-class/service?
 - pathauto_path_alias_types() => Plugins
 
+- For the bulk update we need to provide different action to update node and
+  user as the action is tied to an entity type.
 
+- Fix "Pathauto basic tests"
+  Current status:
+  - there are some strange fails with path[0][pathauto]
+  - bulk operations need to be done
+  - AliasManager has some issues with Drupal\Core\Path\AliasManager->cacheClear('node/2')
+  - Some stuff from token: Argument 2 passed to Drupal\Core\Form\FormBuilder::setError() must be of the type array, string given, called in /Users/martin/projects/d8.dev/www/modules/token/token.module on line 656 and defined
+
+- Lot of legacy stuff in admin.inc that has not bee fully migrated

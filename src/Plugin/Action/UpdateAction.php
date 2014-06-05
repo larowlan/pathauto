@@ -12,7 +12,7 @@ use Drupal\Core\Action\ActionBase;
  * Pathauto entity update action.
  *
  * @Action(
- *   id = "pathauto_update_action",
+ *   id = "pathauto_update_alias",
  *   label = @Translation("Update URL-Alias of an entity"),
  *   type = "node"
  * )

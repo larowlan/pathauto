@@ -1,7 +1,7 @@
 <?php
 
 namespace Drupal\pathauto\Tests\Pathauto;
-use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\views\Views;
 
 /**
  * Test basic pathauto functionality.
@@ -27,11 +27,11 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Ensure that the Pathauto checkbox is checked by default on the node add form.
     $this->drupalGet('node/add/page');
-    $this->assertFieldChecked('edit-path-pathauto');
+    $this->assertFieldChecked('path[0][pathauto]');
 
     // Create node for testing by previewing and saving the node form.
     $title = ' Testing: node title [';
-    $automatic_alias = 'content/testing-node-title';
+    $automatic_alias = 'testing-node-title';
     $this->drupalCreateNode(array('title' => $title));
     /*$this->drupalPostForm(NULL, array('title' => $title), array('Preview'));
     $this->drupalPostForm(NULL, array(), 'Save');*/
@@ -39,8 +39,8 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Look for alias generated in the form.
     $this->drupalGet("node/{$node->id()}/edit");
-    $this->assertFieldChecked('edit-path-pathauto');
-    $this->assertFieldByName('path[alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
+    $this->assertFieldChecked('path[0][pathauto]');
+    $this->assertFieldByName('path[0][alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
 
     // Check whether the alias actually works.
     $this->drupalGet($automatic_alias);
@@ -49,20 +49,20 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Manually set the node's alias.
     $manual_alias = 'content/' . $node->id();
     $edit = array(
-      'path[pathauto]' => FALSE,
-      'path[alias]' => $manual_alias,
+      'path[0][pathauto]' => FALSE,
+      'path[0][alias]' => $manual_alias,
     );
-    $this->drupalPostForm("{$node->getSystemPath()}/edit", $edit, t('Save'));
-    $this->assertText("Basic page $title has been updated.");
+    $this->drupalPostForm("{$node->getSystemPath()}/edit", $edit, t('Save and keep published'));
+    $this->assertRaw(t('@type %title has been updated.', array('@type' => 'page', '%title' => $title)));
 
     // Check that the automatic alias checkbox is now unchecked by default.
     $this->drupalGet("node/{$node->id()}/edit");
-    $this->assertNoFieldChecked('edit-path-pathauto');
-    $this->assertFieldByName('path[alias]', $manual_alias);
+    $this->assertNoFieldChecked('path[0][pathauto]');
+    $this->assertFieldByName('path[0][alias]', $manual_alias);
 
     // Submit the node form with the default values.
-    $this->drupalPostForm(NULL, array(), t('Save'));
-    $this->assertText("Basic page $title has been updated.");
+    $this->drupalPostForm(NULL, array(), t('Save and keep published'));
+    $this->assertRaw(t('@type %title has been updated.', array('@type' => 'page', '%title' => $title)));
 
     // Test that the old (automatic) alias has been deleted and only accessible
     // through the new (manual) alias.
@@ -74,19 +74,19 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Now attempt to create a node that has no pattern (article content type).
     // The Pathauto checkbox should not exist.
     $this->drupalGet('node/add/article');
-    $this->assertNoFieldById('edit-path-pathauto');
-    $this->assertFieldByName('path[alias]', '');
+    $this->assertNoFieldById('path[0][pathauto]');
+    $this->assertFieldByName('path[0][alias]', '');
 
     $edit = array();
     $edit['title'] = 'My test article';
     $this->drupalCreateNode($edit);
-    //$this->drupalPostForm(NULL, $edit, t('Save'));
+    //$this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $node = $this->drupalGetNodeByTitle($edit['title']);
 
     // Pathauto checkbox should still not exist.
     $this->drupalGet($node->getSystemPath() . '/edit');
-    $this->assertNoFieldById('edit-path-pathauto');
-    $this->assertFieldByName('path[alias]', '');
+    $this->assertNoFieldById('path[0][pathauto]');
+    $this->assertFieldByName('path[0][alias]', '');
     $this->assertNoEntityAlias($node);
   }
 
@@ -101,11 +101,14 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->deleteAllAliases();
 
     $edit = array(
-      'operation' => 'pathauto_update_alias',
-      "nodes[{$node1->id()}]" => TRUE,
+      'action' => 'pathauto_update_alias',
+      // @todo - here we expect the $node1 to be at 0 position, any better way?
+      'node_bulk_form[0]' => TRUE,
     );
-    $this->drupalPostForm('admin/content', $edit, t('Update'));
-    $this->assertText('Updated URL alias for 1 node.');
+    $this->drupalPostForm('admin/content', $edit, t('Apply'));
+    $this->assertRaw(\Drupal::translation()->formatPlural(1, '%action was applied to @count item.', '%action was applied to @count items.', array(
+      '%action' => 'Update URL-Alias of an entity',
+    )));
 
     $this->assertEntityAlias($node1, 'content/' . $node1->getTitle());
     $this->assertEntityAlias($node2, 'node/' . $node2->id());
@@ -131,8 +134,8 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Look for alias generated in the form.
     $this->drupalGet("taxonomy/term/{$term->id()}/edit");
-    $this->assertFieldChecked('edit-path-pathauto');
-    $this->assertFieldByName('path[alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
+    $this->assertFieldChecked('path[0][pathauto]');
+    $this->assertFieldByName('path[0][alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
 
     // Check whether the alias actually works.
     $this->drupalGet($automatic_alias);
@@ -141,16 +144,16 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Manually set the term's alias.
     $manual_alias = 'tags/' . $term->id();
     $edit = array(
-      'path[pathauto]' => FALSE,
-      'path[alias]' => $manual_alias,
+      'path[0][pathauto]' => FALSE,
+      'path[0][alias]' => $manual_alias,
     );
     $this->drupalPostForm("taxonomy/term/{$term->id()}/edit", $edit, t('Save'));
     $this->assertText("Updated term $name.");
 
     // Check that the automatic alias checkbox is now unchecked by default.
     $this->drupalGet("taxonomy/term/{$term->id()}/edit");
-    $this->assertNoFieldChecked('edit-path-pathauto');
-    $this->assertFieldByName('path[alias]', $manual_alias);
+    $this->assertNoFieldChecked('path[0][pathauto]');
+    $this->assertFieldByName('path[0][alias]', $manual_alias);
 
     // Submit the term form with the default values.
     $this->drupalPostForm(NULL, array(), t('Save'));
@@ -170,7 +173,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
   function testUserEditing() {
     // There should be no Pathauto checkbox on user forms.
     $this->drupalGet('user/' . $this->adminUser->id() . '/edit');
-    $this->assertNoFieldById('edit-path-pathauto');
+    $this->assertNoFieldById('path[0][pathauto]');
   }
 
   /**
@@ -182,9 +185,19 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Delete all current URL aliases.
     $this->deleteAllAliases();
 
+    // Find the position of just created account in the user_admin_people view.
+    $view = Views::getView('user_admin_people');
+    $view->initDisplay();
+    $view->preview('page_1');
+    foreach ($view->result as $key => $row) {
+      if ($row->users_name == $account->getName()) {
+        break;
+      }
+    }
+
     $edit = array(
-      'operation' => 'pathauto_update_alias',
-      "accounts[{$account->id()}]" => TRUE,
+      'action' => 'pathauto_update_alias',
+      "user_bulk_form[$key]" => TRUE,
     );
     $this->drupalPostForm('admin/people', $edit, t('Update'));
     $this->assertText('Updated URL alias for 1 user account.');
@@ -256,6 +269,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $edit['path'] = array('pathauto' => TRUE);
     $edit['status'] = 1;
     $account = entity_create('user', $edit);
+    $account->save();
     $this->assertEntityAlias($account, 'users/test-user');
   }
 }
