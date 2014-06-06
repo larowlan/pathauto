@@ -1,4 +1,5 @@
-- Convert Unit tests to DrupalUnitTestBase
+- Convert Unit tests to DrupalUnitTestBase (note that this will not be that easy
+  as it inherits from PathatutoTestHelper which provides assert functions used).
 
 - transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists
   Add a test
@@ -10,16 +11,34 @@
 
 Later:
 - Move functions that do sql to alias storage sub-class/service?
+
 - pathauto_path_alias_types() => Plugins
 
+- Bulk generation of aliases is without batch implementation, only dummy form is
+  displayed
+
 - For the bulk update we need to provide different action to update node and
-  user as the action is tied to an entity type.
+  user as the action is tied to an entity type. Currently only the action for
+  node entities is implemented.
 
-- Fix "Pathauto basic tests"
-  Current status:
-  - there are some strange fails with path[0][pathauto]
-  - bulk operations need to be done
-  - AliasManager has some issues with Drupal\Core\Path\AliasManager->cacheClear('node/2')
-  - Some stuff from token: Argument 2 passed to Drupal\Core\Form\FormBuilder::setError() must be of the type array, string given, called in /Users/martin/projects/d8.dev/www/modules/token/token.module on line 656 and defined
+- There is no storage for pathauto checkbox. So if user unchecks the box it will
+  be rechecked again on next edit.
 
-- Lot of legacy stuff in admin.inc that has not bee fully migrated
+- Localization seems not to work. Tests are runnable but not passing.
+
+- The logic that deals with automated aliases spawns across three files
+  (pathauto.module, pathauto.inc, PathautoManager.php). It probably makes sense
+  to refactor this and put everything inside the manager class. What is
+  currently nonsense is the need to include the pathauto.inc file if you want to
+  use the manager.
+
+- Lot of legacy stuff in admin.inc that has not be reviewed and migrated if not
+  yet done so
+
+- Token tests completely broken
+
+- PathautoUnitTest tests are totally broken as well.
+
+- Not really about pathauto, but the AliasManager probably has a bug that
+  affects us: https://drupal.org/node/2281167
+

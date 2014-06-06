@@ -8,8 +8,8 @@ namespace Drupal\pathauto\Tests\Pathauto;
 class PathautoFunctionalTestHelper extends PathautoTestHelper {
   protected $adminUser;
 
-  function setUp(array $modules = array()) {
-    parent::setUp($modules);
+  function setUp() {
+    parent::setUp();
 
     $this->drupalCreateContentType(array('type' => 'page'));
     $this->drupalCreateContentType(array('type' => 'article'));

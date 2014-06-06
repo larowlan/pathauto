@@ -5,6 +5,9 @@ namespace Drupal\pathauto\Tests\Pathauto;
 use Drupal\Core\Language\Language;
 
 class PathautoLocaleTest extends PathautoFunctionalTestHelper {
+
+  public static $modules = array('path', 'token', 'pathauto', 'taxonomy', 'views', 'locale');
+
   public static function getInfo() {
     return array(
       'name' => 'Pathauto localization tests',
@@ -14,33 +17,26 @@ class PathautoLocaleTest extends PathautoFunctionalTestHelper {
     );
   }
 
-  function setUp(array $modules = array()) {
-    $modules[] = 'locale';
-    $modules[] = 'translation';
-    parent::setUp($modules, array('administer languages'));
-
-    // Add predefined French language.
-    $language = new Language(array('id' => 'fr'));
-    language_save($language);
-
-  }
-
   /**
    * Test that when an English node is updated, its old English alias is
    * updated and its newer French alias is left intact.
    */
   function testLanguageAliases() {
+
+    // Add predefined French language.
+    $language = new Language(array('id' => 'fr'));
+    language_save($language);
+
     $node = array(
       'title' => 'English node',
       'language' => 'en',
-      'body' => array('en' => array(array())),
-      'path' => array(
+      'path' => array(array(
         'alias' => 'english-node',
         'pathauto' => FALSE,
-      ),
+      )),
     );
     $node = $this->drupalCreateNode($node);
-    $english_alias = \Drupal::service('path.alias_storage')->load(array('alias' => 'english-node', 'language' => 'en'));
+    $english_alias = \Drupal::service('path.alias_storage')->load(array('alias' => 'english-node', 'langcode' => 'en'));
     $this->assertTrue($english_alias, 'Alias created with proper language.');
 
     // Also save a French alias that should not be left alone, even though
@@ -52,8 +48,8 @@ class PathautoLocaleTest extends PathautoFunctionalTestHelper {
     $this->saveAlias('node/invalid', 'content/english-node', Language::LANGCODE_NOT_SPECIFIED);
 
     // Update the node, triggering a change in the English alias.
-    $node->path['pathauto'] = TRUE;
-    pathauto_node_update($node);
+    $node->path->pathauto = TRUE;
+    pathauto_entity_update($node);
 
     // Check that the new English alias replaced the old one.
     $this->assertEntityAlias($node, 'content/english-node-0', 'en');

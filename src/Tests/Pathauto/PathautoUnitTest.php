@@ -9,6 +9,7 @@ use Drupal\Component\Utility\String;
  * Unit tests for Pathauto functions.
  */
 class PathautoUnitTest extends PathautoTestHelper {
+
   public static function getInfo() {
     return array(
       'name' => 'Pathauto unit tests',
@@ -40,19 +41,19 @@ class PathautoUnitTest extends PathautoTestHelper {
         'entity' => 'node',
         'bundle' => 'article',
         'language' => 'fr',
-        'expected' => 'story/[node:title]',
+        'expected' => 'article/[node:title]',
       ),
       array(
         'entity' => 'node',
         'bundle' => 'article',
         'language' => 'en',
-        'expected' => 'story/en/[node:title]',
+        'expected' => 'article/en/[node:title]',
       ),
       array(
         'entity' => 'node',
         'bundle' => 'article',
         'language' => Language::LANGCODE_NOT_SPECIFIED,
-        'expected' => 'story/[node:title]',
+        'expected' => 'article/[node:title]',
       ),
       array(
         'entity' => 'node',
@@ -103,7 +104,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     $tests['this thing with that thing'] = 'thing-thing';
 
     // Test length truncation and duplicate separator removal.
-    $tests[' - Pathauto is the greatest - module ever in Drupal history - '] = 'pathauto-greatest-module-ever';
+    $tests[' - Pathauto is the greatest - module ever in Drupal hiarticle - '] = 'pathauto-greatest-module-ever';
 
     // Test that HTML tags are removed.
     $tests['This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.'] = 'text-has-html-tags';
@@ -172,7 +173,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Second title');
-    pathauto_node_update($node);
+    pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/second-title');
     $this->assertNoAliasExists(array('alias' => 'content/first-title'));
 
@@ -180,14 +181,14 @@ class PathautoUnitTest extends PathautoTestHelper {
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_LEAVE);
     $config->save();
     $node->setTitle('Third title');
-    pathauto_node_update($node);
+    pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/third-title');
     $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
 
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Fourth title');
-    pathauto_node_update($node);
+    pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/third-title'));
     // The older second alias is not deleted yet.
@@ -197,19 +198,19 @@ class PathautoUnitTest extends PathautoTestHelper {
     $config->set('pathauto_update_alias', PATHAUTO_UPDATE_ACTION_NO_NEW);
     $config->save();
     $node->setTitle('Fifth title');
-    pathauto_node_update($node);
+    pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/fith-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'update'.
     $this->deleteAllAliases();
-    pathauto_node_update($node);
+    pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/fifth-title');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
     $node->setTitle('Sixth title');
-    pathauto_node_update_alias($node, 'bulkupdate');
+    pathauto_update_alias($node, 'bulkupdate');
     $this->assertEntityAlias($node, 'content/sixth-title');
   }
 
@@ -222,7 +223,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     $this->assertNoEntityAliasExists($node);
 
     $node->setTitle('hello');
-    pathauto_node_update($node);
+    pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/hello');
   }
 
@@ -243,7 +244,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     $this->assertEntityAlias($term2, 'parent-term/child-term');
 
     $this->saveEntityAlias($term1, 'My Crazy/Alias/');
-    pathauto_taxonomy_term_update($term2);
+    pathauto_entity_update($term2);
     $this->assertEntityAlias($term2, 'My Crazy/Alias/child-term');
   }
 

@@ -57,8 +57,10 @@ class PathautoTestHelper extends WebTestBase {
   }
 
   public function assertAlias($source, $expected_alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    \Drupal::service('path.alias_manager')->cacheClear($source);
     $alias = \Drupal::request()->attributes->get($source);
+    if (empty($alias)) {
+      $alias = $source;
+    }
     $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
   }
 
@@ -113,7 +115,10 @@ class PathautoTestHelper extends WebTestBase {
   }
 
   public function drupalGetTermByName($name, $reset = FALSE) {
-    $terms = entity_load('taxonomy_term', array(), array('name' => $name), $reset);
+    if ($reset) {
+      // @todo - implement cache reset.
+    }
+    $terms = \Drupal::entityManager()->getStorage('taxonomy_term')->loadByProperties(array('name' => $name));
     return !empty($terms) ? reset($terms) : FALSE;
   }
 }

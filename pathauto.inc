@@ -185,7 +185,7 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
 
   // Skip replacing the current alias with an identical alias.
   if (empty($existing_alias) || $existing_alias['alias'] != $path['alias']) {
-    $path += array('pathauto' => TRUE, 'original' => $existing_alias);
+    $path += array('pathauto' => TRUE, 'original' => $existing_alias, 'pid' => NULL);
 
     // If there is already an alias, respect some update actions.
     if (!empty($existing_alias)) {
@@ -207,7 +207,7 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
     }
 
     // Save the path array.
-    Drupal::service('path.alias_storage')->save($path['source'], $path['alias']);
+    Drupal::service('path.alias_storage')->save($path['source'], $path['alias'], $path['language'], $path['pid']);
 
     if ($verbose) {
       if (!empty($existing_alias['pid'])) {

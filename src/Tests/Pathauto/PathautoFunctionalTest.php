@@ -27,7 +27,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Ensure that the Pathauto checkbox is checked by default on the node add form.
     $this->drupalGet('node/add/page');
-    $this->assertFieldChecked('path[0][pathauto]');
+    $this->assertFieldChecked('edit-path-0-pathauto');
 
     // Create node for testing by previewing and saving the node form.
     $title = ' Testing: node title [';
@@ -39,7 +39,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Look for alias generated in the form.
     $this->drupalGet("node/{$node->id()}/edit");
-    $this->assertFieldChecked('path[0][pathauto]');
+    $this->assertFieldChecked('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
 
     // Check whether the alias actually works.
@@ -57,11 +57,11 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Check that the automatic alias checkbox is now unchecked by default.
     $this->drupalGet("node/{$node->id()}/edit");
-    $this->assertNoFieldChecked('path[0][pathauto]');
+    $this->assertNoFieldChecked('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', $manual_alias);
 
     // Submit the node form with the default values.
-    $this->drupalPostForm(NULL, array(), t('Save and keep published'));
+    $this->drupalPostForm(NULL, array('path[0][pathauto]' => FALSE), t('Save and keep published'));
     $this->assertRaw(t('@type %title has been updated.', array('@type' => 'page', '%title' => $title)));
 
     // Test that the old (automatic) alias has been deleted and only accessible
@@ -74,7 +74,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     // Now attempt to create a node that has no pattern (article content type).
     // The Pathauto checkbox should not exist.
     $this->drupalGet('node/add/article');
-    $this->assertNoFieldById('path[0][pathauto]');
+    $this->assertNoFieldById('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', '');
 
     $edit = array();
@@ -85,7 +85,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Pathauto checkbox should still not exist.
     $this->drupalGet($node->getSystemPath() . '/edit');
-    $this->assertNoFieldById('path[0][pathauto]');
+    $this->assertNoFieldById('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', '');
     $this->assertNoEntityAlias($node);
   }
@@ -152,11 +152,11 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Check that the automatic alias checkbox is now unchecked by default.
     $this->drupalGet("taxonomy/term/{$term->id()}/edit");
-    $this->assertNoFieldChecked('path[0][pathauto]');
+    $this->assertNoFieldChecked('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', $manual_alias);
 
     // Submit the term form with the default values.
-    $this->drupalPostForm(NULL, array(), t('Save'));
+    $this->drupalPostForm(NULL, array('path[0][pathauto]' => FALSE), t('Save'));
     $this->assertText("Updated term $name.");
 
     // Test that the old (automatic) alias has been deleted and only accessible
