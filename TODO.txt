@@ -1,15 +1,6 @@
 - Convert Unit tests to DrupalUnitTestBase (note that this will not be that easy
   as it inherits from PathatutoTestHelper which provides assert functions used).
 
-- transliteration_get() => Drupal::service('transliteration')->transliterate(), remove module exists
-  Add a test
-
-- INSTALL.txt: Update
-- Settings forms: implement submitForm()
-
-- Update hook_help(): https://drupal.org/node/2250345
-
-Later:
 - Move functions that do sql to alias storage sub-class/service?
 
 - pathauto_path_alias_types() => Plugins
@@ -17,14 +8,8 @@ Later:
 - Bulk generation of aliases is without batch implementation, only dummy form is
   displayed
 
-- For the bulk update we need to provide different action to update node and
-  user as the action is tied to an entity type. Currently only the action for
-  node entities is implemented.
-
 - There is no storage for pathauto checkbox. So if user unchecks the box it will
   be rechecked again on next edit.
-
-- Localization seems not to work. Tests are runnable but not passing.
 
 - The logic that deals with automated aliases spawns across three files
   (pathauto.module, pathauto.inc, PathautoManager.php). It probably makes sense
@@ -37,8 +22,9 @@ Later:
 
 - Token tests completely broken
 
-- PathautoUnitTest tests are totally broken as well.
-
 - Not really about pathauto, but the AliasManager probably has a bug that
   affects us: https://drupal.org/node/2281167
 
+- INSTALL.txt: Update
+
+- Update hook_help(): https://drupal.org/node/2250345
