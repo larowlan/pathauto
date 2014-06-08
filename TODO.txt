@@ -3,6 +3,9 @@
 
 - Move functions that do sql to alias storage sub-class/service?
 
+- User currently does not have a path field, either fix the core issue or
+  add it in pathauto. See https://drupal.org/node/476294
+
 - pathauto_path_alias_types() => Plugins
 
 - Bulk generation of aliases is without batch implementation, only dummy form is
@@ -10,15 +13,21 @@
 
 - There is no storage for pathauto checkbox. So if user unchecks the box it will
   be rechecked again on next edit.
+  @berdir: This is AFAIK supposed to be handled based on the current alias.
+    If it does not match, then the checkbox is unchecked.
 
 - The logic that deals with automated aliases spawns across three files
   (pathauto.module, pathauto.inc, PathautoManager.php). It probably makes sense
   to refactor this and put everything inside the manager class. What is
   currently nonsense is the need to include the pathauto.inc file if you want to
   use the manager.
+  @berdir: As defined above, functions that execute SQL should be moved into
+    and extended alias storage service.
 
 - Lot of legacy stuff in admin.inc that has not be reviewed and migrated if not
   yet done so
+  @berdir: Patterns and settings forms can be safely removed now I think, the
+    other functions once implemented.
 
 - Token tests completely broken
 
