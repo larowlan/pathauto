@@ -59,7 +59,7 @@ class PathautoUnitTest extends PathautoTestHelper {
         'entity' => 'node',
         'bundle' => 'page',
         'language' => 'en',
-        'expected' => 'content/[node:title]',
+        'expected' => '[node:title]',
       ),
       array(
         'entity' => 'user',
@@ -96,6 +96,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     $tests = array();
     $config->set('ignore_words', ', in, is,that, the  , this, with, ');
     $config->set('max_component_length', 35);
+    $config->set('transliterate', TRUE);
     $config->save();
 
     // Test the 'ignored words' removal.
@@ -109,6 +110,9 @@ class PathautoUnitTest extends PathautoTestHelper {
     // Test that HTML tags are removed.
     $tests['This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.'] = 'text-has-html-tags';
     $tests[String::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
+
+    // Transliteration.
+    $tests['ľščťžýáíéňô'] = 'lsctzyaieno';
 
     foreach ($tests as $input => $expected) {
       $output = \Drupal::service('pathauto.manager')->cleanString($input);
@@ -167,51 +171,53 @@ class PathautoUnitTest extends PathautoTestHelper {
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
     $config->save();
     $node = $this->drupalCreateNode(array('title' => 'First title'));
-    $this->assertEntityAlias($node, 'content/first-title');
+    $this->assertEntityAlias($node, 'first-title');
+
+    $node->path->pathauto = TRUE;
 
     // Default action is PATHAUTO_UPDATE_ACTION_DELETE.
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Second title');
     pathauto_entity_update($node);
-    $this->assertEntityAlias($node, 'content/second-title');
-    $this->assertNoAliasExists(array('alias' => 'content/first-title'));
+    $this->assertEntityAlias($node, 'second-title');
+    $this->assertNoAliasExists(array('alias' => 'first-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_LEAVE
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_LEAVE);
     $config->save();
     $node->setTitle('Third title');
     pathauto_entity_update($node);
-    $this->assertEntityAlias($node, 'content/third-title');
-    $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
+    $this->assertEntityAlias($node, 'third-title');
+    $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'second-title'));
 
     $config->set('update_action', PATHAUTO_UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Fourth title');
     pathauto_entity_update($node);
-    $this->assertEntityAlias($node, 'content/fourth-title');
-    $this->assertNoAliasExists(array('alias' => 'content/third-title'));
+    $this->assertEntityAlias($node, 'fourth-title');
+    $this->assertNoAliasExists(array('alias' => 'third-title'));
     // The older second alias is not deleted yet.
-    $older_path = $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
+    $older_path = $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
-    $config->set('pathauto_update_alias', PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->set('update_action', PATHAUTO_UPDATE_ACTION_NO_NEW);
     $config->save();
     $node->setTitle('Fifth title');
     pathauto_entity_update($node);
-    $this->assertEntityAlias($node, 'content/fourth-title');
-    $this->assertNoAliasExists(array('alias' => 'content/fith-title'));
+    $this->assertEntityAlias($node, 'fourth-title');
+    $this->assertNoAliasExists(array('alias' => 'fifth-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'update'.
     $this->deleteAllAliases();
     pathauto_entity_update($node);
-    $this->assertEntityAlias($node, 'content/fifth-title');
+    $this->assertEntityAlias($node, 'fifth-title');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
     $node->setTitle('Sixth title');
     pathauto_update_alias($node, 'bulkupdate');
-    $this->assertEntityAlias($node, 'content/sixth-title');
+    $this->assertEntityAlias($node, 'sixth-title');
   }
 
   /**
@@ -224,7 +230,7 @@ class PathautoUnitTest extends PathautoTestHelper {
 
     $node->setTitle('hello');
     pathauto_entity_update($node);
-    $this->assertEntityAlias($node, 'content/hello');
+    $this->assertEntityAlias($node, 'hello');
   }
 
   /**
@@ -254,7 +260,7 @@ class PathautoUnitTest extends PathautoTestHelper {
     // Create a vocabulary and test that it's pattern variable works.
     $vocab = $this->addVocabulary(array('machine_name' => 'old_name'));
     $config->set('taxonomy_term._default', 'base');
-    $config->set("taxonomy_term.old_name", 'bundle');
+    $config->set('taxonomy_term.old_name._default', 'bundle');
     $config->save();
 
     $this->assertEntityPattern('taxonomy_term', 'old_name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');

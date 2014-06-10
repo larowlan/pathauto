@@ -1,5 +1,5 @@
-id: pathauto_update_alias
-label: 'Update URL-Alias of an entity'
+id: pathauto_update_alias_node
+label: 'Update URL-Alias'
 status: true
 langcode: en
 type: node

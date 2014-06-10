@@ -1,0 +1,8 @@
+id: pathauto_update_alias_user
+label: 'Update URL-Alias'
+status: true
+type: user
+plugin: pathauto_update_alias
+dependencies:
+  module:
+    - user

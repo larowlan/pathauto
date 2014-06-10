@@ -13,6 +13,7 @@
  */
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Language\Language;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Case should be left as is in the generated path.
@@ -121,36 +122,21 @@ function pathauto_alias_uniquify(&$alias, $source, $langcode) {
  *   TRUE if the path already exists.
  */
 function _pathauto_path_is_callback($path) {
-  // We need to use a try/catch here because of a core bug which will throw an
-  // exception if $path is something like 'node/foo/bar'.
-  // @todo Remove when http://drupal.org/node/1003788 is fixed in core.
-  /*try {
-    $menu = menu_get_item($path);
-  }
-  catch (Exception $e) {
-    return FALSE;
-  }*/
 
-  /*try {
-    $result = \Drupal::service('router')->match($path);
-    $result;
-  }
-  catch (ResourceNotFoundException $e) {
-    //throw new MatchingRouteNotFoundException(sprintf('No matching route could be found for the path "%s"', $path), 0, $e);
-    return FALSE;
-  }*/
-
-  /*if (isset($menu['path']) && $menu['path'] == $path) {
-    return TRUE;
-  }
-  else*/
   if (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
     // Do not allow existing files or directories to get assigned an automatic
     // alias. Note that we do not need to use is_link() to check for symbolic
     // links since this returns TRUE for either is_file() or is_dir() already.
     return TRUE;
   }
-  return FALSE;
+
+  try {
+    \Drupal::service('router')->match('/' . $path);
+    return TRUE;
+  }
+  catch (ResourceNotFoundException $e) {
+    return FALSE;
+  }
 }
 
 /**
@@ -207,7 +193,7 @@ function _pathauto_set_alias(array $path, $existing_alias = NULL, $op = NULL) {
     }
 
     // Save the path array.
-    Drupal::service('path.alias_storage')->save($path['source'], $path['alias'], $path['language'], $path['pid']);
+    \Drupal::service('path.alias_storage')->save($path['source'], $path['alias'], $path['language'], $path['pid']);
 
     if ($verbose) {
       if (!empty($existing_alias['pid'])) {

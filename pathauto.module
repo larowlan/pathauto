@@ -317,13 +317,12 @@ function pathauto_entity_delete(EntityInterface $entity) {
  *   - NULL if no operation performed.
  */
 function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
-
-  // If the entity does not have path field skip.
+  // Skip if the entity does not have the path field.
   if (!isset($entity->path)) {
     return;
   }
 
-  // Skip processing if pathauto processing is disabled.
+  // Skip if pathauto processing is disabled.
   if (isset($entity->path->pathauto) && empty($entity->path->pathauto) && empty($options['force'])) {
     return;
   }

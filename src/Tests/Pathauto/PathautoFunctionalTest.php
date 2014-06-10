@@ -101,16 +101,16 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->deleteAllAliases();
 
     $edit = array(
-      'action' => 'pathauto_update_alias',
+      'action' => 'pathauto_update_alias_node',
       // @todo - here we expect the $node1 to be at 0 position, any better way?
       'node_bulk_form[0]' => TRUE,
     );
     $this->drupalPostForm('admin/content', $edit, t('Apply'));
     $this->assertRaw(\Drupal::translation()->formatPlural(1, '%action was applied to @count item.', '%action was applied to @count items.', array(
-      '%action' => 'Update URL-Alias of an entity',
+      '%action' => 'Update URL-Alias',
     )));
 
-    $this->assertEntityAlias($node1, 'content/' . $node1->getTitle());
+    $this->assertEntityAlias($node1, $node1->getTitle());
     $this->assertEntityAlias($node2, 'node/' . $node2->id());
   }
 
@@ -134,7 +134,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Look for alias generated in the form.
     $this->drupalGet("taxonomy/term/{$term->id()}/edit");
-    $this->assertFieldChecked('path[0][pathauto]');
+    $this->assertFieldChecked('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', $automatic_alias, 'Generated alias visible in the path alias field.');
 
     // Check whether the alias actually works.
@@ -190,19 +190,21 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $view->initDisplay();
     $view->preview('page_1');
     foreach ($view->result as $key => $row) {
-      if ($row->users_name == $account->getName()) {
+      if ($row->users_name == $account->getUsername()) {
         break;
       }
     }
 
     $edit = array(
-      'action' => 'pathauto_update_alias',
+      'action' => 'pathauto_update_alias_user',
       "user_bulk_form[$key]" => TRUE,
     );
-    $this->drupalPostForm('admin/people', $edit, t('Update'));
-    $this->assertText('Updated URL alias for 1 user account.');
+    $this->drupalPostForm('admin/people', $edit, t('Apply'));
+    $this->assertRaw(\Drupal::translation()->formatPlural(1, '%action was applied to @count item.', '%action was applied to @count items.', array(
+      '%action' => 'Update URL-Alias',
+    )));
 
-    $this->assertEntityAlias($account, 'users/' . drupal_strtolower($account->getName()));
+    $this->assertEntityAlias($account, 'users/' . drupal_strtolower($account->getUsername()));
     $this->assertEntityAlias($this->adminUser, 'user/' . $this->adminUser->id());
   }
 
@@ -257,7 +259,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
    */
   function testProgrammaticEntityCreation() {
     $node = $this->drupalCreateNode(array('title' => 'Test node', 'path' => array('pathauto' => TRUE)));
-    $this->assertEntityAlias($node, 'content/test-node');
+    $this->assertEntityAlias($node, 'test-node');
 
     $vocabulary = $this->addVocabulary(array('name' => 'Tags'));
     $term = $this->addTerm($vocabulary, array('name' => 'Test term', 'path' => array('pathauto' => TRUE)));

@@ -181,14 +181,10 @@ class PathautoManager {
    * @see pathauto_clean_alias()
    */
   protected function getCleanSeparators($string, $separator = NULL) {
-    static $default_separator;
-    $config = \Drupal::configFactory()->get('separator');
+    $config = \Drupal::configFactory()->get('pathauto.settings');
 
     if (!isset($separator)) {
-      if (!isset($default_separator)) {
-        $default_separator = $config->get('separator');
-      }
-      $separator = $default_separator;
+      $separator = $config->get('separator');
     }
 
     $output = $string;
@@ -371,7 +367,7 @@ class PathautoManager {
       'alias' => $alias,
       'language' => $language,
     );
-    $path = _pathauto_set_alias($path, $existing_alias, $op);
-    return $path;
+
+    return _pathauto_set_alias($path, $existing_alias, $op);
   }
 }

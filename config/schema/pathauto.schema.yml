@@ -1,3 +1,6 @@
-action.configuration.pathauto_update_alias:
+action.configuration.pathauto_update_alias_node:
   type: action_configuration_default
-  label: 'Update URL-Alias of an entity'
+  label: 'Update URL-Alias'
+action.configuration.pathauto_update_alias_user:
+  type: action_configuration_default
+  label: 'Update URL-Alias'

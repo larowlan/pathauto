@@ -57,11 +57,15 @@ class PathautoTestHelper extends WebTestBase {
   }
 
   public function assertAlias($source, $expected_alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    $alias = \Drupal::request()->attributes->get($source);
-    if (empty($alias)) {
-      $alias = $source;
+    $alias = array('alias' => $source);
+    foreach (db_select('url_alias')->fields('url_alias')->condition('source', $source)->execute() as $row) {
+      $alias = (array) $row;
+      if ($row->alias == $expected_alias) {
+        break;
+      }
     }
-    $this->assertIdentical($alias, $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.", array('%source' => $source, '%actual' => $alias, '%expected' => $expected_alias, '@language' => $language)));
+    $this->assertIdentical($alias['alias'], $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.",
+      array('%source' => $source, '%actual' => $alias['alias'], '%expected' => $expected_alias, '@language' => $language)));
   }
 
   public function assertAliasExists($conditions) {
@@ -71,7 +75,7 @@ class PathautoTestHelper extends WebTestBase {
   }
 
   public function assertNoAliasExists($conditions) {
-    $alias =  \Drupal::service('path.alias_storage')->load($conditions);
+    $alias = \Drupal::service('path.alias_storage')->load($conditions);
     $this->assertFalse($alias, t('Alias with conditions @conditions not found.', array('@conditions' => var_export($conditions, TRUE))));
   }
 
