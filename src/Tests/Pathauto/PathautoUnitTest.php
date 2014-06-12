@@ -4,11 +4,17 @@ namespace Drupal\pathauto\Tests\Pathauto;
 
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
+use Drupal\simpletest\KernelTestBase;
 
 /**
  * Unit tests for Pathauto functions.
  */
-class PathautoUnitTest extends PathautoTestHelper {
+class PathautoUnitTest extends KernelTestBase {
+  use PathautoTestHelperTrait;
+
+  public static $modules = array('system', 'entity', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token');
+
+  protected $currentUser;
 
   public static function getInfo() {
     return array(
@@ -19,8 +25,22 @@ class PathautoUnitTest extends PathautoTestHelper {
     );
   }
 
-  public function setUp(array $modules = array()) {
-    parent::setUp($modules);
+  public function setUp() {
+    parent::setup();
+
+    $this->installConfig(array('pathauto'));
+    $this->installConfig(array('taxonomy'));
+
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('taxonomy_term');
+
+    $this->installSchema('node', array('node_access'));
+    $this->installSchema('system', array('url_alias', 'sequences', 'router'));
+
+    $this->currentUser = entity_create('user', array('name' => $this->randomName()));
+    $this->currentUser->save();
+
     module_load_include('inc', 'pathauto');
   }
 
@@ -35,6 +55,11 @@ class PathautoUnitTest extends PathautoTestHelper {
    * Test pathauto_pattern_load_by_entity().
    */
   public function testPatternLoadByEntity() {
+    \Drupal::config('pathauto.pattern')
+      ->set('node.article._default', 'article/[node:title]')
+      ->set('node.article.en', 'article/en/[node:title]')
+      ->set('node.page._default', '[node:title]')
+      ->save();
 
     $tests = array(
       array(
@@ -279,10 +304,13 @@ class PathautoUnitTest extends PathautoTestHelper {
   }
 
   function testNoExistingPathAliases() {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
 
-    $config->set('node.page._default', '[node:title]');
-    $config->set('punctuation_period', PATHAUTO_PUNCTUATION_DO_NOTHING);
+    \Drupal::configFactory()->get('pathauto.settings')
+      ->set('punctuation_period', PATHAUTO_PUNCTUATION_DO_NOTHING)
+      ->save();
+    \Drupal::configFactory()->get('pathauto.pattern')
+      ->set('node.page._default', '[node:title]')
+      ->save();
 
     // Check that Pathauto does not create an alias of '/admin'.
     $node = $this->drupalCreateNode(array('title' => 'Admin', 'type' => 'page'));
@@ -303,5 +331,18 @@ class PathautoUnitTest extends PathautoTestHelper {
     $node->setTitle('Safe value');
     $node->save();
     $this->assertEntityAlias($node, 'safe-value');
+  }
+
+  protected function drupalCreateNode(array $settings = array()) {
+    // Populate defaults array.
+    $settings += array(
+      'title'     => $this->randomName(8),
+      'type'      => 'page',
+    );
+
+    $node = entity_create('node', $settings);
+    $node->save();
+
+    return $node;
   }
 }

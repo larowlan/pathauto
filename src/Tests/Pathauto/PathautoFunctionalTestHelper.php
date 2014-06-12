@@ -1,11 +1,21 @@
 <?php
 
 namespace Drupal\pathauto\Tests\Pathauto;
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Helper test class with some added functions for testing.
  */
-class PathautoFunctionalTestHelper extends PathautoTestHelper {
+class PathautoFunctionalTestHelper extends WebTestBase {
+  use PathautoTestHelperTrait;
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('path', 'token', 'pathauto', 'taxonomy', 'views');
+
   protected $adminUser;
 
   function setUp() {
@@ -13,10 +23,6 @@ class PathautoFunctionalTestHelper extends PathautoTestHelper {
 
     $this->drupalCreateContentType(array('type' => 'page'));
     $this->drupalCreateContentType(array('type' => 'article'));
-
-    $config = \Drupal::configFactory()->get('pathauto.pattern');
-    // Set pathauto settings we assume to be as-is in this test.
-    $config->set('node.page._default', 'content/[node:title]');
 
     // Allow other modules to add additional permissions for the admin user.
     $permissions = array(
@@ -29,12 +35,7 @@ class PathautoFunctionalTestHelper extends PathautoTestHelper {
       'administer taxonomy',
       'administer users',
     );
-    $args = func_get_args();
-    if (isset($args[1]) && is_array($args[1])) {
-      $permissions = array_merge($permissions, $args[1]);
-    }
     $this->adminUser = $this->drupalCreateUser($permissions);
-
     $this->drupalLogin($this->adminUser);
   }
 }

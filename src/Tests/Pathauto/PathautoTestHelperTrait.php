@@ -17,14 +17,7 @@ use Drupal\taxonomy\VocabularyInterface;
 /**
  * Helper test class with some added functions for testing.
  */
-class PathautoTestHelper extends WebTestBase {
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = array('path', 'token', 'pathauto', 'taxonomy', 'views');
+trait PathautoTestHelperTrait {
 
   public function assertToken($type, $object, $token, $expected) {
     $tokens = \Drupal::token()->generate($type, array($token => $token), array($type => $object));
@@ -113,7 +106,6 @@ class PathautoTestHelper extends WebTestBase {
 
   public function assertEntityPattern($entity_type, $bundle, $language = Language::LANGCODE_NOT_SPECIFIED, $expected) {
     drupal_static_reset('pathauto_pattern_load_by_entity');
-    $this->refreshVariables();
     $pattern = pathauto_pattern_load_by_entity($entity_type, $bundle, $language);
     $this->assertIdentical($expected, $pattern);
   }
