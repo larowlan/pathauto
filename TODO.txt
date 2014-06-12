@@ -4,9 +4,6 @@
   class with a ustom one and completely replace the logic there. Or fix core to
   make sure that it sets ->pid after saving a new alias.
 
-- Convert Unit tests to DrupalUnitTestBase (note that this will not be that easy
-  as it inherits from PathatutoTestHelper which provides assert functions used).
-
 - Move functions that do sql to alias storage sub-class/service?
 
 - User currently does not have a path field, either fix the core issue or
