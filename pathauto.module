@@ -17,6 +17,7 @@
  */
 
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -220,6 +221,9 @@ function pathauto_entity_bundle_delete($entity_type, $bundle) {
  * Implements hook_entity_presave().
  */
 function pathauto_entity_presave($entity) {
+  if (!($entity instanceof ContentEntityInterface) || $entity->hasField('path')) {
+    return;
+  }
   // About to be saved (before insert/update)
   if (!empty($entity->path->pathauto) && isset($entity->path->old_alias)
       && $entity->path->alias == '' && $entity->path->old_alias != '') {
@@ -314,13 +318,13 @@ function pathauto_entity_delete(EntityInterface $entity) {
  *   - force: will force updating the path
  *   - language: the language for which to create the alias
  *
- * @return mixed
+ * @return array|null
  *   - An array with alias data in case the alias has been created or updated.
  *   - NULL if no operation performed.
  */
 function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
   // Skip if the entity does not have the path field.
-  if (!isset($entity->path)) {
+  if (!($entity instanceof ContentEntityInterface) || $entity->hasField('path')) {
     return;
   }
 
