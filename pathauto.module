@@ -324,7 +324,7 @@ function pathauto_entity_delete(EntityInterface $entity) {
  */
 function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
   // Skip if the entity does not have the path field.
-  if (!($entity instanceof ContentEntityInterface) || $entity->hasField('path')) {
+  if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
     return;
   }
 
