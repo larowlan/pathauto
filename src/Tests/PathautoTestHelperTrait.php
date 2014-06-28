@@ -102,8 +102,8 @@ trait PathautoTestHelperTrait {
   }
 
   public function assertEntityPattern($entity_type, $bundle, $language = Language::LANGCODE_NOT_SPECIFIED, $expected) {
-    drupal_static_reset('pathauto_pattern_load_by_entity');
-    $pattern = pathauto_pattern_load_by_entity($entity_type, $bundle, $language);
+    \Drupal::service('pathauto.manager')->resetCaches();
+    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity_type, $bundle, $language);
     $this->assertIdentical($expected, $pattern);
   }
 

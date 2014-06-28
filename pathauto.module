@@ -78,7 +78,7 @@ function pathauto_help($path, $arg) {
       $output .= '<h3>' . t('Settings') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Maximum alias and component length') . '</dt>';
-      $output .= '<dd>' . t('The <strong>maximum alias length</strong> and <strong>maximum component length</strong> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "alias" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "alias" column it will cause problems in situations where the system needs to append additional words to the aliased URL. You should enter a value that is the length of the "alias" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => _pathauto_get_schema_alias_maxlength())) . '</dd>';
+      $output .= '<dd>' . t('The <strong>maximum alias length</strong> and <strong>maximum component length</strong> values default to 100 and have a limit of @max from Pathauto. This length is limited by the length of the "alias" column of the url_alias database table. The default database schema for this column is @max. If you set a length that is equal to that of the one set in the "alias" column it will cause problems in situations where the system needs to append additional words to the aliased URL. You should enter a value that is the length of the "alias" column minus the length of any strings that might get added to the end of the URL. The length of strings that might get added to the end of your URLs depends on which modules you have enabled and on your Pathauto settings. The recommended and default value is 100.', array('@max' => \Drupal::service('pathauto.manager')->getAliasSchemaMaxlength())) . '</dd>';
       $output .= '</dl>';
       return $output;
 
@@ -197,7 +197,7 @@ function pathauto_entity_path_delete_all(EntityInterface $entity, $default_uri =
  * Implements hook_entity_bundle_rename().
  */
 function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new) {
-  $config = \Drupal::configFactory()->get('pathauto.pattern');
+  $config = \Drupal::config('pathauto.pattern');
   $bundle_settings = $config->get($entity_type_id);
 
   if (isset($bundle_settings[$bundle_old])) {
@@ -212,7 +212,7 @@ function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new
  * Implements hook__entity_bundle_delete().
  */
 function pathauto_entity_bundle_delete($entity_type, $bundle) {
-  $config = \Drupal::configFactory()->get('pathauto.pattern');
+  $config = \Drupal::config('pathauto.pattern');
   $config->clear($entity_type . '.' . $bundle);
   $config->save();
 }
@@ -339,9 +339,7 @@ function pathauto_update_alias(EntityInterface $entity, $op, array $options = ar
   $bundle = $entity->bundle();
 
   // Skip processing if the entity has no pattern.
-  debug(\Drupal::config('pathauto.pattern')->get());
-  debug(pathauto_pattern_load_by_entity($type, $bundle, $options['language']));
-  if (!pathauto_pattern_load_by_entity($type, $bundle, $options['language'])) {
+  if (!\Drupal::service('pathauto.manager')->getPatternByEntity($type, $bundle, $options['language'])) {
     return;
   }
 
@@ -352,16 +350,8 @@ function pathauto_update_alias(EntityInterface $entity, $op, array $options = ar
     if ($entity->getVocabularyId() == $config_forum->get('vocabulary')) {
       $type = 'forum';
     }
-
-    // Check that the term has its bundle, which is the vocabulary's machine
-    // name.
-    if (!isset($entity->vocabulary_machine_name)) {
-      $vocabulary = entity_load('taxonomy_vocabulary', $entity->getVocabularyId());
-      $entity->vocabulary_machine_name = $vocabulary->id();
-    }
   }
 
-  module_load_include('inc', 'pathauto');
   $result = \Drupal::service('pathauto.manager')->createAlias(
     $type, $op, $entity->getSystemPath(), array($type => $entity), $bundle, $options['language']);
 

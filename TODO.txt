@@ -6,9 +6,6 @@
 
 - Move functions that do sql to alias storage sub-class/service?
 
-- User currently does not have a path field, either fix the core issue or
-  add it in pathauto. See https://drupal.org/node/476294
-
 - pathauto_path_alias_types() => Plugins
 
 - The logic that deals with automated aliases spawns across three files
@@ -18,9 +15,6 @@
   use the manager.
   @berdir: As defined above, functions that execute SQL should be moved into
     and extended alias storage service.
-
-- Not really about pathauto, but the AliasManager probably has a bug that
-  affects us: https://drupal.org/node/2281167
 
 - INSTALL.txt: Update
 

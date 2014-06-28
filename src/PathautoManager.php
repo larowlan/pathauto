@@ -2,15 +2,100 @@
 
 /**
  * @file
- * Contains \Drupal\pathauto\PathautoManager
+ * Contains \Drupal\pathauto\PathautoManager.
  */
 
 namespace Drupal\pathauto;
 
-use \Drupal\Core\Language\Language;
+use Drupal\Component\Utility\String;
 use \Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Utility\Token;
 
 class PathautoManager {
+
+  /**
+   * Calculated settings cache.
+   *
+   * @todo Split this up into separate properties.
+   *
+   * @var array
+   */
+  protected $cleanStringCache = array();
+
+  /**
+   * Punctuation characters cache.
+   *
+   * @var array
+   */
+  protected $punctuationCharacters = array();
+
+  /**
+   * Alias max length.
+   *
+   * @var int
+   */
+  protected $aliasMaxLength;
+
+  /**
+   * Alias schema max length.
+   *
+   * @var int
+   */
+  protected $aliasSchemaMaxLength;
+
+  /**
+   * Config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Language manager.
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * Cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
+   * Module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * Token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
+   * Calculated patterns for entities.
+   *
+   * @var array
+   */
+  protected $patterns = array();
+
+  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token) {
+    $this->configFactory = $config_factory;
+    $this->languageManager = $language_manager;
+    $this->cacheBackend = $cache_backend;
+    $this->moduleHandler = $module_handler;
+    $this->token = $token;
+  }
 
   /**
    * Clean up a string segment to be used in an URL alias.
@@ -41,21 +126,10 @@ class PathautoManager {
    *   The cleaned string.
    */
   public function cleanString($string, array $options = array()) {
-
-    // Use the advanced drupal_static() pattern, since this is called very often.
-    static $drupal_static_fast;
-    $config = \Drupal::configFactory()->get('pathauto.settings');
-    module_load_include('inc', 'pathauto');
-
-    if (!isset($drupal_static_fast)) {
-      $drupal_static_fast['cache'] = &drupal_static(__FUNCTION__);
-    }
-    $cache = &$drupal_static_fast['cache'];
-
-    // Generate and cache variables used in this function so that on the second
-    // call to \Drupal::service('pathauto.manager')->cleanString() we focus on processing.
-    if (!isset($cache)) {
-      $cache = array(
+    if (empty($this->cleanStringCache)) {
+      // Generate and cache variables used in this method.
+      $config = $this->configFactory->get('pathauto.settings');
+      $this->cleanStringCache = array(
         'separator' => $config->get('separator'),
         'strings' => array(),
         'transliterate' => $config->get('transliterate'),
@@ -63,20 +137,20 @@ class PathautoManager {
         'reduce_ascii' => (bool) $config->get('reduce_ascii'),
         'ignore_words_regex' => FALSE,
         'lowercase' => (bool) $config->get('case'),
-        'maxlength' => min($config->get('max_component_length'), _pathauto_get_schema_alias_maxlength()),
+        'maxlength' => min($config->get('max_component_length'), $this->getAliasSchemaMaxLength()),
       );
 
       // Generate and cache the punctuation replacements for strtr().
-      $punctuation = pathauto_punctuation_chars();
+      $punctuation = $this->getPunctuationCharacters();
       foreach ($punctuation as $name => $details) {
         $action = $config->get('punctuation_' . $name);
         switch ($action) {
           case PATHAUTO_PUNCTUATION_REMOVE:
             $cache['punctuation'][$details['value']] = '';
-            break;
+            $this->cleanStringCache;
 
           case PATHAUTO_PUNCTUATION_REPLACE:
-            $cache['punctuation'][$details['value']] = $cache['separator'];
+            $this->cleanStringCache['punctuation'][$details['value']] = $this->cleanStringCache['separator'];
             break;
 
           case PATHAUTO_PUNCTUATION_DO_NOTHING:
@@ -89,13 +163,13 @@ class PathautoManager {
       $ignore_words = $config->get('ignore_words');
       $ignore_words_regex = preg_replace(array('/^[,\s]+|[,\s]+$/', '/[,\s]+/'), array('', '\b|\b'), $ignore_words);
       if ($ignore_words_regex) {
-        $cache['ignore_words_regex'] = '\b' . $ignore_words_regex . '\b';
+        $this->cleanStringCache['ignore_words_regex'] = '\b' . $ignore_words_regex . '\b';
         if (function_exists('mb_eregi_replace')) {
-          $cache['ignore_words_callback'] = 'mb_eregi_replace';
+          $this->cleanStringCache['ignore_words_callback'] = 'mb_eregi_replace';
         }
         else {
-          $cache['ignore_words_callback'] = 'preg_replace';
-          $cache['ignore_words_regex'] = '/' . $cache['ignore_words_regex'] . '/i';
+          $this->cleanStringCache['ignore_words_callback'] = 'preg_replace';
+          $this->cleanStringCache['ignore_words_regex'] = '/' . $this->cleanStringCache['ignore_words_regex'] . '/i';
         }
       }
     }
@@ -115,55 +189,120 @@ class PathautoManager {
 
     // Check if the string has already been processed, and if so return the
     // cached result.
-    if (isset($cache['strings'][$langcode][$string])) {
-      return $cache['strings'][$langcode][$string];
+    if (isset($this->cleanStringCache['strings'][$langcode][$string])) {
+      return $this->cleanStringCache['strings'][$langcode][$string];
     }
 
     // Remove all HTML tags from the string.
-    $output = strip_tags(decode_entities($string));
+    $output = strip_tags(String::decodeEntities($string));
 
     // Optionally transliterate.
-    if ($cache['transliterate']) {
+    if ($this->cleanStringCache['transliterate']) {
       // If the reduce strings to letters and numbers is enabled, don't bother
       // replacing unknown characters with a question mark. Use an empty string
       // instead.
-      $output = \Drupal::service('transliteration')->transliterate($output, $cache['reduce_ascii'] ? '' : '?', $langcode);
+      $output = \Drupal::service('transliteration')->transliterate($output, $this->cleanStringCache['reduce_ascii'] ? '' : '?', $langcode);
     }
 
     // Replace or drop punctuation based on user settings.
-    $output = strtr($output, $cache['punctuation']);
+    $output = strtr($output, $this->cleanStringCache['punctuation']);
 
     // Reduce strings to letters and numbers.
-    if ($cache['reduce_ascii']) {
-      $output = preg_replace('/[^a-zA-Z0-9\/]+/', $cache['separator'], $output);
+    if ($this->cleanStringCache['reduce_ascii']) {
+      $output = preg_replace('/[^a-zA-Z0-9\/]+/', $this->cleanStringCache['separator'], $output);
     }
 
     // Get rid of words that are on the ignore list.
-    if ($cache['ignore_words_regex']) {
-      $words_removed = $cache['ignore_words_callback']($cache['ignore_words_regex'], '', $output);
+    if ($this->cleanStringCache['ignore_words_regex']) {
+      $words_removed = $this->cleanStringCache['ignore_words_callback']($this->cleanStringCache['ignore_words_regex'], '', $output);
       if (Unicode::strlen(trim($words_removed)) > 0) {
         $output = $words_removed;
       }
     }
 
     // Always replace whitespace with the separator.
-    $output = preg_replace('/\s+/', $cache['separator'], $output);
+    $output = preg_replace('/\s+/', $this->cleanStringCache['separator'], $output);
 
     // Trim duplicates and remove trailing and leading separators.
-    $output = $this->getCleanSeparators($this->getCleanSeparators($output, $cache['separator']));
+    $output = $this->getCleanSeparators($this->getCleanSeparators($output, $this->cleanStringCache['separator']));
 
     // Optionally convert to lower case.
-    if ($cache['lowercase']) {
+    if ($this->cleanStringCache['lowercase']) {
       $output = Unicode::strtolower($output);
     }
 
     // Shorten to a logical place based on word boundaries.
-    $output = truncate_utf8($output, $cache['maxlength'], TRUE);
+    $output = Unicode::truncate($output, $this->cleanStringCache['maxlength'], TRUE);
 
     // Cache this result in the static array.
-    $cache['strings'][$langcode][$string] = $output;
+    $this->cleanStringCache['strings'][$langcode][$string] = $output;
 
     return $output;
+  }
+
+
+  /**
+   * Return an array of arrays for punctuation values.
+   *
+   * Returns an array of arrays for punctuation values keyed by a name, including
+   * the value and a textual description.
+   * Can and should be expanded to include "all" non text punctuation values.
+   *
+   * @return array
+   *   An array of arrays for punctuation values keyed by a name, including the
+   *   value and a textual description.
+   */
+  public function getPunctuationCharacters() {
+    if (empty($this->punctuationCharacters)) {
+      $langcode = $this->languageManager->getCurrentLanguage()->getId();
+
+      $cid = 'pathauto:punctuation:' . $langcode;
+      if ($cache = $this->cacheBackend->get($cid)) {
+        $this->punctuationCharacters = $cache->data;
+      }
+      else {
+        $punctuation = array();
+        $punctuation['double_quotes']      = array('value' => '"', 'name' => t('Double quotation marks'));
+        $punctuation['quotes']             = array('value' => '\'', 'name' => t("Single quotation marks (apostrophe)"));
+        $punctuation['backtick']           = array('value' => '`', 'name' => t('Back tick'));
+        $punctuation['comma']              = array('value' => ',', 'name' => t('Comma'));
+        $punctuation['period']             = array('value' => '.', 'name' => t('Period'));
+        $punctuation['hyphen']             = array('value' => '-', 'name' => t('Hyphen'));
+        $punctuation['underscore']         = array('value' => '_', 'name' => t('Underscore'));
+        $punctuation['colon']              = array('value' => ':', 'name' => t('Colon'));
+        $punctuation['semicolon']          = array('value' => ';', 'name' => t('Semicolon'));
+        $punctuation['pipe']               = array('value' => '|', 'name' => t('Vertical bar (pipe)'));
+        $punctuation['left_curly']         = array('value' => '{', 'name' => t('Left curly bracket'));
+        $punctuation['left_square']        = array('value' => '[', 'name' => t('Left square bracket'));
+        $punctuation['right_curly']        = array('value' => '}', 'name' => t('Right curly bracket'));
+        $punctuation['right_square']       = array('value' => ']', 'name' => t('Right square bracket'));
+        $punctuation['plus']               = array('value' => '+', 'name' => t('Plus sign'));
+        $punctuation['equal']              = array('value' => '=', 'name' => t('Equal sign'));
+        $punctuation['asterisk']           = array('value' => '*', 'name' => t('Asterisk'));
+        $punctuation['ampersand']          = array('value' => '&', 'name' => t('Ampersand'));
+        $punctuation['percent']            = array('value' => '%', 'name' => t('Percent sign'));
+        $punctuation['caret']              = array('value' => '^', 'name' => t('Caret'));
+        $punctuation['dollar']             = array('value' => '$', 'name' => t('Dollar sign'));
+        $punctuation['hash']               = array('value' => '#', 'name' => t('Number sign (pound sign, hash)'));
+        $punctuation['at']                 = array('value' => '@', 'name' => t('At sign'));
+        $punctuation['exclamation']        = array('value' => '!', 'name' => t('Exclamation mark'));
+        $punctuation['tilde']              = array('value' => '~', 'name' => t('Tilde'));
+        $punctuation['left_parenthesis']   = array('value' => '(', 'name' => t('Left parenthesis'));
+        $punctuation['right_parenthesis']  = array('value' => ')', 'name' => t('Right parenthesis'));
+        $punctuation['question_mark']      = array('value' => '?', 'name' => t('Question mark'));
+        $punctuation['less_than']          = array('value' => '<', 'name' => t('Less-than sign'));
+        $punctuation['greater_than']       = array('value' => '>', 'name' => t('Greater-than sign'));
+        $punctuation['slash']              = array('value' => '/', 'name' => t('Slash'));
+        $punctuation['back_slash']         = array('value' => '\\', 'name' => t('Backslash'));
+
+        // Allow modules to alter the punctuation list and cache the result.
+        $this->moduleHandler->alter('pathauto_punctuation_chars', $punctuation);
+        $this->cacheBackend->set($cid, $punctuation);
+        $this->punctuationCharacters = $punctuation;
+      }
+    }
+
+    return $this->punctuationCharacters;
   }
 
   /**
@@ -181,7 +320,7 @@ class PathautoManager {
    * @see pathauto_clean_alias()
    */
   protected function getCleanSeparators($string, $separator = NULL) {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
+    $config = $this->configFactory->get('pathauto.settings');
 
     if (!isset($separator)) {
       $separator = $config->get('separator');
@@ -223,14 +362,9 @@ class PathautoManager {
    *   The cleaned URL alias.
    */
   public function cleanAlias($alias) {
-    $cache = &drupal_static(__FUNCTION__);
-    $config = \Drupal::configFactory()->get('pathauto.settings');
-    module_load_include('inc', 'pathauto');
-
-    if (!isset($cache)) {
-      $cache = array(
-        'maxlength' => min($config->get('max_length'), _pathauto_get_schema_alias_maxlength()),
-      );
+    if (!isset($this->aliasMaxLength)) {
+      $config = $this->configFactory->get('pathauto.settings');
+      $this->aliasMaxLength = min($config->get('max_length'), $this->getAliasSchemaMaxLength());
     }
 
     $output = $alias;
@@ -245,7 +379,7 @@ class PathautoManager {
     $output = $this->getCleanSeparators($output, '/');
 
     // Shorten to a logical place based on word boundaries.
-    $output = truncate_utf8($output, $cache['maxlength'], TRUE);
+    $output = Unicode::truncate($output, $this->aliasMaxLength, TRUE);
 
     return $output;
   }
@@ -278,12 +412,12 @@ class PathautoManager {
    *
    * @see _pathauto_set_alias()
    */
-  public function createAlias($module, $op, $source, $data, $type = NULL, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
+  public function createAlias($module, $op, $source, $data, $type = NULL, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    $config = $this->configFactory->get('pathauto.settings');
     module_load_include('inc', 'pathauto');
 
     // Retrieve and apply the pattern for this content type.
-    $pattern = pathauto_pattern_load_by_entity($module, $type, $language);
+    $pattern = $this->getPatternByEntity($module, $type, $language);
 
     // Allow other modules to alter the pattern.
     $context = array(
@@ -294,7 +428,7 @@ class PathautoManager {
       'type' => $type,
       'language' => &$language,
     );
-    \Drupal::moduleHandler()->alter('pathauto_pattern', $pattern, $context);
+    $this->moduleHandler->alter('pathauto_pattern', $pattern, $context);
 
     if (empty($pattern)) {
       // No pattern? Do nothing (otherwise we may blow away existing aliases...)
@@ -317,7 +451,7 @@ class PathautoManager {
 
     // Replace any tokens in the pattern.
     // Uses callback option to clean replacements. No sanitization.
-    $alias = \Drupal::token()->replace($pattern, $data, array(
+    $alias = $this->token->replace($pattern, $data, array(
       'sanitize' => FALSE,
       'clear' => TRUE,
       'callback' => 'pathauto_clean_token_values',
@@ -338,7 +472,7 @@ class PathautoManager {
     // Allow other modules to alter the alias.
     $context['source'] = &$source;
     $context['pattern'] = $pattern;
-    \Drupal::moduleHandler()->alter('pathauto_alias', $alias, $context);
+    $this->moduleHandler->alter('pathauto_alias', $alias, $context);
 
     // If we have arrived at an empty string, discontinue.
     if (!Unicode::strlen($alias)) {
@@ -370,4 +504,64 @@ class PathautoManager {
 
     return _pathauto_set_alias($path, $existing_alias, $op);
   }
+
+  /**
+   * Load an URL alias pattern by entity, bundle, and language.
+   *
+   * @param $entity_type_id
+   *   An entity (e.g. node, taxonomy, user, etc.)
+   * @param $bundle
+   *   A bundle (e.g. content type, vocabulary ID, etc.)
+   * @param $language
+   *   A language code, defaults to the LANGUAGE_NONE constant.
+   */
+  public function getPatternByEntity($entity_type_id, $bundle = '', $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    $config = $this->configFactory->get('pathauto.pattern');
+
+    $pattern_id = "$entity_type_id:$bundle:$language";
+    if (!isset($this->patterns[$pattern_id])) {
+      $pattern = '';
+      $variables = array();
+      if ($language != LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+        $variables[] = "{$entity_type_id}.{$bundle}.{$language}";
+      }
+      if ($bundle) {
+        $variables[] = "{$entity_type_id}.{$bundle}._default";
+      }
+      $variables[] = "{$entity_type_id}._default";
+
+      foreach ($variables as $variable) {
+        if ($pattern = trim($config->get($variable))) {
+          break;
+        }
+      }
+
+      $this->patterns[$pattern_id] = $pattern;
+    }
+
+    return $this->patterns[$pattern_id];
+  }
+
+  /**
+   * Fetch the maximum length of the {url_alias}.alias field from the schema.
+   *
+   * @return int
+   *   An integer of the maximum URL alias length allowed by the database.
+   */
+  public function getAliasSchemaMaxLength() {
+    if (!isset($this->aliasSchemaMaxLength)) {
+      $schema = drupal_get_schema('url_alias');
+      $this->aliasSchemaMaxLength = $schema['fields']['alias']['length'];
+    }
+    return $this->aliasSchemaMaxLength;
+  }
+
+  /**
+   * Resets internal caches.
+   */
+  public function resetCaches() {
+    $this->patterns = array();
+    $this->cleanStringCache = array();
+  }
+
 }

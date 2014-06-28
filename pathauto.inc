@@ -97,7 +97,7 @@ function pathauto_alias_uniquify(&$alias, $source, $langcode) {
   }
 
   // If the alias already exists, generate a new, hopefully unique, variant.
-  $maxlength = min($config->get('max_length'), _pathauto_get_schema_alias_maxlength());
+  $maxlength = min($config->get('max_length'), \Drupal::service('pathauto.manager')->getAliasSchemaMaxlength());
   $separator = $config->get('separator');
   $original_alias = $alias;
 
@@ -271,90 +271,4 @@ function pathauto_clean_token_values(&$replacements, $data = array(), $options =
       $replacements[$token] = \Drupal::service('pathauto.manager')->cleanString($value, $options);
     }
   }
-}
-
-/**
- * Return an array of arrays for punctuation values.
- *
- * Returns an array of arrays for punctuation values keyed by a name, including
- * the value and a textual description.
- * Can and should be expanded to include "all" non text punctuation values.
- *
- * @return array
- *   An array of arrays for punctuation values keyed by a name, including the
- *   value and a textual description.
- */
-function pathauto_punctuation_chars() {
-  $punctuation = &drupal_static(__FUNCTION__);
-
-  if (!isset($punctuation)) {
-
-    if (isset($GLOBALS['language'])) {
-      $lang = $GLOBALS['language']->language;
-    }
-    else {
-      $lang = Language::LANGCODE_NOT_SPECIFIED;
-    }
-
-    $cid = 'pathauto:punctuation:' . $lang;
-    if ($cache = \Drupal::cache()->get($cid)) {
-      $punctuation = $cache->data;
-    }
-    else {
-      $punctuation = array();
-      $punctuation['double_quotes']      = array('value' => '"', 'name' => t('Double quotation marks'));
-      $punctuation['quotes']             = array('value' => '\'', 'name' => t("Single quotation marks (apostrophe)"));
-      $punctuation['backtick']           = array('value' => '`', 'name' => t('Back tick'));
-      $punctuation['comma']              = array('value' => ',', 'name' => t('Comma'));
-      $punctuation['period']             = array('value' => '.', 'name' => t('Period'));
-      $punctuation['hyphen']             = array('value' => '-', 'name' => t('Hyphen'));
-      $punctuation['underscore']         = array('value' => '_', 'name' => t('Underscore'));
-      $punctuation['colon']              = array('value' => ':', 'name' => t('Colon'));
-      $punctuation['semicolon']          = array('value' => ';', 'name' => t('Semicolon'));
-      $punctuation['pipe']               = array('value' => '|', 'name' => t('Vertical bar (pipe)'));
-      $punctuation['left_curly']         = array('value' => '{', 'name' => t('Left curly bracket'));
-      $punctuation['left_square']        = array('value' => '[', 'name' => t('Left square bracket'));
-      $punctuation['right_curly']        = array('value' => '}', 'name' => t('Right curly bracket'));
-      $punctuation['right_square']       = array('value' => ']', 'name' => t('Right square bracket'));
-      $punctuation['plus']               = array('value' => '+', 'name' => t('Plus sign'));
-      $punctuation['equal']              = array('value' => '=', 'name' => t('Equal sign'));
-      $punctuation['asterisk']           = array('value' => '*', 'name' => t('Asterisk'));
-      $punctuation['ampersand']          = array('value' => '&', 'name' => t('Ampersand'));
-      $punctuation['percent']            = array('value' => '%', 'name' => t('Percent sign'));
-      $punctuation['caret']              = array('value' => '^', 'name' => t('Caret'));
-      $punctuation['dollar']             = array('value' => '$', 'name' => t('Dollar sign'));
-      $punctuation['hash']               = array('value' => '#', 'name' => t('Number sign (pound sign, hash)'));
-      $punctuation['at']                 = array('value' => '@', 'name' => t('At sign'));
-      $punctuation['exclamation']        = array('value' => '!', 'name' => t('Exclamation mark'));
-      $punctuation['tilde']              = array('value' => '~', 'name' => t('Tilde'));
-      $punctuation['left_parenthesis']   = array('value' => '(', 'name' => t('Left parenthesis'));
-      $punctuation['right_parenthesis']  = array('value' => ')', 'name' => t('Right parenthesis'));
-      $punctuation['question_mark']      = array('value' => '?', 'name' => t('Question mark'));
-      $punctuation['less_than']          = array('value' => '<', 'name' => t('Less-than sign'));
-      $punctuation['greater_than']       = array('value' => '>', 'name' => t('Greater-than sign'));
-      $punctuation['slash']              = array('value' => '/', 'name' => t('Slash'));
-      $punctuation['back_slash']         = array('value' => '\\', 'name' => t('Backslash'));
-
-      // Allow modules to alter the punctuation list and cache the result.
-      \Drupal::moduleHandler()->alter('pathauto_punctuation_chars', $punctuation);
-      \Drupal::cache()->set($cid, $punctuation);
-    }
-  }
-
-  return $punctuation;
-}
-
-/**
- * Fetch the maximum length of the {url_alias}.alias field from the schema.
- *
- * @return int
- *   An integer of the maximum URL alias length allowed by the database.
- */
-function _pathauto_get_schema_alias_maxlength() {
-  $maxlength = &drupal_static(__FUNCTION__);
-  if (!isset($maxlength)) {
-    $schema = drupal_get_schema('url_alias');
-    $maxlength = $schema['fields']['alias']['length'];
-  }
-  return $maxlength;
 }

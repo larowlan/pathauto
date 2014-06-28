@@ -81,7 +81,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $config = \Drupal::configFactory()->get('pathauto.pattern');
     $config->set('node', array('_default' => ''));
     $config->save();
-    drupal_static_reset('pathauto_pattern_load_by_entity');
+    \Drupal::service('pathauto.manager')->resetCaches();
 
     $this->drupalGet('node/add/article');
     $this->assertNoFieldById('edit-path-0-pathauto');

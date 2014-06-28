@@ -46,15 +46,13 @@ class PathautoUnitTest extends KernelTestBase {
 
     $this->currentUser = entity_create('user', array('name' => $this->randomName()));
     $this->currentUser->save();
-
-    module_load_include('inc', 'pathauto');
   }
 
   /**
    * Test _pathauto_get_schema_alias_maxlength().
    */
   public function testGetSchemaAliasMaxLength() {
-    $this->assertIdentical(_pathauto_get_schema_alias_maxlength(), 255);
+    $this->assertIdentical(\Drupal::service('pathauto.manager')->getAliasSchemaMaxlength(), 255);
   }
 
   /**
@@ -106,7 +104,7 @@ class PathautoUnitTest extends KernelTestBase {
       ),
     );
     foreach ($tests as $test) {
-      $actual = pathauto_pattern_load_by_entity($test['entity'], $test['bundle'], $test['language']);
+      $actual = \Drupal::service('pathauto.manager')->getPatternByEntity($test['entity'], $test['bundle'], $test['language']);
       $this->assertIdentical($actual, $test['expected'], t("pathauto_pattern_load_by_entity('@entity', '@bundle', '@language') returned '@actual', expected '@expected'", array(
         '@entity' => $test['entity'],
         '@bundle' => $test['bundle'],
@@ -129,7 +127,7 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('max_component_length', 35);
     $config->set('transliterate', TRUE);
     $config->save();
-    drupal_static_reset('cleanString');
+    \Drupal::service('pathauto.manager')->resetCaches();
 
     // Test the 'ignored words' removal.
     $tests['this'] = 'this';
@@ -315,10 +313,10 @@ class PathautoUnitTest extends KernelTestBase {
     \Drupal::configFactory()->get('pathauto.settings')
       ->set('punctuation_period', PATHAUTO_PUNCTUATION_DO_NOTHING)
       ->save();
-    drupal_static_reset('cleanString');
     \Drupal::configFactory()->get('pathauto.pattern')
       ->set('node.page._default', '[node:title]')
       ->save();
+    \Drupal::service('pathauto.manager')->resetCaches();
 
     // Check that Pathauto does not create an alias of '/admin'.
     $node = $this->drupalCreateNode(array('title' => 'Admin', 'type' => 'page'));

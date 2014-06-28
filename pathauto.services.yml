@@ -1,3 +1,4 @@
 services:
   pathauto.manager:
     class: Drupal\pathauto\PathautoManager
+    arguments: ['@config.factory', '@language_manager', '@cache.default', '@module_handler', '@token']

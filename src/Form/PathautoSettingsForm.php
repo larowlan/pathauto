@@ -57,7 +57,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       ),
     );
 
-    $max_length = _pathauto_get_schema_alias_maxlength();
+    $max_length = \Drupal::service('pathauto.manager')->getAliasSchemaMaxlength();
 
     $form['max_length'] = array(
       '#type' => 'number',
@@ -130,7 +130,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#collapsed' => TRUE,
     );
 
-    $punctuation = pathauto_punctuation_chars();
+    $punctuation = \Drupal::service('pathauto.manager')->getPunctuationCharacteres();
 
     foreach ($punctuation as $name => $details) {
       $details['default'] = PATHAUTO_PUNCTUATION_REMOVE;
