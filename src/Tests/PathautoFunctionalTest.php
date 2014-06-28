@@ -36,7 +36,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
 
     // Create node for testing by previewing and saving the node form.
     $title = ' Testing: node title [';
-    $automatic_alias = 'testing-node-title';
+    $automatic_alias = 'content/testing-node-title';
     $this->drupalCreateNode(array('title' => $title));
     /*$this->drupalPostForm(NULL, array('title' => $title), array('Preview'));
     $this->drupalPostForm(NULL, array(), 'Save');*/

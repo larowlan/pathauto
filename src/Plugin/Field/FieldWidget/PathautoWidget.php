@@ -57,10 +57,10 @@ class PathautoWidget extends PathWidget {
 
 
     if (!isset($entity->path->pathauto)) {
-      if (!empty($id)) {
+      if (!$entity->isNew()) {
         module_load_include('inc', 'pathauto');
-        $path = \Drupal::service('path.alias_manager.cached')->getPathAlias($entity->getSystemPath(), $entity->language()->getId());
-        $pathauto_alias = \Drupal::service('pathauto.manager')->createAlias($entity->getEntityType(), 'return', $entity->getSystemPath(), array($entity->getEntityType()->id() => $entity), $entity->bundle(), $entity->language()->getId());
+        $path = \Drupal::service('path.alias_manager')->getAliasByPath($entity->getSystemPath(), $entity->language()->getId());
+        $pathauto_alias = \Drupal::service('pathauto.manager')->createAlias($entity->getEntityTypeId(), 'return', $entity->getSystemPath(), array($entity->getEntityType()->id() => $entity), $entity->bundle(), $entity->language()->getId());
         $entity->path->pathauto = ($path != $entity->getSystemPath() && $path == $pathauto_alias);
       }
       else {
@@ -71,7 +71,7 @@ class PathautoWidget extends PathWidget {
     $element['pathauto'] = array(
       '#type' => 'checkbox',
       '#title' => t('Generate automatic URL alias'),
-      '#default_value' => !empty($pathauto_alias) ? $pathauto_alias == $entity->path->alias : $entity->path->pathauto,
+      '#default_value' => $entity->path->pathauto,
       '#description' => t('Uncheck this to create a custom alias below.'),
       '#weight' => -1,
     );
