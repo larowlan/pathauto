@@ -42,10 +42,10 @@ class PathautoUnitTest extends KernelTestBase {
     $this->installSchema('node', array('node_access'));
     $this->installSchema('system', array('url_alias', 'sequences', 'router'));
 
+    \Drupal::service('router.builder')->rebuild();
+
     $this->currentUser = entity_create('user', array('name' => $this->randomName()));
     $this->currentUser->save();
-
-    \Drupal::service('router.builder')->rebuild();
 
     module_load_include('inc', 'pathauto');
   }
@@ -129,6 +129,7 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('max_component_length', 35);
     $config->set('transliterate', TRUE);
     $config->save();
+    drupal_static_reset('cleanString');
 
     // Test the 'ignored words' removal.
     $tests['this'] = 'this';
@@ -314,6 +315,7 @@ class PathautoUnitTest extends KernelTestBase {
     \Drupal::configFactory()->get('pathauto.settings')
       ->set('punctuation_period', PATHAUTO_PUNCTUATION_DO_NOTHING)
       ->save();
+    drupal_static_reset('cleanString');
     \Drupal::configFactory()->get('pathauto.pattern')
       ->set('node.page._default', '[node:title]')
       ->save();
