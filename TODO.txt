@@ -32,8 +32,6 @@
   @berdir: Patterns and settings forms can be safely removed now I think, the
     other functions once implemented.
 
-- Token tests completely broken
-
 - Not really about pathauto, but the AliasManager probably has a bug that
   affects us: https://drupal.org/node/2281167
 
