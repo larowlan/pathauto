@@ -52,7 +52,7 @@ install:
   # Get latest drupal 8 core
   - cd $TRAVIS_BUILD_DIR/..
   - git clone --depth 1 --branch 8.x http://git.drupal.org/project/drupal.git
-  - cd modules
+  - cd drupal/modules
   - git clone --depth 1 --branch 8.x-1.x https://github.com/md-systems/token.git
   # Restart apache and test it
   - sudo service apache2 restart
