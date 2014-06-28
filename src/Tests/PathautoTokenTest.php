@@ -11,12 +11,12 @@ namespace Drupal\pathauto\Tests;
  * Token functionality tests.
  */
 class PathautoTokenTest extends PathautoFunctionalTestHelper {
+
   public static function getInfo() {
     return array(
       'name' => 'Pathauto tokens',
       'description' => 'Tests tokens provided by Pathauto.',
       'group' => 'Pathauto',
-      'dependencies' => array('token'),
     );
   }
 

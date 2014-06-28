@@ -34,7 +34,7 @@ class PathautoLocaleTest extends PathautoFunctionalTestHelper {
 
     $node = array(
       'title' => 'English node',
-      'language' => 'en',
+      'langcode' => 'en',
       'path' => array(array(
         'alias' => 'english-node',
         'pathauto' => FALSE,

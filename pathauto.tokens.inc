@@ -35,8 +35,7 @@ function pathauto_tokens($type, $tokens, array $data = array(), array $options =
         case 'join-path':
           module_load_include('inc', 'pathauto');
           $values = array();
-          debug($array);
-          foreach (Element::children($array) as $key) {
+          foreach (token_element_children($array) as $key) {
             $value = is_array($array[$key]) ? render($array[$key]) : (string) $array[$key];
             $value = \Drupal::service('pathauto.manager')->cleanString($value, $options);
             $values[] = $value;
