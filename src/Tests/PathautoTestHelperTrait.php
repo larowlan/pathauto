@@ -2,16 +2,13 @@
 
 /**
  * @file
- * Functionality tests for Pathauto.
- *
- * @ingroup pathauto
+ * Contains \Drupal\pathauto\Tests\PathautoTestHelperTrait.
  */
 
-namespace Drupal\pathauto\Tests\Pathauto;
+namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
-use Drupal\simpletest\WebTestBase;
 use Drupal\taxonomy\VocabularyInterface;
 
 /**

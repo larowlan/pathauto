@@ -1,6 +1,11 @@
 <?php
 
-namespace Drupal\pathauto\Tests\Pathauto;
+/**
+ * @file
+ * Contains \Drupal\pathauto\Tests\PathautoBulkUpdateTest.
+ */
+
+namespace Drupal\pathauto\Tests;
 
 /**
  * Bulk update functionality tests.

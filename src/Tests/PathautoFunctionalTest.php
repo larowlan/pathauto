@@ -1,6 +1,11 @@
 <?php
 
-namespace Drupal\pathauto\Tests\Pathauto;
+/**
+ * @file
+ * Contains \Drupal\pathauto\Tests\PathautoFunctionalTest.
+ */
+
+namespace Drupal\pathauto\Tests;
 use Drupal\views\Views;
 
 /**

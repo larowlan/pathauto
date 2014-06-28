@@ -1,6 +1,11 @@
 <?php
 
-namespace Drupal\pathauto\Tests\Pathauto;
+/**
+ * @file
+ * Contains \Drupal\pathauto\Tests\PathautoTokenTest.
+ */
+
+namespace Drupal\pathauto\Tests;
 
 /**
  * Token functionality tests.
@@ -11,7 +16,7 @@ class PathautoTokenTest extends PathautoFunctionalTestHelper {
       'name' => 'Pathauto tokens',
       'description' => 'Tests tokens provided by Pathauto.',
       'group' => 'Pathauto',
-      // 'dependencies' => array('token'),
+      'dependencies' => array('token'),
     );
   }
 

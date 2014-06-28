@@ -1,6 +1,11 @@
 <?php
 
-namespace Drupal\pathauto\Tests\Pathauto;
+/**
+ * @file
+ * Contains \Drupal\pathauto\Tests\PathautoUnitTest.
+ */
+
+namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
@@ -12,7 +17,7 @@ use Drupal\simpletest\KernelTestBase;
 class PathautoUnitTest extends KernelTestBase {
   use PathautoTestHelperTrait;
 
-  public static $modules = array('system', 'entity', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token');
+  public static $modules = array('system', 'entity', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token', 'menu_link', 'filter');
 
   protected $currentUser;
 
@@ -28,8 +33,7 @@ class PathautoUnitTest extends KernelTestBase {
   public function setUp() {
     parent::setup();
 
-    $this->installConfig(array('pathauto'));
-    $this->installConfig(array('taxonomy'));
+    $this->installConfig(array('pathauto', 'taxonomy', 'system'));
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
@@ -40,6 +44,8 @@ class PathautoUnitTest extends KernelTestBase {
 
     $this->currentUser = entity_create('user', array('name' => $this->randomName()));
     $this->currentUser->save();
+
+    \Drupal::service('router.builder')->rebuild();
 
     module_load_include('inc', 'pathauto');
   }
