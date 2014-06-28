@@ -26,7 +26,7 @@ class PathautoFunctionalTestHelper extends WebTestBase {
   function setUp() {
     parent::setUp();
 
-    $this->drupalCreateContentType(array('type' => 'page'));
+    $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
     $this->drupalCreateContentType(array('type' => 'article'));
 
     // Allow other modules to add additional permissions for the admin user.

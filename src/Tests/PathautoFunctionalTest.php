@@ -76,8 +76,13 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
     $this->drupalGet($manual_alias);
     $this->assertText($title, 'Node accessible through manual alias.');
 
-    // Now attempt to create a node that has no pattern (article content type).
-    // The Pathauto checkbox should not exist.
+    // Remove the pattern for nodes, the pathauto checkbox should not be
+    // displayed.
+    $config = \Drupal::configFactory()->get('pathauto.pattern');
+    $config->set('node', array('_default' => ''));
+    $config->save();
+    drupal_static_reset('pathauto_pattern_load_by_entity');
+
     $this->drupalGet('node/add/article');
     $this->assertNoFieldById('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', '');

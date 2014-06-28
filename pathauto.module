@@ -19,6 +19,7 @@
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\node\Entity\Node;
@@ -338,6 +339,8 @@ function pathauto_update_alias(EntityInterface $entity, $op, array $options = ar
   $bundle = $entity->bundle();
 
   // Skip processing if the entity has no pattern.
+  debug(\Drupal::config('pathauto.pattern')->get());
+  debug(pathauto_pattern_load_by_entity($type, $bundle, $options['language']));
   if (!pathauto_pattern_load_by_entity($type, $bundle, $options['language'])) {
     return;
   }
@@ -455,5 +458,26 @@ function pathauto_entity_base_field_info_alter(&$fields, EntityTypeInterface $en
       'type' => 'pathauto',
       'weight' => 30,
     ));
+  }
+}
+
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
+  // @todo: Make this configurable and/or remove if
+  //   https://drupal.org/node/476294 is resolved.
+  if ($entity_type->id() === 'user') {
+    $fields['path'] = FieldDefinition::create('path')
+      ->setLabel(t('URL alias'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'pathauto',
+        'weight' => 30,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
+
+    return $fields;
   }
 }
