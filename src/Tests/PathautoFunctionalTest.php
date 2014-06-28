@@ -115,7 +115,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
       '%action' => 'Update URL-Alias',
     )));
 
-    $this->assertEntityAlias($node1, $node1->getTitle());
+    $this->assertEntityAlias($node1, 'content/' . $node1->getTitle());
     $this->assertEntityAlias($node2, 'node/' . $node2->id());
   }
 
@@ -264,7 +264,7 @@ class PathautoFunctionalTest extends PathautoFunctionalTestHelper {
    */
   function testProgrammaticEntityCreation() {
     $node = $this->drupalCreateNode(array('title' => 'Test node', 'path' => array('pathauto' => TRUE)));
-    $this->assertEntityAlias($node, 'test-node');
+    $this->assertEntityAlias($node, 'content/test-node');
 
     $vocabulary = $this->addVocabulary(array('name' => 'Tags'));
     $term = $this->addTerm($vocabulary, array('name' => 'Test term', 'path' => array('pathauto' => TRUE)));
