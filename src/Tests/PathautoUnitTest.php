@@ -339,6 +339,27 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($node, 'safe-value');
   }
 
+  /**
+   * Test programmatic entity creation for aliases.
+   */
+  function testProgrammaticEntityCreation() {
+    $node = $this->drupalCreateNode(array('title' => 'Test node', 'path' => array('pathauto' => TRUE)));
+    $this->assertEntityAlias($node, 'content/test-node');
+
+    $vocabulary = $this->addVocabulary(array('name' => 'Tags'));
+    $term = $this->addTerm($vocabulary, array('name' => 'Test term', 'path' => array('pathauto' => TRUE)));
+    $this->assertEntityAlias($term, 'tags/test-term');
+
+    $edit['name'] = 'Test user';
+    $edit['mail'] = 'test-user@example.com';
+    $edit['pass']   = user_password();
+    $edit['path'] = array('pathauto' => TRUE);
+    $edit['status'] = 1;
+    $account = entity_create('user', $edit);
+    $account->save();
+    $this->assertEntityAlias($account, 'users/test-user');
+  }
+
   protected function drupalCreateNode(array $settings = array()) {
     // Populate defaults array.
     $settings += array(

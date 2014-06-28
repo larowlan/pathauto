@@ -8,17 +8,31 @@
 namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Language\Language;
+use Drupal\simpletest\WebTestBase;
 
-class PathautoLocaleTest extends PathautoFunctionalTestHelper {
+class PathautoLocaleTest extends WebTestBase {
 
-  public static $modules = array('path', 'token', 'pathauto', 'taxonomy', 'views', 'locale');
+  use PathautoTestHelperTrait;
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('node', 'pathauto', 'locale');
+
+  /**
+   * Admin user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
 
   public static function getInfo() {
     return array(
       'name' => 'Pathauto localization tests',
       'description' => 'Test pathauto functionality with localization and translation.',
       'group' => 'Pathauto',
-      // 'dependencies' => array('token'),
     );
   }
 

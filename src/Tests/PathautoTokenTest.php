@@ -7,10 +7,19 @@
 
 namespace Drupal\pathauto\Tests;
 
+use Drupal\simpletest\KernelTestBase;
+
 /**
  * Token functionality tests.
  */
-class PathautoTokenTest extends PathautoFunctionalTestHelper {
+class PathautoTokenTest extends KernelTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('system', 'token', 'pathauto');
 
   public static function getInfo() {
     return array(
@@ -21,6 +30,9 @@ class PathautoTokenTest extends PathautoFunctionalTestHelper {
   }
 
   public function testPathautoTokens() {
+
+    $this->installConfig(array('pathauto'));
+
     $array = array(
       'test first arg',
       'The Array / value',

@@ -7,24 +7,63 @@
 
 namespace Drupal\pathauto\Tests;
 
+use Drupal\simpletest\WebTestBase;
+
 /**
  * Bulk update functionality tests.
  */
-class PathautoBulkUpdateTest extends PathautoFunctionalTestHelper {
-  private $nodes;
+class PathautoBulkUpdateTest extends WebTestBase {
+
+  use PathautoTestHelperTrait;
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('node', 'pathauto');
+
+  /**
+   * Admin user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
+
+  /**
+   * The created nodes.
+   *
+   * @var \Drupal\node\NodeInterface
+   */
+  protected $nodes;
 
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
-
     return array(
       'name' => 'Pathauto bulk updating',
       'description' => 'Tests bulk updating of URL aliases.',
       'group' => 'Pathauto',
-      // 'dependencies' => array('token'),
     );
   }
+
+  /**
+   * {inheritdoc}
+   */
+  function setUp() {
+    parent::setUp();
+
+    // Allow other modules to add additional permissions for the admin user.
+    $permissions = array(
+      'administer pathauto',
+      'administer url aliases',
+      'create url aliases',
+    );
+    $this->adminUser = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($this->adminUser);
+  }
+
 
   function testBulkUpdate() {
     // Create some nodes.
