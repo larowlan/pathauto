@@ -460,6 +460,7 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
   //   https://drupal.org/node/476294 is resolved.
   if ($entity_type->id() === 'user') {
     $fields['path'] = FieldDefinition::create('path')
+      ->setCustomStorage(TRUE)
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', array(
