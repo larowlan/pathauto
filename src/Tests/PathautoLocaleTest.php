@@ -10,6 +10,11 @@ namespace Drupal\pathauto\Tests;
 use Drupal\Core\Language\Language;
 use Drupal\simpletest\WebTestBase;
 
+/**
+ * Test pathauto functionality with localization and translation.
+ *
+ * @group Pathauto
+ */
 class PathautoLocaleTest extends WebTestBase {
 
   use PathautoTestHelperTrait;
@@ -27,14 +32,6 @@ class PathautoLocaleTest extends WebTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto localization tests',
-      'description' => 'Test pathauto functionality with localization and translation.',
-      'group' => 'Pathauto',
-    );
-  }
 
   /**
    * Test that when an English node is updated, its old English alias is
