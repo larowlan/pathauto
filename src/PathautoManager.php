@@ -35,20 +35,6 @@ class PathautoManager {
   protected $punctuationCharacters = array();
 
   /**
-   * Alias max length.
-   *
-   * @var int
-   */
-  protected $aliasMaxLength;
-
-  /**
-   * Alias schema max length.
-   *
-   * @var int
-   */
-  protected $aliasSchemaMaxLength;
-
-  /**
    * Config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
@@ -89,12 +75,36 @@ class PathautoManager {
    */
   protected $patterns = array();
 
-  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token) {
+  /**
+   * The alias cleaner.
+   *
+   * @var \Drupal\pathauto\AliasCleanerInterface
+   */
+  protected $aliasCleaner;
+
+  /**
+   * Creates a new Pathauto manager.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   The cache backend.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token utility.
+   * @param \Drupal\pathauto\AliasCleanerInterface $alias_cleaner
+   *   The alias cleaner.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner) {
     $this->configFactory = $config_factory;
     $this->languageManager = $language_manager;
     $this->cacheBackend = $cache_backend;
     $this->moduleHandler = $module_handler;
     $this->token = $token;
+    $this->aliasCleaner = $alias_cleaner;
   }
 
   /**
@@ -305,84 +315,6 @@ class PathautoManager {
     return $this->punctuationCharacters;
   }
 
-  /**
-   * Trims duplicate, leading, and trailing separators from a string.
-   *
-   * @param string $string
-   *   The string to clean path separators from.
-   * @param string $separator
-   *   The path separator to use when cleaning.
-   *
-   * @return string
-   *   The cleaned version of the string.
-   *
-   * @see pathauto_cleanstring()
-   * @see pathauto_clean_alias()
-   */
-  protected function getCleanSeparators($string, $separator = NULL) {
-    $config = $this->configFactory->get('pathauto.settings');
-
-    if (!isset($separator)) {
-      $separator = $config->get('separator');
-    }
-
-    $output = $string;
-
-    if (strlen($separator)) {
-      // Trim any leading or trailing separators.
-      $output = trim($output, $separator);
-
-      // Escape the separator for use in regular expressions.
-      $seppattern = preg_quote($separator, '/');
-
-      // Replace multiple separators with a single one.
-      $output = preg_replace("/$seppattern+/", $separator, $output);
-
-      // Replace trailing separators around slashes.
-      if ($separator !== '/') {
-        $output = preg_replace("/\/+$seppattern\/+|$seppattern\/+|\/+$seppattern/", "/", $output);
-      }
-    }
-
-    return $output;
-  }
-
-  /**
-   * Clean up an URL alias.
-   *
-   * Performs the following alterations:
-   * - Trim duplicate, leading, and trailing back-slashes.
-   * - Trim duplicate, leading, and trailing separators.
-   * - Shorten to a desired length and logical position based on word boundaries.
-   *
-   * @param string $alias
-   *   A string with the URL alias to clean up.
-   *
-   * @return string
-   *   The cleaned URL alias.
-   */
-  public function cleanAlias($alias) {
-    if (!isset($this->aliasMaxLength)) {
-      $config = $this->configFactory->get('pathauto.settings');
-      $this->aliasMaxLength = min($config->get('max_length'), $this->getAliasSchemaMaxLength());
-    }
-
-    $output = $alias;
-
-    // Trim duplicate, leading, and trailing separators. Do this before cleaning
-    // backslashes since a pattern like "[token1]/[token2]-[token3]/[token4]"
-    // could end up like "value1/-/value2" and if backslashes were cleaned first
-    // this would result in a duplicate blackslash.
-    $output = $this->getCleanSeparators($output);
-
-    // Trim duplicate, leading, and trailing backslashes.
-    $output = $this->getCleanSeparators($output, '/');
-
-    // Shorten to a logical place based on word boundaries.
-    $output = Unicode::truncate($output, $this->aliasMaxLength, TRUE);
-
-    return $output;
-  }
 
   /**
    * Apply patterns to create an alias.
@@ -467,7 +399,7 @@ class PathautoManager {
       return NULL;
     }
 
-    $alias = $this->cleanAlias($alias);
+    $alias = $this->aliasCleaner->cleanAlias($alias);
 
     // Allow other modules to alter the alias.
     $context['source'] = &$source;
@@ -540,20 +472,6 @@ class PathautoManager {
     }
 
     return $this->patterns[$pattern_id];
-  }
-
-  /**
-   * Fetch the maximum length of the {url_alias}.alias field from the schema.
-   *
-   * @return int
-   *   An integer of the maximum URL alias length allowed by the database.
-   */
-  public function getAliasSchemaMaxLength() {
-    if (!isset($this->aliasSchemaMaxLength)) {
-      $schema = drupal_get_schema('url_alias');
-      $this->aliasSchemaMaxLength = $schema['fields']['alias']['length'];
-    }
-    return $this->aliasSchemaMaxLength;
   }
 
   /**
