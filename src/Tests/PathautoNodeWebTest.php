@@ -10,6 +10,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests pathauto node UI integration.
+ *
+ * @group pathauto
  */
 class PathautoNodeWebTest extends WebTestBase {
 
@@ -28,17 +30,6 @@ class PathautoNodeWebTest extends WebTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
-
-  /**
-   * {inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto node UI tests',
-      'description' => 'Test pathauto node UI integration.',
-      'group' => 'Pathauto',
-    );
-  }
 
   /**
    * {inheritdoc}

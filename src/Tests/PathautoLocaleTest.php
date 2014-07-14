@@ -13,7 +13,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Test pathauto functionality with localization and translation.
  *
- * @group Pathauto
+ * @group pathauto
  */
 class PathautoLocaleTest extends WebTestBase {
 

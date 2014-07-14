@@ -11,6 +11,8 @@ use Drupal\views\Views;
 
 /**
  * Tests pathauto user UI integration.
+ *
+ * @group pathauto
  */
 class PathautoUserWebTest extends WebTestBase {
 
@@ -29,17 +31,6 @@ class PathautoUserWebTest extends WebTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
-
-  /**
-   * {inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto user UI tests',
-      'description' => 'Test pathauto user UI integration.',
-      'group' => 'Pathauto',
-    );
-  }
 
   /**
    * {inheritdoc}

@@ -11,6 +11,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Bulk update functionality tests.
+ *
+ * @group pathauto
  */
 class PathautoBulkUpdateTest extends WebTestBase {
 
@@ -36,17 +38,6 @@ class PathautoBulkUpdateTest extends WebTestBase {
    * @var \Drupal\node\NodeInterface
    */
   protected $nodes;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto bulk updating',
-      'description' => 'Tests bulk updating of URL aliases.',
-      'group' => 'Pathauto',
-    );
-  }
 
   /**
    * {inheritdoc}

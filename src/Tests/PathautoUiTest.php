@@ -11,6 +11,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Test basic pathauto functionality.
+ *
+ * @group pathauto
  */
 class PathautoUiTest extends WebTestBase {
 
@@ -29,17 +31,6 @@ class PathautoUiTest extends WebTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
-
-  /**
-   * {inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto UI tests',
-      'description' => 'Test the pathauto UI',
-      'group' => 'Pathauto',
-    );
-  }
 
   /**
    * {inheritdoc}

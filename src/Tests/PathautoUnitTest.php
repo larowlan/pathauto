@@ -13,22 +13,16 @@ use Drupal\simpletest\KernelTestBase;
 
 /**
  * Unit tests for Pathauto functions.
+ *
+ * @group pathauto
  */
 class PathautoUnitTest extends KernelTestBase {
+
   use PathautoTestHelperTrait;
 
   public static $modules = array('system', 'entity', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token', 'menu_link', 'filter');
 
   protected $currentUser;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto unit tests',
-      'description' => 'Unit tests for Pathauto functions.',
-      'group' => 'Pathauto',
-      // 'dependencies' => array('token'),
-    );
-  }
 
   public function setUp() {
     parent::setup();

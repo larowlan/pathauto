@@ -10,6 +10,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests pathauto taxonomy UI integration.
+ *
+ * @group pathauto
  */
 class PathautoTaxonomyWebTest extends WebTestBase {
 
@@ -28,17 +30,6 @@ class PathautoTaxonomyWebTest extends WebTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
-
-  /**
-   * {inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathauto taxonomy UI tests',
-      'description' => 'Test pathauto taxonomy UI integration.',
-      'group' => 'Pathauto',
-    );
-  }
 
   /**
    * {inheritdoc}
