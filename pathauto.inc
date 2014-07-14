@@ -97,7 +97,7 @@ function pathauto_alias_uniquify(&$alias, $source, $langcode) {
   }
 
   // If the alias already exists, generate a new, hopefully unique, variant.
-  $maxlength = min($config->get('max_length'), \Drupal::service('pathauto.manager')->getAliasSchemaMaxlength());
+  $maxlength = min($config->get('max_length'), \Drupal::service('pathauto.alias_storage_helper')->getAliasSchemaMaxlength());
   $separator = $config->get('separator');
   $original_alias = $alias;
 

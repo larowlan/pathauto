@@ -46,7 +46,7 @@ class PathautoUnitTest extends KernelTestBase {
    * Test _pathauto_get_schema_alias_maxlength().
    */
   public function testGetSchemaAliasMaxLength() {
-    $this->assertIdentical(\Drupal::service('pathauto.manager')->getAliasSchemaMaxlength(), 255);
+    $this->assertIdentical(\Drupal::service('pathauto.alias_storage_helper')->getAliasSchemaMaxlength(), 255);
   }
 
   /**
@@ -160,7 +160,7 @@ class PathautoUnitTest extends KernelTestBase {
     $tests['one/-//three--/four'] = 'one/three/four';
 
     foreach ($tests as $input => $expected) {
-      $output = \Drupal::service('pathauto.manager')->cleanAlias($input);
+      $output = \Drupal::service('pathauto.alias_cleaner')->cleanAlias($input);
       $this->assertEqual($output, $expected, t("Drupal::service('pathauto.manager')->cleanAlias('@input') expected '@expected', actual '@output'", array(
         '@input' => $input,
         '@expected' => $expected,

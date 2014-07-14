@@ -26,4 +26,20 @@ interface AliasCleanerInterface {
    *   The cleaned URL alias.
    */
   public function cleanAlias($alias);
+
+  /**
+   * Trims duplicate, leading, and trailing separators from a string.
+   *
+   * @param string $string
+   *   The string to clean path separators from.
+   * @param string $separator
+   *   The path separator to use when cleaning.
+   *
+   * @return string
+   *   The cleaned version of the string.
+   *
+   * @see pathauto_cleanstring()
+   * @see pathauto_clean_alias()
+   */
+  public function getCleanSeparators($string, $separator = NULL);
 }

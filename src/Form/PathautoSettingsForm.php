@@ -57,7 +57,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       ),
     );
 
-    $max_length = \Drupal::service('pathauto.manager')->getAliasSchemaMaxlength();
+    $max_length = \Drupal::service('pathauto.alias_storage_helper')->getAliasSchemaMaxlength();
 
     $form['max_length'] = array(
       '#type' => 'number',
