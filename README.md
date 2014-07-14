@@ -1,9 +1,12 @@
+#Pathauto [![Build Status](https://travis-ci.org/md-systems/pathauto.svg?branch=8.x-1.x)](https://travis-ci.org/md-systems/pathauto)
+
 Please read this file and also the INSTALL.txt.
 They contain answers to many common questions.
 If you are developing for this module, the API.txt may be interesting.
 If you are upgrading, check the CHANGELOG.txt for major changes.
 
-**Description:
+##Description
+
 The Pathauto module provides support functions for other modules to
 automatically generate aliases based on appropriate criteria, with a
 central settings path for site administrators.
@@ -14,7 +17,8 @@ and users (including blogs and tracker pages).
 Pathauto also provides a way to delete large numbers of aliases.  This feature
 is available at  Administer > Site building > URL aliases > Delete aliases
 
-**Benefits:
+##Benefits
+
 Besides making the page address more reflective of its content than
 "node/138", it's important to know that modern search engines give
 heavy weight to search terms which appear in a page's URL. By
@@ -22,10 +26,12 @@ automatically using keywords based directly on the page content in the URL,
 relevant search engine hits for your page can be significantly
 enhanced.
 
-**Installation AND Upgrades:
+##Installation AND Upgrades
+
 See the INSTALL.txt file.
 
-**Notices:
+##Notices
+
 Pathauto just adds URL aliases to content, users, and taxonomy terms.
 Because it's an alias, the standard Drupal URL (for example node/123 or
 taxonomy/term/1) will still function as normal.  If you have external links
@@ -57,24 +63,28 @@ Drupal API instead:
 See http://api.drupal.org/api/HEAD/function/url and
 http://api.drupal.org/api/HEAD/function/l for more information.
 
-** Disabling Pathauto for a specific content type (or taxonomy)
+## Disabling Pathauto for a specific content type (or taxonomy)
+
 When the pattern for a content type is left blank, the default pattern will be
 used. But if the default pattern is also blank, Pathauto will be disabled
 for that content type.
 
-** Bulk Updates Must be Run Multiple Times:
+## Bulk Updates Must be Run Multiple Times
+
 As of 5.x-2.x Pathauto now performs bulk updates in a manner which is more
 likely to succeed on large sites.  The drawback is that it needs to be run
 multiple times.  If you want to reduce the number of times that you need to
 run Pathauto you can increase the "Maximum number of objects to alias in a
 bulk update:" setting under General Settings.
 
-**WYSIWYG Conflicts - FCKEditor, TinyMCE, etc.
+##WYSIWYG Conflicts - FCKEditor, TinyMCE, etc.
+
 If you use a WYSIWYG editor, please disable it for the Pathauto admin page.
 Failure to do so may cause errors about "preg_replace" problems due to the <p>
 tag being added to the "strings to replace".  See http://drupal.org/node/175772
 
-**Credits:
+##Credits:
+
 The original module combined the functionality of Mike Ryan's autopath with
 Tommy Sundstrom's path_automatic.
 
@@ -85,7 +95,8 @@ Matt England added the tracker support.
 Other suggestions and patches contributed by the Drupal community.
 
 Current maintainers:
-  Dave Reid - http://www.davereid.net
-  Greg Knaddison - http://www.knaddison.com
-  Mike Ryan - http://mikeryan.name
-  Frederik 'Freso' S. Olesen - http://freso.dk
+
+- Dave Reid - http://www.davereid.net
+- Greg Knaddison - http://www.knaddison.com
+- Mike Ryan - http://mikeryan.name
+- Frederik 'Freso' S. Olesen - http://freso.dk
