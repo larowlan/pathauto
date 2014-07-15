@@ -6,11 +6,10 @@
  */
 
 namespace Drupal\pathauto;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
- * @todo add class comment.
+ * Provides an interface for alias uniquifiers.
  */
 interface AliasUniquifierInterface {
 

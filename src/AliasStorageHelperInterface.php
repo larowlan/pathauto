@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * Contains ${NAMESPACE}\\${NAME}
+ * Contains \Drupal\pathauto\AliasStorageHelperInterface
  */
 
 namespace Drupal\pathauto;
