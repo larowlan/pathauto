@@ -74,28 +74,6 @@ function _pathauto_existing_alias_data($source, $language = Language::LANGCODE_N
   return \Drupal::service('path.alias_storage')->load(array('pid' => $pid));
 }
 
-
-/**
- * Check to ensure a path alias is unique and add suffix variants if necessary.
- *
- * Given an alias 'content/test' if a path alias with the exact alias already
- * exists, the function will change the alias to 'content/test-0' and will
- * increase the number suffix until it finds a unique alias.
- *
- * @param string $alias
- *   A string with the alias. Can be altered by reference.
- * @param string $source
- *   A string with the path source.
- * @param string $langcode
- *   A string with a language code.
- *
- * @deprecated Use \Drupal::service('pathauto.alias_uniquifier')->uniquify()
- *   instead.
- */
-function pathauto_alias_uniquify(&$alias, $source, $langcode) {
-  \Drupal::service('pathauto.alias_uniquifier')->uniquify($alias, $source, $langcode);
-}
-
 /**
  * Verify if the given path is a valid menu callback.
  *
