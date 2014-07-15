@@ -83,6 +83,13 @@ class PathautoManager {
   protected $aliasCleaner;
 
   /**
+   * The alias storage helper.
+   *
+   * @var \Drupal\pathauto\AliasStorageHelper
+   */
+  protected $aliasStorageHelper;
+
+  /**
    * Creates a new Pathauto manager.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -98,13 +105,14 @@ class PathautoManager {
    * @param \Drupal\pathauto\AliasCleanerInterface $alias_cleaner
    *   The alias cleaner.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner) {
+  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelper $alias_storage_helper) {
     $this->configFactory = $config_factory;
     $this->languageManager = $language_manager;
     $this->cacheBackend = $cache_backend;
     $this->moduleHandler = $module_handler;
     $this->token = $token;
     $this->aliasCleaner = $alias_cleaner;
+    $this->aliasStorageHelper = $alias_storage_helper;
   }
 
   /**
@@ -147,7 +155,7 @@ class PathautoManager {
         'reduce_ascii' => (bool) $config->get('reduce_ascii'),
         'ignore_words_regex' => FALSE,
         'lowercase' => (bool) $config->get('case'),
-        'maxlength' => min($config->get('max_component_length'), $this->getAliasSchemaMaxLength()),
+        'maxlength' => min($config->get('max_component_length'), $this->aliasStorageHelper->getAliasSchemaMaxLength()),
       );
 
       // Generate and cache the punctuation replacements for strtr().
@@ -234,7 +242,7 @@ class PathautoManager {
     $output = preg_replace('/\s+/', $this->cleanStringCache['separator'], $output);
 
     // Trim duplicates and remove trailing and leading separators.
-    $output = $this->getCleanSeparators($this->getCleanSeparators($output, $this->cleanStringCache['separator']));
+    $output = $this->aliasCleaner->getCleanSeparators($this->aliasCleaner->getCleanSeparators($output, $this->cleanStringCache['separator']));
 
     // Optionally convert to lower case.
     if ($this->cleanStringCache['lowercase']) {
