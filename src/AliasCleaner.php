@@ -41,7 +41,7 @@ class AliasCleaner implements AliasCleanerInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param AliasStorageHelperInterface $alias_storage_helper
+   * @param \Drupal\pathauto\AliasStorageHelperInterface $alias_storage_helper
    *   The alias storage helper.
    */
   public function __construct(ConfigFactoryInterface $config_factory, AliasStorageHelperInterface $alias_storage_helper) {
