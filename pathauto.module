@@ -246,25 +246,12 @@ function pathauto_entity_presave($entity) {
   }
 }
 
-
+/**
+ * @deprecated Use \Drupal::service('pathauto.alias_uniquifier')->isReserved()
+ *   instead.
+ */
 function pathauto_is_alias_reserved($alias, $source, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
-  foreach (\Drupal::moduleHandler()->getImplementations('pathauto_is_alias_reserved') as $module) {
-    $args = array(
-      $alias,
-      $source,
-      $langcode,
-    );
-
-    $result = \Drupal::moduleHandler()->invoke($module, 'pathauto_is_alias_reserved', $args);
-
-    if (!empty($result)) {
-      // As soon as the first module says that an alias is in fact reserved,
-      // then there is no point in checking the rest of the modules.
-      return TRUE;
-    }
-  }
-
-  return FALSE;
+  \Drupal::service('pathauto.alias_uniquifier')->isReserved($alias, $source, $langcode);
 }
 
 /**

@@ -85,7 +85,7 @@ class PathautoManager {
   /**
    * The alias storage helper.
    *
-   * @var \Drupal\pathauto\AliasStorageHelper
+   * @var \Drupal\pathauto\AliasStorageHelperInterface
    */
   protected $aliasStorageHelper;
 
@@ -104,8 +104,10 @@ class PathautoManager {
    *   The token utility.
    * @param \Drupal\pathauto\AliasCleanerInterface $alias_cleaner
    *   The alias cleaner.
+   * @param \Drupal\pathauto\AliasStorageHelperInterface $alias_storage_helper
+   *   The alias storage helper.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelper $alias_storage_helper) {
+  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelperInterface $alias_storage_helper) {
     $this->configFactory = $config_factory;
     $this->languageManager = $language_manager;
     $this->cacheBackend = $cache_backend;

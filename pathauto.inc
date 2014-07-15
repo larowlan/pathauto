@@ -88,26 +88,12 @@ function _pathauto_existing_alias_data($source, $language = Language::LANGCODE_N
  *   A string with the path source.
  * @param string $langcode
  *   A string with a language code.
+ *
+ * @deprecated Use \Drupal::service('pathauto.alias_uniquifier')->uniquify()
+ *   instead.
  */
 function pathauto_alias_uniquify(&$alias, $source, $langcode) {
-  $config = \Drupal::configFactory()->get('pathauto.settings');
-
-  if (!pathauto_is_alias_reserved($alias, $source, $langcode)) {
-    return;
-  }
-
-  // If the alias already exists, generate a new, hopefully unique, variant.
-  $maxlength = min($config->get('max_length'), \Drupal::service('pathauto.alias_storage_helper')->getAliasSchemaMaxlength());
-  $separator = $config->get('separator');
-  $original_alias = $alias;
-
-  $i = 0;
-  do {
-    // Append an incrementing numeric suffix until we find a unique alias.
-    $unique_suffix = $separator . $i;
-    $alias = truncate_utf8($original_alias, $maxlength - Unicode::strlen($unique_suffix, TRUE)) . $unique_suffix;
-    $i++;
-  } while (pathauto_is_alias_reserved($alias, $source, $langcode));
+  \Drupal::service('pathauto.alias_uniquifier')->uniquify($alias, $source, $langcode);
 }
 
 /**

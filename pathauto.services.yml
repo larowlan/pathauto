@@ -7,3 +7,6 @@ services:
     arguments: ['@config.factory', '@pathauto.alias_storage_helper']
   pathauto.alias_storage_helper:
     class: Drupal\pathauto\AliasStorageHelper
+  pathauto.alias_uniquifier:
+    class: Drupal\pathauto\AliasUniquifier
+    arguments: ['@config.factory', '@pathauto.alias_storage_helper','@module_handler']
