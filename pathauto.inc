@@ -74,42 +74,6 @@ function _pathauto_existing_alias_data($source, $language = Language::LANGCODE_N
   return \Drupal::service('path.alias_storage')->load(array('pid' => $pid));
 }
 
-
-/**
- * Check to ensure a path alias is unique and add suffix variants if necessary.
- *
- * Given an alias 'content/test' if a path alias with the exact alias already
- * exists, the function will change the alias to 'content/test-0' and will
- * increase the number suffix until it finds a unique alias.
- *
- * @param string $alias
- *   A string with the alias. Can be altered by reference.
- * @param string $source
- *   A string with the path source.
- * @param string $langcode
- *   A string with a language code.
- */
-function pathauto_alias_uniquify(&$alias, $source, $langcode) {
-  $config = \Drupal::configFactory()->get('pathauto.settings');
-
-  if (!pathauto_is_alias_reserved($alias, $source, $langcode)) {
-    return;
-  }
-
-  // If the alias already exists, generate a new, hopefully unique, variant.
-  $maxlength = min($config->get('max_length'), \Drupal::service('pathauto.alias_storage_helper')->getAliasSchemaMaxlength());
-  $separator = $config->get('separator');
-  $original_alias = $alias;
-
-  $i = 0;
-  do {
-    // Append an incrementing numeric suffix until we find a unique alias.
-    $unique_suffix = $separator . $i;
-    $alias = truncate_utf8($original_alias, $maxlength - Unicode::strlen($unique_suffix, TRUE)) . $unique_suffix;
-    $i++;
-  } while (pathauto_is_alias_reserved($alias, $source, $langcode));
-}
-
 /**
  * Verify if the given path is a valid menu callback.
  *

@@ -85,9 +85,16 @@ class PathautoManager {
   /**
    * The alias storage helper.
    *
-   * @var \Drupal\pathauto\AliasStorageHelper
+   * @var \Drupal\pathauto\AliasStorageHelperInterface
    */
   protected $aliasStorageHelper;
+
+  /**
+   * The alias uniquifier.
+   *
+   * @var \Drupal\pathauto\AliasUniquifierInterface
+   */
+  protected $aliasUniquifier;
 
   /**
    * Creates a new Pathauto manager.
@@ -104,8 +111,12 @@ class PathautoManager {
    *   The token utility.
    * @param \Drupal\pathauto\AliasCleanerInterface $alias_cleaner
    *   The alias cleaner.
+   * @param \Drupal\pathauto\AliasStorageHelperInterface $alias_storage_helper
+   *   The alias storage helper.
+   * @param AliasUniquifierInterface $alias_uniquifier
+   *   The alias uniquifier.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelper $alias_storage_helper) {
+  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelperInterface $alias_storage_helper, AliasUniquifierInterface $alias_uniquifier) {
     $this->configFactory = $config_factory;
     $this->languageManager = $language_manager;
     $this->cacheBackend = $cache_backend;
@@ -113,6 +124,7 @@ class PathautoManager {
     $this->token = $token;
     $this->aliasCleaner = $alias_cleaner;
     $this->aliasStorageHelper = $alias_storage_helper;
+    $this->aliasUniquifier = $alias_uniquifier;
   }
 
   /**
@@ -421,7 +433,7 @@ class PathautoManager {
 
     // If the alias already exists, generate a new, hopefully unique, variant.
     $original_alias = $alias;
-    pathauto_alias_uniquify($alias, $source, $language);
+    $this->aliasUniquifier->uniquify($alias, $source, $language);
     if ($original_alias != $alias) {
       // Alert the user why this happened.
       _pathauto_verbose(t('The automatically generated alias %original_alias conflicted with an existing alias. Alias changed to %alias.', array(

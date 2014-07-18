@@ -10,7 +10,7 @@ namespace Drupal\pathauto;
 /**
  * Provides helper methods for accessing alias storage.
  */
-class AliasStorageHelper {
+class AliasStorageHelper implements AliasStorageHelperInterface {
 
   /**
    * Alias schema max length.
@@ -20,10 +20,7 @@ class AliasStorageHelper {
   protected $aliasSchemaMaxLength;
 
   /**
-   * Fetch the maximum length of the {url_alias}.alias field from the schema.
-   *
-   * @return int
-   *   An integer of the maximum URL alias length allowed by the database.
+   * {@inheritdoc}
    */
   public function getAliasSchemaMaxLength() {
     if (!isset($this->aliasSchemaMaxLength)) {
