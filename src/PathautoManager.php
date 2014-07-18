@@ -454,7 +454,7 @@ class PathautoManager {
       'language' => $language,
     );
 
-    return _pathauto_set_alias($path, $existing_alias, $op);
+    return $this->aliasStorageHelper->save($path, $existing_alias, $op);
   }
 
   /**
