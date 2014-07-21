@@ -54,6 +54,6 @@ interface AliasStorageHelperInterface {
    *   - pid: Unique path alias identifier.
    *   - alias: The URL alias.
    */
-  public function lookupPathSource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
+  public function loadBySource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
 
 }

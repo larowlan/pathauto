@@ -135,8 +135,8 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function lookupPathSource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-    return $this->aliasStorage->lookupPathSource($source, $language);
+  public function loadBySource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    return $this->aliasStorage->load(array('source' => $source, 'langcode' => $language));
   }
 
 }
