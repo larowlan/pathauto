@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\pathauto;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Provides helper methods for accessing alias storage.
@@ -38,5 +39,21 @@ interface AliasStorageHelperInterface {
    *   The saved path or NULL if the path was not saved.
    */
   public function save(array $path, $existing_alias = NULL, $op = NULL);
+
+  /**
+   * Fetches an existing URL alias given a path and optional language.
+   *
+   * @param string $source
+   *   An internal Drupal path.
+   * @param string $language
+   *   An optional language code to look up the path in.
+   *
+   * @return bool|array
+   *   FALSE if no alias was found or an associative array containing the
+   *   following keys:
+   *   - pid: Unique path alias identifier.
+   *   - alias: The URL alias.
+   */
+  public function loadBySource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
 
 }

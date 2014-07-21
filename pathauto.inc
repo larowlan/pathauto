@@ -16,25 +16,6 @@ use Drupal\Core\Language\Language;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
- * Fetches an existing URL alias given a path and optional language.
- *
- * @param string $source
- *   An internal Drupal path.
- * @param string $language
- *   An optional language code to look up the path in.
- *
- * @return bool|array
- *   FALSE if no alias was found or an associative array containing the
- *   following keys:
- *   - pid: Unique path alias identifier.
- *   - alias: The URL alias.
- */
-function _pathauto_existing_alias_data($source, $language = Language::LANGCODE_NOT_SPECIFIED) {
-  $pid = db_query_range("SELECT pid FROM {url_alias} WHERE source = :source AND langcode IN (:language, :language_none) ORDER BY langcode DESC, pid DESC", 0, 1, array(':source' => $source, ':language' => $language, ':language_none' => Language::LANGCODE_NOT_SPECIFIED))->fetchField();
-  return \Drupal::service('path.alias_storage')->load(array('pid' => $pid));
-}
-
-/**
  * Verify if the given path is a valid menu callback.
  *
  * Taken from menu_execute_active_handler().
