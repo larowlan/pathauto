@@ -9,6 +9,7 @@ namespace Drupal\pathauto\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Component\Utility\String;
+use Drupal\pathauto\PathautoManagerInterface;
 
 /**
  * Configure file system settings for this site.
@@ -52,8 +53,8 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#title' => t('Character case'),
       '#default_value' => $config->get('case'),
       '#options' => array(
-        PATHAUTO_CASE_LEAVE_ASIS => t('Leave case the same as source token values.'),
-        PATHAUTO_CASE_LOWER => t('Change to lower case'),
+        PathautoManagerInterface::PATHAUTO_CASE_LEAVE_ASIS => t('Leave case the same as source token values.'),
+        PathautoManagerInterface::PATHAUTO_CASE_LOWER => t('Change to lower case'),
       ),
     );
 
@@ -94,9 +95,9 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#title' => t('Update action'),
       '#default_value' => $config->get('update_action'),
       '#options' => array(
-        PATHAUTO_UPDATE_ACTION_NO_NEW => t('Do nothing. Leave the old alias intact.'),
-        PATHAUTO_UPDATE_ACTION_LEAVE => t('Create a new alias. Leave the existing alias functioning.'),
-        PATHAUTO_UPDATE_ACTION_DELETE => t('Create a new alias. Delete the old alias.'),
+        PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_NO_NEW => t('Do nothing. Leave the old alias intact.'),
+        PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_LEAVE => t('Create a new alias. Leave the existing alias functioning.'),
+        PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_DELETE => t('Create a new alias. Delete the old alias.'),
       ),
       '#description' => $description,
     );
@@ -133,18 +134,18 @@ class PathautoSettingsForm extends ConfigFormBase {
     $punctuation = \Drupal::service('pathauto.manager')->getPunctuationCharacters();
 
     foreach ($punctuation as $name => $details) {
-      $details['default'] = PATHAUTO_PUNCTUATION_REMOVE;
+      $details['default'] = PathautoManagerInterface::PATHAUTO_PUNCTUATION_REMOVE;
       if ($details['value'] == $config->get('separator')) {
-        $details['default'] = PATHAUTO_PUNCTUATION_REPLACE;
+        $details['default'] = PathautoManagerInterface::PATHAUTO_PUNCTUATION_REPLACE;
       }
       $form['punctuation']['punctuation_' . $name] = array(
         '#type' => 'select',
         '#title' => $details['name'] . ' (<code>' . String::checkPlain($details['value']) . '</code>)',
         '#default_value' => $details['default'],
         '#options' => array(
-          PATHAUTO_PUNCTUATION_REMOVE => t('Remove'),
-          PATHAUTO_PUNCTUATION_REPLACE => t('Replace by separator'),
-          PATHAUTO_PUNCTUATION_DO_NOTHING => t('No action (do not replace)'),
+          PathautoManagerInterface::PATHAUTO_PUNCTUATION_REMOVE => t('Remove'),
+          PathautoManagerInterface::PATHAUTO_PUNCTUATION_REPLACE => t('Replace by separator'),
+          PathautoManagerInterface::PATHAUTO_PUNCTUATION_DO_NOTHING => t('No action (do not replace)'),
         ),
       );
     }

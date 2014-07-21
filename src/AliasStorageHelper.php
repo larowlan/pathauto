@@ -87,16 +87,16 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
       // If there is already an alias, respect some update actions.
       if (!empty($existing_alias)) {
         switch ($config->get('update_action')) {
-          case PATHAUTO_UPDATE_ACTION_NO_NEW:
+          case PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_NO_NEW:
             // Do not create the alias.
             return NULL;
 
-          case PATHAUTO_UPDATE_ACTION_LEAVE:
+          case PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_LEAVE:
             // Create a new alias instead of overwriting the existing by leaving
             // $path['pid'] empty.
             break;
 
-          case PATHAUTO_UPDATE_ACTION_DELETE:
+          case PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_DELETE:
             // The delete actions should overwrite the existing alias.
             $path['pid'] = $existing_alias['pid'];
             break;
