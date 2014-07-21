@@ -17,6 +17,16 @@ use Drupal\pathauto\PathautoManagerInterface;
 class PathautoSettingsForm extends ConfigFormBase {
 
   /**
+   * Case should be left as is in the generated path.
+   */
+  const PATHAUTO_CASE_LEAVE_ASIS = 0;
+
+  /**
+   * Case should be lowercased in the generated path.
+   */
+  const PATHAUTO_CASE_LOWER = 1;
+
+  /**
    * {@inheritdoc}
    */
   public function getFormId() {
@@ -53,8 +63,8 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#title' => t('Character case'),
       '#default_value' => $config->get('case'),
       '#options' => array(
-        PathautoManagerInterface::PATHAUTO_CASE_LEAVE_ASIS => t('Leave case the same as source token values.'),
-        PathautoManagerInterface::PATHAUTO_CASE_LOWER => t('Change to lower case'),
+        self::PATHAUTO_CASE_LEAVE_ASIS => t('Leave case the same as source token values.'),
+        self::PATHAUTO_CASE_LOWER => t('Change to lower case'),
       ),
     );
 

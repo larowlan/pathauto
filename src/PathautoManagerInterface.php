@@ -14,16 +14,6 @@ use Drupal\Core\Language\LanguageInterface;
 interface PathautoManagerInterface {
 
   /**
-   * Case should be left as is in the generated path.
-   */
-  const PATHAUTO_CASE_LEAVE_ASIS = 0;
-
-  /**
-   * Case should be lowercased in the generated path.
-   */
-  const PATHAUTO_CASE_LOWER = 1;
-
-  /**
    * "Do nothing. Leave the old alias intact."
    */
   const PATHAUTO_UPDATE_ACTION_NO_NEW = 0;
