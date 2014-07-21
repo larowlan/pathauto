@@ -8,6 +8,7 @@
 namespace Drupal\pathauto;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasStorageInterface;
 
 /**
@@ -130,4 +131,12 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
       return $path;
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lookupPathSource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    return $this->aliasStorage->lookupPathSource($source, $language);
+  }
+
 }

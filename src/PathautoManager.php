@@ -332,7 +332,7 @@ class PathautoManager implements PathautoManagerInterface {
     // Special handling when updating an item which is already aliased.
     $existing_alias = NULL;
     if ($op == 'update' || $op == 'bulkupdate') {
-      if ($existing_alias = _pathauto_existing_alias_data($source, $language)) {
+      if ($existing_alias = $this->aliasStorageHelper->lookupPathSource($source, $language)) {
         switch ($config->get('update_action')) {
           case PathautoManagerInterface::UPDATE_ACTION_NO_NEW:
             // If an alias already exists,
