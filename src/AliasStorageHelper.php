@@ -8,6 +8,7 @@
 namespace Drupal\pathauto;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasStorageInterface;
 
@@ -38,16 +39,26 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
   protected $aliasStorage;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * The config factory.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\Path\AliasStorageInterface $alias_storage
    *   The alias storage.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageInterface $alias_storage) {
+  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageInterface $alias_storage, Connection $database) {
     $this->configFactory = $config_factory;
     $this->aliasStorage = $alias_storage;
+    $this->database = $database;
   }
 
   /**
@@ -136,7 +147,13 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
    * {@inheritdoc}
    */
   public function loadBySource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-    return $this->aliasStorage->load(array('source' => $source, 'langcode' => $language));
+    // @todo convert this to be a query on alias storage.
+    $pid = $this->database->queryRange("SELECT pid FROM {url_alias} WHERE source = :source AND langcode IN (:language, :language_none) ORDER BY langcode DESC, pid DESC", 0, 1, array(
+      ':source' => $source,
+      ':language' => $language,
+      ':language_none' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ))->fetchField();
+    return $this->aliasStorage->load(array('pid' => $pid));
   }
 
 }
