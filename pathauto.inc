@@ -16,46 +16,6 @@ use Drupal\Core\Language\Language;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
- * Case should be left as is in the generated path.
- */
-define('PATHAUTO_CASE_LEAVE_ASIS', 0);
-
-/**
- * Case should be lowercased in the generated path.
- */
-define('PATHAUTO_CASE_LOWER', 1);
-
-/**
- * "Do nothing. Leave the old alias intact."
- */
-define('PATHAUTO_UPDATE_ACTION_NO_NEW', 0);
-
-/**
- * "Create a new alias. Leave the existing alias functioning."
- */
-define('PATHAUTO_UPDATE_ACTION_LEAVE', 1);
-
-/**
- * "Create a new alias. Delete the old alias."
- */
-define('PATHAUTO_UPDATE_ACTION_DELETE', 2);
-
-/**
- * Remove the punctuation from the alias.
- */
-define('PATHAUTO_PUNCTUATION_REMOVE', 0);
-
-/**
- * Replace the punctuation with the separator in the alias.
- */
-define('PATHAUTO_PUNCTUATION_REPLACE', 1);
-
-/**
- * Leave the punctuation as it is in the alias.
- */
-define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
-
-/**
  * Fetches an existing URL alias given a path and optional language.
  *
  * @param string $source

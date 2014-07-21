@@ -16,7 +16,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Utility\Token;
 
-class PathautoManager {
+class PathautoManager implements PathautoManagerInterface {
 
   /**
    * Calculated settings cache.
@@ -128,32 +128,7 @@ class PathautoManager {
   }
 
   /**
-   * Clean up a string segment to be used in an URL alias.
-   *
-   * Performs the following possible alterations:
-   * - Remove all HTML tags.
-   * - Process the string through the transliteration module.
-   * - Replace or remove punctuation with the separator character.
-   * - Remove back-slashes.
-   * - Replace non-ascii and non-numeric characters with the separator.
-   * - Remove common words.
-   * - Replace whitespace with the separator character.
-   * - Trim duplicate, leading, and trailing separators.
-   * - Convert to lower-case.
-   * - Shorten to a desired length and logical position based on word boundaries.
-   *
-   * This function should *not* be called on URL alias or path strings
-   * because it is assumed that they are already clean.
-   *
-   * @param string $string
-   *   A string to clean.
-   * @param array $options
-   *   (optional) A keyed array of settings and flags to control the Pathauto
-   *   clean string replacement process. Supported options are:
-   *   - langcode: A language code to be used when translating strings.
-   *
-   * @return string
-   *   The cleaned string.
+   * {@inheritdoc}
    */
   public function cleanString($string, array $options = array()) {
     if (empty($this->cleanStringCache)) {
@@ -175,15 +150,15 @@ class PathautoManager {
       foreach ($punctuation as $name => $details) {
         $action = $config->get('punctuation_' . $name);
         switch ($action) {
-          case PATHAUTO_PUNCTUATION_REMOVE:
+          case PathautoManagerInterface::PUNCTUATION_REMOVE:
             $cache['punctuation'][$details['value']] = '';
             $this->cleanStringCache;
 
-          case PATHAUTO_PUNCTUATION_REPLACE:
+          case PathautoManagerInterface::PUNCTUATION_REPLACE:
             $this->cleanStringCache['punctuation'][$details['value']] = $this->cleanStringCache['separator'];
             break;
 
-          case PATHAUTO_PUNCTUATION_DO_NOTHING:
+          case PathautoManagerInterface::PUNCTUATION_DO_NOTHING:
             // Literally do nothing.
             break;
         }
@@ -272,15 +247,7 @@ class PathautoManager {
 
 
   /**
-   * Return an array of arrays for punctuation values.
-   *
-   * Returns an array of arrays for punctuation values keyed by a name, including
-   * the value and a textual description.
-   * Can and should be expanded to include "all" non text punctuation values.
-   *
-   * @return array
-   *   An array of arrays for punctuation values keyed by a name, including the
-   *   value and a textual description.
+   * {@inheritdoc}
    */
   public function getPunctuationCharacters() {
     if (empty($this->punctuationCharacters)) {
@@ -337,32 +304,7 @@ class PathautoManager {
 
 
   /**
-   * Apply patterns to create an alias.
-   *
-   * @param string $module
-   *   The name of your module (e.g., 'node').
-   * @param string $op
-   *   Operation being performed on the content being aliased
-   *   ('insert', 'update', 'return', or 'bulkupdate').
-   * @param string $source
-   *   An internal Drupal path to be aliased.
-   * @param array $data
-   *   An array of keyed objects to pass to token_replace(). For simple
-   *   replacement scenarios 'node', 'user', and others are common keys, with an
-   *   accompanying node or user object being the value. Some token types, like
-   *   'site', do not require any explicit information from $data and can be
-   *   replaced even if it is empty.
-   * @param string $type
-   *   For modules which provided pattern items in hook_pathauto(),
-   *   the relevant identifier for the specific item to be aliased
-   *   (e.g., $node->type).
-   * @param string $language
-   *   A string specify the path's language.
-   *
-   * @return array|string
-   *   The alias that was created.
-   *
-   * @see _pathauto_set_alias()
+   * {@inheritdoc}
    */
   public function createAlias($module, $op, $source, $data, $type = NULL, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
     $config = $this->configFactory->get('pathauto.settings');
@@ -392,7 +334,7 @@ class PathautoManager {
     if ($op == 'update' || $op == 'bulkupdate') {
       if ($existing_alias = _pathauto_existing_alias_data($source, $language)) {
         switch ($config->get('update_action')) {
-          case PATHAUTO_UPDATE_ACTION_NO_NEW:
+          case PathautoManagerInterface::UPDATE_ACTION_NO_NEW:
             // If an alias already exists,
             // and the update action is set to do nothing,
             // then gosh-darn it, do nothing.
@@ -458,14 +400,7 @@ class PathautoManager {
   }
 
   /**
-   * Load an URL alias pattern by entity, bundle, and language.
-   *
-   * @param $entity_type_id
-   *   An entity (e.g. node, taxonomy, user, etc.)
-   * @param $bundle
-   *   A bundle (e.g. content type, vocabulary ID, etc.)
-   * @param $language
-   *   A language code, defaults to the LANGUAGE_NONE constant.
+   * {@inheritdoc}
    */
   public function getPatternByEntity($entity_type_id, $bundle = '', $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
     $config = $this->configFactory->get('pathauto.pattern');
