@@ -16,32 +16,32 @@ interface PathautoManagerInterface {
   /**
    * "Do nothing. Leave the old alias intact."
    */
-  const PATHAUTO_UPDATE_ACTION_NO_NEW = 0;
+  const UPDATE_ACTION_NO_NEW = 0;
 
   /**
    * "Create a new alias. Leave the existing alias functioning."
    */
-  const PATHAUTO_UPDATE_ACTION_LEAVE = 1;
+  const UPDATE_ACTION_LEAVE = 1;
 
   /**
    * "Create a new alias. Delete the old alias."
    */
-  const PATHAUTO_UPDATE_ACTION_DELETE = 2;
+  const UPDATE_ACTION_DELETE = 2;
 
   /**
    * Remove the punctuation from the alias.
    */
-  const PATHAUTO_PUNCTUATION_REMOVE = 0;
+  const PUNCTUATION_REMOVE = 0;
 
   /**
    * Replace the punctuation with the separator in the alias.
    */
-  const PATHAUTO_PUNCTUATION_REPLACE = 1;
+  const PUNCTUATION_REPLACE = 1;
 
   /**
    * Leave the punctuation as it is in the alias.
    */
-  const PATHAUTO_PUNCTUATION_DO_NOTHING = 2;
+  const PUNCTUATION_DO_NOTHING = 2;
 
   /**
    * Resets internal caches.

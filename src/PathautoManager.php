@@ -150,15 +150,15 @@ class PathautoManager implements PathautoManagerInterface {
       foreach ($punctuation as $name => $details) {
         $action = $config->get('punctuation_' . $name);
         switch ($action) {
-          case PathautoManagerInterface::PATHAUTO_PUNCTUATION_REMOVE:
+          case PathautoManagerInterface::PUNCTUATION_REMOVE:
             $cache['punctuation'][$details['value']] = '';
             $this->cleanStringCache;
 
-          case PathautoManagerInterface::PATHAUTO_PUNCTUATION_REPLACE:
+          case PathautoManagerInterface::PUNCTUATION_REPLACE:
             $this->cleanStringCache['punctuation'][$details['value']] = $this->cleanStringCache['separator'];
             break;
 
-          case PathautoManagerInterface::PATHAUTO_PUNCTUATION_DO_NOTHING:
+          case PathautoManagerInterface::PUNCTUATION_DO_NOTHING:
             // Literally do nothing.
             break;
         }
@@ -334,7 +334,7 @@ class PathautoManager implements PathautoManagerInterface {
     if ($op == 'update' || $op == 'bulkupdate') {
       if ($existing_alias = _pathauto_existing_alias_data($source, $language)) {
         switch ($config->get('update_action')) {
-          case PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_NO_NEW:
+          case PathautoManagerInterface::UPDATE_ACTION_NO_NEW:
             // If an alias already exists,
             // and the update action is set to do nothing,
             // then gosh-darn it, do nothing.

@@ -193,7 +193,7 @@ class PathautoUnitTest extends KernelTestBase {
     $config = \Drupal::configFactory()->get('pathauto.settings');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'insert'.
-    $config->set('update_action', PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
     $config->save();
     $node = $this->drupalCreateNode(array('title' => 'First title'));
     $this->assertEntityAlias($node, 'content/first-title');
@@ -201,7 +201,7 @@ class PathautoUnitTest extends KernelTestBase {
     $node->path->pathauto = TRUE;
 
     // Default action is PATHAUTO_UPDATE_ACTION_DELETE.
-    $config->set('update_action', PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_DELETE);
+    $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Second title');
     pathauto_entity_update($node);
@@ -209,14 +209,14 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertNoAliasExists(array('alias' => 'content/first-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_LEAVE
-    $config->set('update_action', PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_LEAVE);
+    $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_LEAVE);
     $config->save();
     $node->setTitle('Third title');
     pathauto_entity_update($node);
     $this->assertEntityAlias($node, 'content/third-title');
     $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
 
-    $config->set('update_action', PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_DELETE);
+    $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Fourth title');
     pathauto_entity_update($node);
@@ -226,7 +226,7 @@ class PathautoUnitTest extends KernelTestBase {
     $older_path = $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
-    $config->set('update_action', PathautoManagerInterface::PATHAUTO_UPDATE_ACTION_NO_NEW);
+    $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
     $config->save();
     $node->setTitle('Fifth title');
     pathauto_entity_update($node);
@@ -306,7 +306,7 @@ class PathautoUnitTest extends KernelTestBase {
   function testNoExistingPathAliases() {
 
     \Drupal::configFactory()->get('pathauto.settings')
-      ->set('punctuation_period', PathautoManagerInterface::PATHAUTO_PUNCTUATION_DO_NOTHING)
+      ->set('punctuation_period', PathautoManagerInterface::PUNCTUATION_DO_NOTHING)
       ->save();
     \Drupal::configFactory()->get('pathauto.pattern')
       ->set('node.page._default', '[node:title]')
