@@ -8,7 +8,7 @@
 namespace Drupal\pathauto;
 
 /**
- * Provides and
+ * Provides an interface for Messengers.
  */
 interface MessengerInterface {
 
