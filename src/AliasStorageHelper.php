@@ -11,11 +11,15 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasStorageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Provides helper methods for accessing alias storage.
  */
 class AliasStorageHelper implements AliasStorageHelperInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Alias schema max length.
@@ -46,6 +50,13 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
   protected $database;
 
   /**
+   * The messenger.
+   *
+   * @var \Drupal\pathauto\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * The config factory.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -54,11 +65,17 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
    *   The alias storage.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
+   * @param MessengerInterface $messenger
+   *   The messenger.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   *   The string translation service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageInterface $alias_storage, Connection $database) {
+  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageInterface $alias_storage, Connection $database, MessengerInterface $messenger, TranslationInterface $string_translation) {
     $this->configFactory = $config_factory;
     $this->aliasStorage = $alias_storage;
     $this->database = $database;
+    $this->messenger = $messenger;
+    $this->stringTranslation = $string_translation;
   }
 
   /**
@@ -76,15 +93,12 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
    * {@inheritdoc}
    */
   public function save(array $path, $existing_alias = NULL, $op = NULL) {
-    $verbose = _pathauto_verbose(NULL, $op);
     $config = $this->configFactory->get('pathauto.settings');
 
     // Alert users if they are trying to create an alias that is the same as the
     // internal path.
     if ($path['source'] == $path['alias']) {
-      if ($verbose) {
-        _pathauto_verbose(t('Ignoring alias %alias because it is the same as the internal path.', array('%alias' => $path['alias'])));
-      }
+      $this->messenger->addMessage($this->t('Ignoring alias %alias because it is the same as the internal path.', array('%alias' => $path['alias'])));
       return NULL;
     }
 
@@ -118,25 +132,22 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
       // Save the path array.
       $this->aliasStorage->save($path['source'], $path['alias'], $path['language'], $path['pid']);
 
-      if ($verbose) {
-        if (!empty($existing_alias['pid'])) {
-          _pathauto_verbose(
-            t(
-              'Created new alias %alias for %source, replacing %old_alias.',
-              array(
-                '%alias' => $path['alias'],
-                '%source' => $path['source'],
-                '%old_alias' => $existing_alias['alias'],
-              )
+      if (!empty($existing_alias['pid'])) {
+        $this->messenger->addMessage($this->t(
+            'Created new alias %alias for %source, replacing %old_alias.',
+            array(
+              '%alias' => $path['alias'],
+              '%source' => $path['source'],
+              '%old_alias' => $existing_alias['alias'],
             )
-          );
-        }
-        else {
-          _pathauto_verbose(t('Created new alias %alias for %source.', array(
-            '%alias' => $path['alias'],
-            '%source' => $path['source'],
-          )));
-        }
+          )
+        );
+      }
+      else {
+        $this->messenger->addMessage($this->t('Created new alias %alias for %source.', array(
+          '%alias' => $path['alias'],
+          '%source' => $path['source'],
+        )));
       }
 
       return $path;

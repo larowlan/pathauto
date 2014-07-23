@@ -14,9 +14,13 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
 
 class PathautoManager implements PathautoManagerInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Calculated settings cache.
@@ -97,6 +101,13 @@ class PathautoManager implements PathautoManagerInterface {
   protected $aliasUniquifier;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\pathauto\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Creates a new Pathauto manager.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -115,8 +126,12 @@ class PathautoManager implements PathautoManagerInterface {
    *   The alias storage helper.
    * @param AliasUniquifierInterface $alias_uniquifier
    *   The alias uniquifier.
+   * @param MessengerInterface $messenger
+   *   The messenger service.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   *   The string translation service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelperInterface $alias_storage_helper, AliasUniquifierInterface $alias_uniquifier) {
+  public function __construct(ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelperInterface $alias_storage_helper, AliasUniquifierInterface $alias_uniquifier, MessengerInterface $messenger, TranslationInterface $string_translation) {
     $this->configFactory = $config_factory;
     $this->languageManager = $language_manager;
     $this->cacheBackend = $cache_backend;
@@ -125,6 +140,8 @@ class PathautoManager implements PathautoManagerInterface {
     $this->aliasCleaner = $alias_cleaner;
     $this->aliasStorageHelper = $alias_storage_helper;
     $this->aliasUniquifier = $alias_uniquifier;
+    $this->messenger = $messenger;
+    $this->stringTranslation = $string_translation;
   }
 
   /**
@@ -378,7 +395,7 @@ class PathautoManager implements PathautoManagerInterface {
     $this->aliasUniquifier->uniquify($alias, $source, $language);
     if ($original_alias != $alias) {
       // Alert the user why this happened.
-      _pathauto_verbose(t('The automatically generated alias %original_alias conflicted with an existing alias. Alias changed to %alias.', array(
+      $this->messenger->addMessage($this->t('The automatically generated alias %original_alias conflicted with an existing alias. Alias changed to %alias.', array(
         '%original_alias' => $original_alias,
         '%alias' => $alias,
       )), $op);

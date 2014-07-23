@@ -45,42 +45,6 @@ function _pathauto_path_is_callback($path) {
 }
 
 /**
- * Output a helpful message if verbose output is enabled.
- *
- * Verbose output is only enabled when:
- * - The 'pathauto_verbose' setting is enabled.
- * - The current user has the 'notify of path changes' permission.
- * - The $op parameter is anything but 'bulkupdate' or 'return'.
- *
- * @param string $message
- *   An optional string of the verbose message to display. This string should
- *   already be run through t().
- * @param string $op
- *   An optional string with the operation being performed.
- *
- * @return bool
- *   TRUE if verbose output is enabled, or FALSE otherwise.
- */
-function _pathauto_verbose($message = NULL, $op = NULL) {
-  static $verbose;
-  $config = \Drupal::configFactory()->get('pathauto.settings');
-
-  if (!isset($verbose)) {
-    $verbose = $config->get('verbose') && \Drupal::currentUser()->hasPermission('notify of path changes');
-  }
-
-  if (!$verbose || (isset($op) && in_array($op, array('bulkupdate', 'return')))) {
-    return FALSE;
-  }
-
-  if ($message) {
-    drupal_set_message($message);
-  }
-
-  return $verbose;
-}
-
-/**
  * Clean tokens so they are URL friendly.
  *
  * @param array $replacements
