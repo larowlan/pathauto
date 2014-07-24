@@ -8,14 +8,6 @@
 
 - pathauto_path_alias_types() => Plugins
 
-- The logic that deals with automated aliases spawns across three files
-  (pathauto.module, pathauto.inc, PathautoManager.php). It probably makes sense
-  to refactor this and put everything inside the manager class. What is
-  currently nonsense is the need to include the pathauto.inc file if you want to
-  use the manager.
-  @berdir: As defined above, functions that execute SQL should be moved into
-    and extended alias storage service.
-
 - INSTALL.txt: Update
 
 - Update hook_help(): https://drupal.org/node/2250345
