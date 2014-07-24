@@ -325,7 +325,6 @@ class PathautoManager implements PathautoManagerInterface {
    */
   public function createAlias($module, $op, $source, $data, $type = NULL, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
     $config = $this->configFactory->get('pathauto.settings');
-    module_load_include('inc', 'pathauto');
 
     // Retrieve and apply the pattern for this content type.
     $pattern = $this->getPatternByEntity($module, $type, $language);

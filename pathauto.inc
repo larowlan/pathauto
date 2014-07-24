@@ -44,22 +44,3 @@ function _pathauto_path_is_callback($path) {
   }
 }
 
-/**
- * Clean tokens so they are URL friendly.
- *
- * @param array $replacements
- *   An array of token replacements
- *   that need to be "cleaned" for use in the URL.
- * @param array $data
- *   An array of objects used to generate the replacements.
- * @param array $options
- *   An array of options used to generate the replacements.
- */
-function pathauto_clean_token_values(&$replacements, $data = array(), $options = array()) {
-  foreach ($replacements as $token => $value) {
-    // Only clean non-path tokens.
-    if (!preg_match('/(path|alias|url|url-brief)\]$/', $token)) {
-      $replacements[$token] = \Drupal::service('pathauto.manager')->cleanString($value, $options);
-    }
-  }
-}
