@@ -94,12 +94,15 @@ class AliasUniquifier implements AliasUniquifierInterface {
    * {@inheritdoc}
    */
   public function isReserved($alias, $source, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    // First check whether the alias exists for another source.
     if ($this->aliasStorageHelper->exists($alias, $source, $langcode)) {
       return TRUE;
     }
+    // Then check if there is a route with the same path.
     if ($this->isRoute($alias)) {
       return TRUE;
     }
+    // Finally check if any other modules have reserved the alias.
     $args = array(
       $alias,
       $source,
