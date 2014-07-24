@@ -167,4 +167,16 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
     return $this->aliasStorage->load(array('pid' => $pid));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function exists($alias, $source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    return (bool) $this->database->queryRange("SELECT pid FROM {url_alias} WHERE source <> :source AND alias = :alias AND langcode IN (:language, :language_none) ORDER BY langcode DESC, pid DESC", 0, 1, array(
+      ':source' => $source,
+      ':alias' => $alias,
+      ':language' => $language,
+      ':language_none' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ))->fetchField();
+  }
+
 }

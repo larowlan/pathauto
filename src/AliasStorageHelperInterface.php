@@ -56,4 +56,19 @@ interface AliasStorageHelperInterface {
    */
   public function loadBySource($source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
 
+  /**
+   * Checks if a URL alias exists for the path and optional language.
+   *
+   * @param string $alias
+   *   The url alias path.
+   * @param string $source
+   *   An internal Drupal path.
+   * @param string $language
+   *   (optional) The language code.
+   *
+   * @return bool
+   *   TRUE if the alias exists.
+   */
+  public function exists($alias, $source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
+
 }

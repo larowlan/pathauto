@@ -247,34 +247,6 @@ function pathauto_entity_presave($entity) {
 }
 
 /**
- * @deprecated Use \Drupal::service('pathauto.alias_uniquifier')->isReserved()
- *   instead.
- */
-function pathauto_is_alias_reserved($alias, $source, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
-  \Drupal::service('pathauto.alias_uniquifier')->isReserved($alias, $source, $langcode);
-}
-
-/**
- * Implements hook_pathauto_is_alias_reserved() on behalf of path.module.
- */
-function path_pathauto_is_alias_reserved($alias, $source, $langcode) {
-  return (bool) db_query_range("SELECT pid FROM {url_alias} WHERE source <> :source AND alias = :alias AND langcode IN (:language, :language_none) ORDER BY langcode DESC, pid DESC", 0, 1, array(
-    ':source' => $source,
-    ':alias' => $alias,
-    ':language' => $langcode,
-    ':language_none' => Language::LANGCODE_NOT_SPECIFIED,
-  ))->fetchField();
-}
-
-/**
- * Implements hook_pathauto_is_alias_reserved().
- */
-function pathauto_pathauto_is_alias_reserved($alias, $source, $langcode) {
-  module_load_include('inc', 'pathauto');
-  return _pathauto_path_is_callback($alias);
-}
-
-/**
  * Implements hook_entity_insert().
  */
 function pathauto_entity_insert(EntityInterface $entity) {

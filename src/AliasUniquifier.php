@@ -11,6 +11,8 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
  * Provides a utility for creating a unique path alias.
@@ -39,6 +41,13 @@ class AliasUniquifier implements AliasUniquifierInterface {
   protected $moduleHandler;
 
   /**
+   * The url matcher service.
+   *
+   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface
+   */
+  protected $urlMatcher;
+
+  /**
    * Creates a new AliasUniquifier.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -47,11 +56,14 @@ class AliasUniquifier implements AliasUniquifierInterface {
    *   The alias storage helper.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $url_matcher
+   *   The url matcher service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageHelperInterface $alias_storage_helper, ModuleHandlerInterface $module_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageHelperInterface $alias_storage_helper, ModuleHandlerInterface $module_handler, UrlMatcherInterface $url_matcher) {
     $this->configFactory = $config_factory;
     $this->aliasStorageHelper = $alias_storage_helper;
     $this->moduleHandler = $module_handler;
+    $this->urlMatcher = $url_matcher;
   }
 
   /**
@@ -82,6 +94,12 @@ class AliasUniquifier implements AliasUniquifierInterface {
    * {@inheritdoc}
    */
   public function isReserved($alias, $source, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+    if ($this->aliasStorageHelper->exists($alias, $source, $langcode)) {
+      return TRUE;
+    }
+    if ($this->isRoute($alias)) {
+      return TRUE;
+    }
     $args = array(
       $alias,
       $source,
@@ -100,6 +118,34 @@ class AliasUniquifier implements AliasUniquifierInterface {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Verify if the given path is a valid route.
+   *
+   * Taken from menu_execute_active_handler().
+   *
+   * @param string $path
+   *   A string containing a relative path.
+   *
+   * @return bool
+   *   TRUE if the path already exists.
+   */
+  public function isRoute($path) {
+    if (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
+      // Do not allow existing files or directories to get assigned an automatic
+      // alias. Note that we do not need to use is_link() to check for symbolic
+      // links since this returns TRUE for either is_file() or is_dir() already.
+      return TRUE;
+    }
+
+    try {
+      $this->urlMatcher->match('/' . $path);
+      return TRUE;
+    }
+    catch (ResourceNotFoundException $e) {
+      return FALSE;
+    }
   }
 
 }
