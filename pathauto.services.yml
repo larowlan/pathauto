@@ -10,7 +10,7 @@ services:
     arguments: ['@config.factory', '@path.alias_storage', '@database','@pathauto.verbose_messenger', '@string_translation']
   pathauto.alias_uniquifier:
     class: Drupal\pathauto\AliasUniquifier
-    arguments: ['@config.factory', '@pathauto.alias_storage_helper','@module_handler']
+    arguments: ['@config.factory', '@pathauto.alias_storage_helper','@module_handler', '@router']
   pathauto.verbose_messenger:
     class: Drupal\pathauto\VerboseMessenger
     arguments: ['@config.factory', '@current_user']
