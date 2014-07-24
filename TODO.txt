@@ -4,8 +4,6 @@
   class with a ustom one and completely replace the logic there. Or fix core to
   make sure that it sets ->pid after saving a new alias.
 
-- Move functions that do sql to alias storage sub-class/service?
-
 - pathauto_path_alias_types() => Plugins
 
 - INSTALL.txt: Update
