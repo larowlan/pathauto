@@ -8,6 +8,7 @@
 namespace Drupal\pathauto\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Configure file system settings for this site.
@@ -24,7 +25,7 @@ class PathautoPatternsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->configFactory()->get('pathauto.pattern');
 
     $form = array();
@@ -99,7 +100,7 @@ class PathautoPatternsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
 
     $config = $this->configFactory()->get('pathauto.pattern');
 

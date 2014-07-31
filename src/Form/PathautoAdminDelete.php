@@ -8,6 +8,7 @@
 namespace Drupal\pathauto\Form;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Configure file system settings for this site.
@@ -24,7 +25,7 @@ class PathautoAdminDelete extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form = array();
 
@@ -74,7 +75,7 @@ class PathautoAdminDelete extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     foreach ($form_state['values'] as $key => $value) {
       if ($value) {
         if ($key === 'all_aliases') {

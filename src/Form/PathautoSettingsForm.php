@@ -10,6 +10,7 @@ namespace Drupal\pathauto\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Component\Utility\String;
 use Drupal\pathauto\PathautoManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Configure file system settings for this site.
@@ -36,7 +37,7 @@ class PathautoSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     module_load_include('inc', 'pathauto');
     $config = $this->configFactory()->get('pathauto.settings');
 
@@ -166,7 +167,7 @@ class PathautoSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
 
     $config = $this->configFactory()->get('pathauto.settings');
 
