@@ -282,7 +282,7 @@ function pathauto_entity_delete(EntityInterface $entity) {
  *   - An array with alias data in case the alias has been created or updated.
  *   - NULL if no operation performed.
  *
- * @deprecated Use Drupal::service('pathauto.alias_storage_helper')->update
+ * @deprecated Use Drupal::service('pathauto.manager')->update
  *   instead.
  */
 function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
