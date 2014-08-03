@@ -250,14 +250,14 @@ function pathauto_entity_presave($entity) {
  * Implements hook_entity_insert().
  */
 function pathauto_entity_insert(EntityInterface $entity) {
-  pathauto_update_alias($entity, 'insert');
+  \Drupal::service('pathauto.manager')->updateEntity($entity, 'insert');
 }
 
 /**
  * Implements hook_entity_update().
  */
 function pathauto_entity_update(EntityInterface $entity) {
-  pathauto_update_alias($entity, 'update');
+  \Drupal::service('pathauto.manager')->updateEntity($entity, 'update');
 }
 
 /**
@@ -265,28 +265,6 @@ function pathauto_entity_update(EntityInterface $entity) {
  */
 function pathauto_entity_delete(EntityInterface $entity) {
   pathauto_entity_path_delete_all($entity);
-}
-
-/**
- * Creates or updates an alias for the given entity.
- *
- * @param EntityInterface $entity
- *   Entity for which to update the alias.
- * @param $op
- *   The operation performed (insert, update)
- * @param array $options
- *   - force: will force updating the path
- *   - language: the language for which to create the alias
- *
- * @return array|null
- *   - An array with alias data in case the alias has been created or updated.
- *   - NULL if no operation performed.
- *
- * @deprecated Use Drupal::service('pathauto.manager')->update
- *   instead.
- */
-function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
-  return Drupal::service('pathauto.manager')->updateEntity($entity, $op, $options);
 }
 
 /**
@@ -305,7 +283,7 @@ function pathauto_node_update_alias_multiple(array $nids, $op, array $options = 
 
   $nodes = Node::loadMultiple($nids);
   foreach ($nodes as $node) {
-    pathauto_update_alias($node, $op, $options);
+    \Drupal::service('pathauto.manager')->updateEntity($node, $op, $options);
   }
 
   if (!empty($options['message'])) {
@@ -329,7 +307,7 @@ function pathauto_taxonomy_term_update_alias_multiple(array $tids, $op, array $o
 
   $terms = entity_load_multiple('taxonomy_term', $tids);
   foreach ($terms as $term) {
-    pathauto_update_alias($term, $op, $options);
+    \Drupal::service('pathauto.manager')->updateEntity($term, $op, $options);
   }
 
   if (!empty($options['message'])) {
@@ -353,7 +331,7 @@ function pathauto_user_update_alias_multiple(array $uids, $op, array $options = 
 
   $accounts = User::loadMultiple($uids);
   foreach ($accounts as $account) {
-    pathauto_update_alias($account, $op, $options);
+    \Drupal::service('pathauto.manager')->updateEntity($account, $op, $options);
   }
 
   if (!empty($options['message'])) {

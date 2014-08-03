@@ -472,7 +472,7 @@ class PathautoManager implements PathautoManagerInterface {
       return NULL;
     }
 
-    $options += array('language' => $entity->language()->id);
+    $options += array('language' => $entity->language()->getId());
     $type = $entity->getEntityTypeId();
     $bundle = $entity->bundle();
 
