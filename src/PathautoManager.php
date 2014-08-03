@@ -8,9 +8,11 @@
 namespace Drupal\pathauto;
 
 use Drupal\Component\Utility\String;
-use \Drupal\Component\Utility\Unicode;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -18,6 +20,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
 
+/**
+ * Provides methods for managing pathauto aliases and related entities.
+ */
 class PathautoManager implements PathautoManagerInterface {
 
   use StringTranslationTrait;
@@ -451,6 +456,53 @@ class PathautoManager implements PathautoManagerInterface {
   public function resetCaches() {
     $this->patterns = array();
     $this->cleanStringCache = array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateEntity(EntityInterface $entity, $op, array $options = array()) {
+    // Skip if the entity does not have the path field.
+    if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
+      return NULL;
+    }
+
+    // Skip if pathauto processing is disabled.
+    if (isset($entity->path->pathauto) && empty($entity->path->pathauto) && empty($options['force'])) {
+      return NULL;
+    }
+
+    $options += array('language' => $entity->language()->id);
+    $type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
+
+    // Skip processing if the entity has no pattern.
+    if (!$this->getPatternByEntity($type, $bundle, $options['language'])) {
+      return NULL;
+    }
+
+    // Deal with taxonomy specific logic.
+    if ($type == 'taxonomy_term') {
+
+      $config_forum = $this->configFactory->get('forum.settings');
+      if ($entity->getVocabularyId() == $config_forum->get('vocabulary')) {
+        $type = 'forum';
+      }
+    }
+
+    $result = $this->createAlias(
+      $type, $op, $entity->getSystemPath(), array($type => $entity), $bundle, $options['language']);
+
+    if ($type == 'taxonomy_term' && empty($options['is_child'])) {
+      // For all children generate new aliases.
+      $options['is_child'] = TRUE;
+      unset($options['language']);
+      foreach (taxonomy_get_tree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
+        $this->updateEntity($subterm, $op, $options);
+      }
+    }
+
+    return $result;
   }
 
 }

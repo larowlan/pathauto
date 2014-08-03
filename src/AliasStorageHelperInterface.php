@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto;
 use Drupal\Core\Language\LanguageInterface;
+use Symfony\Component\Validator\Tests\Fixtures\EntityInterface;
 
 /**
  * Provides helper methods for accessing alias storage.

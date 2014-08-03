@@ -281,49 +281,12 @@ function pathauto_entity_delete(EntityInterface $entity) {
  * @return array|null
  *   - An array with alias data in case the alias has been created or updated.
  *   - NULL if no operation performed.
+ *
+ * @deprecated Use Drupal::service('pathauto.alias_storage_helper')->update
+ *   instead.
  */
 function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
-  // Skip if the entity does not have the path field.
-  if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
-    return;
-  }
-
-  // Skip if pathauto processing is disabled.
-  if (isset($entity->path->pathauto) && empty($entity->path->pathauto) && empty($options['force'])) {
-    return;
-  }
-
-  $options += array('language' => $entity->language()->id);
-  $type = $entity->getEntityTypeId();
-  $bundle = $entity->bundle();
-
-  // Skip processing if the entity has no pattern.
-  if (!\Drupal::service('pathauto.manager')->getPatternByEntity($type, $bundle, $options['language'])) {
-    return;
-  }
-
-  // Deal with taxonomy specific logic.
-  if ($type == 'taxonomy_term') {
-
-    $config_forum = \Drupal::configFactory()->get('forum.settings');
-    if ($entity->getVocabularyId() == $config_forum->get('vocabulary')) {
-      $type = 'forum';
-    }
-  }
-
-  $result = \Drupal::service('pathauto.manager')->createAlias(
-    $type, $op, $entity->getSystemPath(), array($type => $entity), $bundle, $options['language']);
-
-  if ($type == 'taxonomy_term' && empty($options['is_child'])) {
-    // For all children generate new aliases.
-    $options['is_child'] = TRUE;
-    unset($options['language']);
-    foreach (taxonomy_get_tree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
-      pathauto_update_alias($subterm, $op, $options);
-    }
-  }
-
-  return $result;
+  return Drupal::service('pathauto.manager')->updateEntity($entity, $op, $options);
 }
 
 /**
