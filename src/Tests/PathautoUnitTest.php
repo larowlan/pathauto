@@ -241,7 +241,7 @@ class PathautoUnitTest extends KernelTestBase {
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
     $node->setTitle('Sixth title');
-    \Drupal::service('pathauto.manager')->updateEntity($node, 'bulkupdate');
+    \Drupal::service('pathauto.manager')->updateAlias($node, 'bulkupdate');
     $this->assertEntityAlias($node, 'content/sixth-title');
   }
 
