@@ -149,5 +149,5 @@ interface PathautoManagerInterface {
    *   - An array with alias data in case the alias has been created or updated.
    *   - NULL if no operation performed.
    */
-  public function updateEntity(EntityInterface $entity, $op, array $options = array());
+  public function updateAlias(EntityInterface $entity, $op, array $options = array());
 }

@@ -461,7 +461,7 @@ class PathautoManager implements PathautoManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function updateEntity(EntityInterface $entity, $op, array $options = array()) {
+  public function updateAlias(EntityInterface $entity, $op, array $options = array()) {
     // Skip if the entity does not have the path field.
     if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
       return NULL;
@@ -497,12 +497,40 @@ class PathautoManager implements PathautoManagerInterface {
       // For all children generate new aliases.
       $options['is_child'] = TRUE;
       unset($options['language']);
-      foreach (taxonomy_get_tree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
-        $this->updateEntity($subterm, $op, $options);
+      foreach ($this->getTermTree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
+        $this->updateAlias($subterm, $op, $options);
       }
     }
 
     return $result;
+  }
+
+  /**
+   * Create a hierarchical representation of a vocabulary.
+   *
+   * Wrapper of taxonomy_get_tree() for testing.
+   *
+   * @param int $vid
+   *   The vocabulary ID to generate the tree for.
+   * @param int $parent
+   *   The term ID under which to generate the tree. If 0, generate the tree
+   *   for the entire vocabulary.
+   * @param int $max_depth
+   *   The number of levels of the tree to return. Leave NULL to return all levels.
+   * @param bool $load_entities
+   *   If TRUE, a full entity load will occur on the term objects. Otherwise they
+   *   are partial objects queried directly from the {taxonomy_term_field_data}
+   *   table to save execution time and memory consumption when listing large
+   *   numbers of terms. Defaults to FALSE.
+   *
+   * @return array
+   *   An array of all term objects in the tree. Each term object is extended
+   *   to have "depth" and "parents" attributes in addition to its normal ones.
+   *   Results are statically cached. Term objects will be partial or complete
+   *   depending on the $load_entities parameter.
+   */
+  protected function getTermTree($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE) {
+    return taxonomy_get_tree($vid, $parent, $max_depth, $load_entities);
   }
 
 }
