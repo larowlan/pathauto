@@ -150,4 +150,18 @@ interface PathautoManagerInterface {
    *   - NULL if no operation performed.
    */
   public function updateAlias(EntityInterface $entity, $op, array $options = array());
+
+  /**
+   * Clean tokens so they are URL friendly.
+   *
+   * @param array $replacements
+   *   An array of token replacements
+   *   that need to be "cleaned" for use in the URL.
+   * @param array $data
+   *   An array of objects used to generate the replacements.
+   * @param array $options
+   *   An array of options used to generate the replacements.
+   */
+  public function cleanTokenValues(&$replacements, $data = array(), $options = array());
+
 }

@@ -369,7 +369,7 @@ class PathautoManager implements PathautoManagerInterface {
     $alias = $this->token->replace($pattern, $data, array(
       'sanitize' => FALSE,
       'clear' => TRUE,
-      'callback' => 'pathauto_clean_token_values',
+      'callback' => array($this, 'cleanTokenValues'),
       'language' => (object) array('language' => $language),
       'pathauto' => TRUE,
     ));
@@ -533,4 +533,15 @@ class PathautoManager implements PathautoManagerInterface {
     return taxonomy_get_tree($vid, $parent, $max_depth, $load_entities);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function cleanTokenValues(&$replacements, $data = array(), $options = array()) {
+    foreach ($replacements as $token => $value) {
+      // Only clean non-path tokens.
+      if (!preg_match('/(path|alias|url|url-brief)\]$/', $token)) {
+        $replacements[$token] = $this->cleanString($value, $options);
+      }
+    }
+  }
 }
