@@ -39,7 +39,7 @@ class PathautoUnitTest extends KernelTestBase {
 
     \Drupal::service('router.builder')->rebuild();
 
-    $this->currentUser = entity_create('user', array('name' => $this->randomName()));
+    $this->currentUser = entity_create('user', array('name' => $this->randomMachineName()));
     $this->currentUser->save();
   }
 
@@ -358,7 +358,7 @@ class PathautoUnitTest extends KernelTestBase {
   protected function drupalCreateNode(array $settings = array()) {
     // Populate defaults array.
     $settings += array(
-      'title'     => $this->randomName(8),
+      'title'     => $this->randomMachineName(8),
       'type'      => 'page',
     );
 

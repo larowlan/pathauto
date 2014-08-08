@@ -79,7 +79,7 @@ trait PathautoTestHelperTrait {
    * @return \Drupal\taxonomy\VocabularyInterface
    */
   public function addVocabulary(array $values = array()) {
-    $name = drupal_strtolower($this->randomName(5));
+    $name = drupal_strtolower($this->randomMachineName(5));
     $values += array(
       'name' => $name,
       'vid' => $name,
@@ -92,7 +92,7 @@ trait PathautoTestHelperTrait {
 
   public function addTerm(VocabularyInterface $vocabulary, array $values = array()) {
     $values += array(
-      'name' => drupal_strtolower($this->randomName(5)),
+      'name' => drupal_strtolower($this->randomMachineName(5)),
       'vid' => $vocabulary->id(),
     );
 
