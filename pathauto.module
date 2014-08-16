@@ -19,7 +19,7 @@
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\node\Entity\Node;
@@ -418,7 +418,7 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
   // @todo: Make this configurable and/or remove if
   //   https://drupal.org/node/476294 is resolved.
   if ($entity_type->id() === 'user') {
-    $fields['path'] = FieldDefinition::create('path')
+    $fields['path'] = BaseFieldDefinition::create('path')
       ->setCustomStorage(TRUE)
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
