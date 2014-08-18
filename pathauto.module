@@ -250,14 +250,14 @@ function pathauto_entity_presave($entity) {
  * Implements hook_entity_insert().
  */
 function pathauto_entity_insert(EntityInterface $entity) {
-  pathauto_update_alias($entity, 'insert');
+  \Drupal::service('pathauto.manager')->updateAlias($entity, 'insert');
 }
 
 /**
  * Implements hook_entity_update().
  */
 function pathauto_entity_update(EntityInterface $entity) {
-  pathauto_update_alias($entity, 'update');
+  \Drupal::service('pathauto.manager')->updateAlias($entity, 'update');
 }
 
 /**
@@ -265,65 +265,6 @@ function pathauto_entity_update(EntityInterface $entity) {
  */
 function pathauto_entity_delete(EntityInterface $entity) {
   pathauto_entity_path_delete_all($entity);
-}
-
-/**
- * Creates or updates an alias for the given entity.
- *
- * @param EntityInterface $entity
- *   Entity for which to update the alias.
- * @param $op
- *   The operation performed (insert, update)
- * @param array $options
- *   - force: will force updating the path
- *   - language: the language for which to create the alias
- *
- * @return array|null
- *   - An array with alias data in case the alias has been created or updated.
- *   - NULL if no operation performed.
- */
-function pathauto_update_alias(EntityInterface $entity, $op, array $options = array()) {
-  // Skip if the entity does not have the path field.
-  if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
-    return;
-  }
-
-  // Skip if pathauto processing is disabled.
-  if (isset($entity->path->pathauto) && empty($entity->path->pathauto) && empty($options['force'])) {
-    return;
-  }
-
-  $options += array('language' => $entity->language()->id);
-  $type = $entity->getEntityTypeId();
-  $bundle = $entity->bundle();
-
-  // Skip processing if the entity has no pattern.
-  if (!\Drupal::service('pathauto.manager')->getPatternByEntity($type, $bundle, $options['language'])) {
-    return;
-  }
-
-  // Deal with taxonomy specific logic.
-  if ($type == 'taxonomy_term') {
-
-    $config_forum = \Drupal::configFactory()->get('forum.settings');
-    if ($entity->getVocabularyId() == $config_forum->get('vocabulary')) {
-      $type = 'forum';
-    }
-  }
-
-  $result = \Drupal::service('pathauto.manager')->createAlias(
-    $type, $op, $entity->getSystemPath(), array($type => $entity), $bundle, $options['language']);
-
-  if ($type == 'taxonomy_term' && empty($options['is_child'])) {
-    // For all children generate new aliases.
-    $options['is_child'] = TRUE;
-    unset($options['language']);
-    foreach (taxonomy_get_tree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
-      pathauto_update_alias($subterm, $op, $options);
-    }
-  }
-
-  return $result;
 }
 
 /**
@@ -342,7 +283,7 @@ function pathauto_node_update_alias_multiple(array $nids, $op, array $options = 
 
   $nodes = Node::loadMultiple($nids);
   foreach ($nodes as $node) {
-    pathauto_update_alias($node, $op, $options);
+    \Drupal::service('pathauto.manager')->updateAlias($node, $op, $options);
   }
 
   if (!empty($options['message'])) {
@@ -366,7 +307,7 @@ function pathauto_taxonomy_term_update_alias_multiple(array $tids, $op, array $o
 
   $terms = entity_load_multiple('taxonomy_term', $tids);
   foreach ($terms as $term) {
-    pathauto_update_alias($term, $op, $options);
+    \Drupal::service('pathauto.manager')->updateAlias($term, $op, $options);
   }
 
   if (!empty($options['message'])) {
@@ -390,7 +331,7 @@ function pathauto_user_update_alias_multiple(array $uids, $op, array $options = 
 
   $accounts = User::loadMultiple($uids);
   foreach ($accounts as $account) {
-    pathauto_update_alias($account, $op, $options);
+    \Drupal::service('pathauto.manager')->updateAlias($account, $op, $options);
   }
 
   if (!empty($options['message'])) {

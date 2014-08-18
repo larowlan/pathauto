@@ -6,6 +6,7 @@
 
 namespace Drupal\pathauto;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
@@ -132,4 +133,21 @@ interface PathautoManagerInterface {
    *   value and a textual description.
    */
   public function getPunctuationCharacters();
+
+  /**
+   * Creates or updates an alias for the given entity.
+   *
+   * @param EntityInterface $entity
+   *   Entity for which to update the alias.
+   * @param string $op
+   *   The operation performed (insert, update)
+   * @param array $options
+   *   - force: will force updating the path
+   *   - language: the language for which to create the alias
+   *
+   * @return array|null
+   *   - An array with alias data in case the alias has been created or updated.
+   *   - NULL if no operation performed.
+   */
+  public function updateAlias(EntityInterface $entity, $op, array $options = array());
 }
