@@ -38,13 +38,12 @@ class PathautoTokenTest extends KernelTestBase {
     $data['array'] = $array;
     $replacements = $this->assertTokens('array', $data, $tokens);
 
-    // Ensure that the cleanTokenValues() does not alter this token value.
+    // Ensure that the cleanTokenValues() method does not alter this token value.
     /* @var \Drupal\pathauto\PathautoManagerInterface $manager */
     $manager = \Drupal::service('pathauto.manager');
     $manager->cleanTokenValues($replacements, $data, array());
     $this->assertEqual($replacements['[array:join-path]'], 'test-first-arg/array-value');
   }
-
 
   /**
    * Function copied from TokenTestHelper::assertTokens().
