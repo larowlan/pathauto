@@ -95,7 +95,7 @@ class PathautoAdminDelete extends FormBase {
         }
       }
     }
-    $form_state['redirect'] = 'admin/config/search/path/delete_bulk';
+    $form_state->setRedirect('pathauto.bulk.update.form');
   }
 
 }
