@@ -22,32 +22,32 @@ trait PathautoTestHelperTrait {
     $this->assertIdentical($tokens[$token], $expected, t("Token value for [@type:@token] was '@actual', expected value '@expected'.", array('@type' => $type, '@token' => $token, '@actual' => $tokens[$token], '@expected' => $expected)));
   }
 
-  public function saveAlias($source, $alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    \Drupal::service('path.alias_storage')->delete(array('source' => $source));
-    return \Drupal::service('path.alias_storage')->save($source, $alias, $language);
+  public function saveAlias($source, $alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+    \Drupal::service('path.alias_storage')->delete(array('source' => $source, 'language', 'langcode' => $langcode));
+    return \Drupal::service('path.alias_storage')->save($source, $alias, $langcode);
   }
 
-  public function saveEntityAlias(EntityInterface $entity, $alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    return $this->saveAlias($entity->getSystemPath(), $alias, $language);
+  public function saveEntityAlias(EntityInterface $entity, $alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+    return $this->saveAlias($entity->getSystemPath(), $alias, $langcode);
   }
 
-  public function assertEntityAlias(EntityInterface $entity, $expected_alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    $this->assertAlias($entity->getSystemPath(), $expected_alias, $language);
+  public function assertEntityAlias(EntityInterface $entity, $expected_alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+    $this->assertAlias($entity->getSystemPath(), $expected_alias, $langcode);
   }
 
   public function assertEntityAliasExists(EntityInterface $entity) {
     return $this->assertAliasExists(array('source' => $entity->getSystemPath()));
   }
 
-  public function assertNoEntityAlias(EntityInterface $entity, $language = Language::LANGCODE_NOT_SPECIFIED) {
-    $this->assertEntityAlias($entity, $entity->getSystemPath(), $language);
+  public function assertNoEntityAlias(EntityInterface $entity, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+    $this->assertEntityAlias($entity, $entity->getSystemPath(), $langcode);
   }
 
   public function assertNoEntityAliasExists(EntityInterface $entity) {
     $this->assertNoAliasExists(array('source' => $entity->getSystemPath()));
   }
 
-  public function assertAlias($source, $expected_alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
+  public function assertAlias($source, $expected_alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
     $alias = array('alias' => $source);
     foreach (db_select('url_alias')->fields('url_alias')->condition('source', $source)->execute() as $row) {
       $alias = (array) $row;
@@ -56,7 +56,7 @@ trait PathautoTestHelperTrait {
       }
     }
     $this->assertIdentical($alias['alias'], $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.",
-      array('%source' => $source, '%actual' => $alias['alias'], '%expected' => $expected_alias, '@language' => $language)));
+      array('%source' => $source, '%actual' => $alias['alias'], '%expected' => $expected_alias, '@language' => $langcode)));
   }
 
   public function assertAliasExists($conditions) {
@@ -102,9 +102,9 @@ trait PathautoTestHelperTrait {
     return $term;
   }
 
-  public function assertEntityPattern($entity_type, $bundle, $language = Language::LANGCODE_NOT_SPECIFIED, $expected) {
+  public function assertEntityPattern($entity_type, $bundle, $langcode = Language::LANGCODE_NOT_SPECIFIED, $expected) {
     \Drupal::service('pathauto.manager')->resetCaches();
-    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity_type, $bundle, $language);
+    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity_type, $bundle, $langcode);
     $this->assertIdentical($expected, $pattern);
   }
 
