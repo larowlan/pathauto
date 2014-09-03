@@ -23,6 +23,7 @@ trait PathautoTestHelperTrait {
   }
 
   public function saveAlias($source, $alias, $language = Language::LANGCODE_NOT_SPECIFIED) {
+    \Drupal::service('path.alias_storage')->delete(array('source' => $source));
     return \Drupal::service('path.alias_storage')->save($source, $alias, $language);
   }
 
