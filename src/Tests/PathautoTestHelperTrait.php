@@ -27,11 +27,19 @@ trait PathautoTestHelperTrait {
     return \Drupal::service('path.alias_storage')->save($source, $alias, $langcode);
   }
 
-  public function saveEntityAlias(EntityInterface $entity, $alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+  public function saveEntityAlias(EntityInterface $entity, $alias, $langcode = NULL) {
+    // By default, use the entity language.
+    if (!$langcode) {
+      $langcode = $entity->language()->getId();
+    }
     return $this->saveAlias($entity->getSystemPath(), $alias, $langcode);
   }
 
-  public function assertEntityAlias(EntityInterface $entity, $expected_alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+  public function assertEntityAlias(EntityInterface $entity, $expected_alias, $langcode = NULL) {
+    // By default, use the entity language.
+    if (!$langcode) {
+      $langcode = $entity->language()->getId();
+    }
     $this->assertAlias($entity->getSystemPath(), $expected_alias, $langcode);
   }
 
@@ -39,7 +47,11 @@ trait PathautoTestHelperTrait {
     return $this->assertAliasExists(array('source' => $entity->getSystemPath()));
   }
 
-  public function assertNoEntityAlias(EntityInterface $entity, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
+  public function assertNoEntityAlias(EntityInterface $entity, $langcode = NULL) {
+    // By default, use the entity language.
+    if (!$langcode) {
+      $langcode = $entity->language()->getId();
+    }
     $this->assertEntityAlias($entity, $entity->getSystemPath(), $langcode);
   }
 
