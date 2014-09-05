@@ -7,9 +7,43 @@
 
 namespace Drupal\pathauto;
 
+use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\Plugin\PluginFormInterface;
+
 /**
  * Provides an interface for pathauto alias types.
  */
-interface AliasTypeInterface {
+interface AliasTypeInterface extends ConfigurablePluginInterface, PluginFormInterface {
 
+  /**
+   * Get the label.
+   *
+   * @return string
+   *   The label.
+   */
+  public function getLabel();
+
+  /**
+   * Get the pattern description.
+   *
+   * @return string
+   *   The pattern description.
+   */
+  public function getPatternDescription();
+
+  /**
+   * Get the patterns.
+   *
+   * @return string[]
+   *   The array of patterns.
+   */
+  public function getPatterns();
+
+  /**
+   * Get the token type.
+   *
+   * @return string
+   *   The token type.
+   */
+  public function getTokenType();
 }

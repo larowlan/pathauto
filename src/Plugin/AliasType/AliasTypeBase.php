@@ -16,7 +16,6 @@ use Drupal\pathauto\AliasTypeInterface;
  */
 abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
 
-
   /**
    * {@inheritdoc}
    */
@@ -29,13 +28,6 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = $configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfigurationValue($key, $value) {
-    $this->configuration[$key] = $value;
   }
 
   /**
@@ -58,38 +50,6 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     return $form_state;
   }
-
-  /**
-   * Get the label.
-   *
-   * @return string
-   *   The label.
-   */
-  public abstract function getLabel();
-
-  /**
-   * Get the pattern description.
-   *
-   * @return string
-   *   The pattern description.
-   */
-  public abstract function getPatternDescription();
-
-  /**
-   * Get the patterns.
-   *
-   * @return string[]
-   *   The array of patterns.
-   */
-  public abstract function getPatterns();
-
-  /**
-   * Get the token type.
-   *
-   * @return string
-   *   The token type.
-   */
-  public abstract function getTokenType();
 
   /**
    * {@inheritdoc}

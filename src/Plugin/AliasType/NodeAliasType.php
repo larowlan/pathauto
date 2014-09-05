@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Contains Drupal\pathauto\Plugin\AliasType\ContentEntityAliasType
+ * Contains Drupal\pathauto\Plugin\AliasType\NodeAliasType
  */
 
 namespace Drupal\pathauto\Plugin\AliasType;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A pathauto alias type plugin for content entities.
@@ -18,7 +22,54 @@ use Drupal\Core\Language\LanguageInterface;
  *   label = @Translation("Pathauto alias for nodes."),
  * )
  */
-class ContentEntityAliasType extends AliasTypeBase {
+class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * Constructs a NodeAliasType instance.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->moduleHandler = $module_handler;
+    $this->languageManager = $language_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('module_handler'),
+      $container->get('language_manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -93,8 +144,8 @@ class ContentEntityAliasType extends AliasTypeBase {
    */
   protected function getLanguages() {
     $languages = array();
-    if (\Drupal::moduleHandler()->moduleExists('locale')) {
-      $languages = array(LanguageInterface::LANGCODE_NOT_SPECIFIED => $this->t('language neutral')) + \Drupal::languageManager()->getLanguages('name');
+    if ($this->moduleHandler->moduleExists('locale')) {
+      $languages = array(LanguageInterface::LANGCODE_NOT_SPECIFIED => $this->t('language neutral')) + $this->languageManager->getLanguages('name');
     }
     return $languages;
   }
@@ -109,7 +160,7 @@ class ContentEntityAliasType extends AliasTypeBase {
    *   tRUE if content translation is enabled for the content type.
    */
   protected function isContentTranslationEnabled($node_type) {
-    return \Drupal::moduleHandler()->moduleExists('content_translation') && content_translation_enabled('node', $node_type);
+    return $this->moduleHandler->moduleExists('content_translation') && content_translation_enabled('node', $node_type);
   }
 
 }
