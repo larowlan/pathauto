@@ -5,7 +5,7 @@
  * Contains Drupal\pathauto\VerboseMessengerTest
  */
 
-namespace Drupal\pathauto\Tests {
+namespace Drupal\Tests\pathauto {
 
   use Drupal\pathauto\VerboseMessenger;
   use Drupal\Tests\UnitTestCase;
