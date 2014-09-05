@@ -65,7 +65,7 @@ class PathautoLocaleTest extends WebTestBase {
 
     // Update the node, triggering a change in the English alias.
     $node->path->pathauto = TRUE;
-    pathauto_entity_update($node);
+    $node->save();
 
     // Check that the new English alias replaced the old one.
     $this->assertEntityAlias($node, 'content/english-node-0', 'en');

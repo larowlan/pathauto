@@ -204,7 +204,7 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Second title');
-    pathauto_entity_update($node);
+    $node->save();
     $this->assertEntityAlias($node, 'content/second-title');
     $this->assertNoAliasExists(array('alias' => 'content/first-title'));
 
@@ -212,14 +212,14 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_LEAVE);
     $config->save();
     $node->setTitle('Third title');
-    pathauto_entity_update($node);
+    $node->save();
     $this->assertEntityAlias($node, 'content/third-title');
     $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Fourth title');
-    pathauto_entity_update($node);
+    $node->save();
     $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/third-title'));
     // The older second alias is not deleted yet.
@@ -229,13 +229,13 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
     $config->save();
     $node->setTitle('Fifth title');
-    pathauto_entity_update($node);
+    $node->save();
     $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/fifth-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'update'.
     $this->deleteAllAliases();
-    pathauto_entity_update($node);
+    $node->save();
     $this->assertEntityAlias($node, 'content/fifth-title');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
@@ -254,7 +254,7 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertNoEntityAliasExists($node);
 
     $node->setTitle('hello');
-    pathauto_entity_update($node);
+    $node->save();
     $this->assertEntityAlias($node, 'content/hello');
   }
 
@@ -275,7 +275,7 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($term2, 'parent-term/child-term');
 
     $this->saveEntityAlias($term1, 'My Crazy/Alias/');
-    pathauto_entity_update($term2);
+    $term1->save();
     $this->assertEntityAlias($term2, 'My Crazy/Alias/child-term');
   }
 
