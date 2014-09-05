@@ -57,21 +57,14 @@ class PathautoNodeWebTest extends WebTestBase {
    * Tests editing nodes with different settings.
    */
   function testNodeEditing() {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
-
-    // Delete the default node pattern. Only the page content type will have a pattern.
-    $config->clear('node_pattern');
-
     // Ensure that the Pathauto checkbox is checked by default on the node add form.
     $this->drupalGet('node/add/page');
     $this->assertFieldChecked('edit-path-0-pathauto');
 
-    // Create node for testing by previewing and saving the node form.
+    // Create a node by saving the node form.
     $title = ' Testing: node title [';
     $automatic_alias = 'content/testing-node-title';
-    $this->drupalCreateNode(array('title' => $title));
-    /*$this->drupalPostForm(NULL, array('title' => $title), array('Preview'));
-    $this->drupalPostForm(NULL, array(), 'Save');*/
+    $this->drupalPostForm(NULL, array('title[0][value]' => $title), t('Save and publish'));
     $node = $this->drupalGetNodeByTitle($title);
 
     // Look for alias generated in the form.
@@ -107,6 +100,19 @@ class PathautoNodeWebTest extends WebTestBase {
     $this->assertResponse(404, 'Node not accessible through automatic alias.');
     $this->drupalGet($manual_alias);
     $this->assertText($title, 'Node accessible through manual alias.');
+
+    // Test that the manual alias is not kept for new nodes when the pathauto
+    // checkbox is ticked.
+    $title = 'Automatic Title';
+    $edit = array(
+      'title[0][value]' => $title,
+      'path[0][pathauto]' => TRUE,
+      'path[0][alias]' => 'should-not-get-created',
+    );
+    $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
+    $this->assertNoAliasExists(array('alias' => 'should-not-get-created'));
+    $node = $this->drupalGetNodeByTitle($title);
+    $this->assertEntityAlias($node, 'content/automatic-title');
 
     // Remove the pattern for nodes, the pathauto checkbox should not be
     // displayed.
