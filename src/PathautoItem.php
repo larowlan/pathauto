@@ -18,11 +18,10 @@ class PathautoItem extends PathItem {
    * {@inheritdoc}
    */
   public function insert() {
+    // Only allow the parent implementation to act if pathauto will not create
+    // an alias.
     if (isset($this->pathauto) && empty($this->pathauto)) {
       parent::insert();
-    }
-    else {
-      \Drupal::service('pathauto.manager')->updateAlias($this->getEntity(), 'insert');
     }
   }
 
@@ -30,11 +29,10 @@ class PathautoItem extends PathItem {
    * {@inheritdoc}
    */
   public function update() {
+    // Only allow the parent implementation to act if pathauto will not create
+    // an alias.
     if (isset($this->pathauto) && empty($this->pathauto)) {
       parent::update();
-    }
-    else {
-      \Drupal::service('pathauto.manager')->updateAlias($this->getEntity(), 'update');
     }
   }
 

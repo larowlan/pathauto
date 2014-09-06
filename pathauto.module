@@ -247,6 +247,21 @@ function pathauto_entity_presave($entity) {
 }
 
 /**
+ * Implements hook_entity_insert().
+ */
+function pathauto_entity_insert(EntityInterface $entity) {
+  \Drupal::service('pathauto.manager')->updateAlias($entity, 'insert');
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function pathauto_entity_update(EntityInterface $entity) {
+  \Drupal::service('pathauto.manager')->updateAlias($entity, 'update');
+}
+
+
+/**
  * Update the URL aliases for multiple nodes.
  *
  * @param array $nids

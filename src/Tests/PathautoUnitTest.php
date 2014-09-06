@@ -275,7 +275,7 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($term2, 'parent-term/child-term');
 
     $this->saveEntityAlias($term1, 'My Crazy/Alias/');
-    $term1->save();
+    $term2->save();
     $this->assertEntityAlias($term2, 'My Crazy/Alias/child-term');
   }
 
