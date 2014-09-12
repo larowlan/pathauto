@@ -68,7 +68,7 @@ class PathautoBulkUpdateForm extends FormBase {
       'finished' => 'Drupal\pathauto\Form\PathautoBulkUpdateForm::batchFinished',
     );
 
-    foreach ($form_state['values']['update'] as $callback) {
+    foreach ($form_state->getValue('update') as $callback) {
       if (!empty($callback)) {
         $settings = $form['#update_callbacks'][$callback];
         if (!empty($settings->batch_file)) {

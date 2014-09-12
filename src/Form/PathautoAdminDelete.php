@@ -76,7 +76,7 @@ class PathautoAdminDelete extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach ($form_state['values'] as $key => $value) {
+    foreach ($form_state->getValues() as $key => $value) {
       if ($value) {
         if ($key === 'all_aliases') {
           db_delete('url_alias')

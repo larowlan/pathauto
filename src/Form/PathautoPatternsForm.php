@@ -108,7 +108,7 @@ class PathautoPatternsForm extends ConfigFormBase {
 
     foreach ($all_settings as $settings) {
       $module = $settings->module;
-      $config->set($module, $form_state['values'][$module]);
+      $config->set($module, $form_state->getValue($module));
     }
 
     $config->save();

@@ -171,10 +171,9 @@ class PathautoSettingsForm extends ConfigFormBase {
 
     $config = $this->configFactory()->get('pathauto.settings');
 
-    foreach ($form_state['values'] as $key => $value) {
-      if ($key != 'submit' && $key != 'form_build_id' && $key != 'form_token' && $key != 'form_id' && $key != 'op') {
-        $config->set($key, $value);
-      }
+    form_state_values_clean($form_state);
+    foreach ($form_state->getValues() as $key => $value) {
+      $config->set($key, $value);
     }
 
     $config->save();
