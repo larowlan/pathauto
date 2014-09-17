@@ -88,9 +88,7 @@ class PathautoWidget extends PathWidget {
     );
 
     // Add a shortcut link to configure URL alias patterns.
-    if (drupal_valid_path('admin/config/search/path/patterns')) {
-      $element['pathauto']['#description'] .= ' ' . l(t('Configure URL alias patterns.'), 'admin/config/search/path/patterns');
-    }
+    $element['pathauto']['#description'] .= ' ' . \Drupal::l(t('Configure URL alias patterns.'), 'pathauto.patterns.form');
 
 
     if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {

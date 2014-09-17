@@ -8,6 +8,7 @@
 namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Language\Language;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -40,8 +41,7 @@ class PathautoLocaleTest extends WebTestBase {
   function testLanguageAliases() {
 
     // Add predefined French language.
-    $language = new Language(array('id' => 'fr'));
-    language_save($language);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
 
     $node = array(
       'title' => 'English node',
