@@ -260,12 +260,6 @@ function pathauto_entity_update(EntityInterface $entity) {
   \Drupal::service('pathauto.manager')->updateAlias($entity, 'update');
 }
 
-/**
- * Implements hook_entity_delete().
- */
-function pathauto_entity_delete(EntityInterface $entity) {
-  pathauto_entity_path_delete_all($entity);
-}
 
 /**
  * Update the URL aliases for multiple nodes.
@@ -337,6 +331,13 @@ function pathauto_user_update_alias_multiple(array $uids, $op, array $options = 
   if (!empty($options['message'])) {
     drupal_set_message(\Drupal::translation()->formatPlural(count($uids), 'Updated URL alias for 1 user account.', 'Updated URL aliases for @count user accounts.'));
   }
+}
+
+/**
+ * Implements hook_field_info_alter().
+ */
+function pathauto_field_info_alter(&$info) {
+  $info['path']['class'] = '\Drupal\pathauto\PathautoItem';
 }
 
 /**
