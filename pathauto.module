@@ -89,22 +89,6 @@ function pathauto_help($path, $arg) {
 }
 
 /**
- * Implements hook_permission().
- */
-function pathauto_permission() {
-  return array(
-    'administer pathauto' => array(
-      'title' => t('Administer pathauto'),
-      'description' => t('Allows a user to configure patterns for automated aliases and bulk delete URL-aliases.'),
-    ),
-    'notify of path changes' => array(
-      'title' => t('Notify of Path Changes'),
-      'description' => t('Determines whether or not users are notified.'),
-    ),
-  );
-}
-
-/**
  * Load an URL alias pattern by entity, bundle, and language.
  *
  * @param $entity
