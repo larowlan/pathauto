@@ -20,7 +20,7 @@ class PathautoItem extends PathItem {
   public function insert() {
     // Only allow the parent implementation to act if pathauto will not create
     // an alias.
-    if (isset($this->pathauto) && empty($this->pathauto)) {
+    if (!isset($this->pathauto) || empty($this->pathauto)) {
       parent::insert();
     }
   }
@@ -31,7 +31,7 @@ class PathautoItem extends PathItem {
   public function update() {
     // Only allow the parent implementation to act if pathauto will not create
     // an alias.
-    if (isset($this->pathauto) && empty($this->pathauto)) {
+    if (!isset($this->pathauto) || empty($this->pathauto)) {
       parent::update();
     }
   }
