@@ -5,7 +5,7 @@
  * Contains Drupal\pathauto\Plugin\AliasType\NodeAliasType
  */
 
-namespace Drupal\pathauto\Plugin\AliasType;
+namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;

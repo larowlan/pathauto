@@ -5,7 +5,7 @@
  * Contains Drupal\pathauto\Plugin\AliasType\AliasTypeBase
  */
 
-namespace Drupal\pathauto\Plugin\AliasType;
+namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
