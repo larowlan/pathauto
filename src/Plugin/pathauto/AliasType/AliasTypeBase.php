@@ -54,6 +54,24 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
   /**
    * {@inheritdoc}
    */
+  public function getLabel() {
+    $definition = $this->getPluginDefinition();
+    // Cast the admin label to a string since it is an object.
+    // @see \Drupal\Core\StringTranslation\TranslationWrapper
+    return (string) $definition['label'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTokenTypes() {
+    $definition = $this->getPluginDefinition();
+    return $definition['token_types'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $plugin_id = $this->getPluginId();
 
@@ -76,7 +94,7 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
       '#maxlength' => 1280,
       '#element_validate' => array('token_element_validate'),
       '#after_build' => array('token_element_validate'),
-      '#token_types' => array($this->getTokenType()),
+      '#token_types' => array($this->getTokenTypes()),
       '#min_tokens' => 1,
     );
 
@@ -94,7 +112,7 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
         '#maxlength' => 1280,
         '#element_validate' => array('token_element_validate'),
         '#after_build' => array('token_element_validate'),
-        '#token_types' => array($this->getTokenType()),
+        '#token_types' => array($this->getTokenTypes()),
         '#min_tokens' => 1,
       );
     }
@@ -109,7 +127,7 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
     );
     $form[$plugin_id]['token_help']['help'] = array(
       '#theme' => 'token_tree',
-      '#token_types' => array($this->getTokenType()),
+      '#token_types' => array($this->getTokenTypes()),
     );
   }
 

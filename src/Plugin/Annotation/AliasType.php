@@ -30,4 +30,11 @@ class AliasType extends Plugin {
    */
   public $label;
 
+  /**
+   * The token types.
+   *
+   * @var string[]
+   */
+  public $types = array();
+
 }

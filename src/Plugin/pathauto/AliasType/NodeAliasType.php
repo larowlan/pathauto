@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @AliasType(
  *   id = "content_entity_alias_type",
  *   label = @Translation("Pathauto alias for nodes."),
+ *   types = {"node"},
  * )
  */
 class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInterface {
@@ -74,22 +75,8 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function getLabel() {
-    return $this->t('Content paths');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPatternDescription() {
     $this->t('Default path pattern (applies to all content types with blank patterns below)');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTokenType() {
-    return 'node';
   }
 
   /**
