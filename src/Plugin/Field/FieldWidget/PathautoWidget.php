@@ -9,7 +9,7 @@ namespace Drupal\pathauto\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\path\Plugin\Field\FieldWidget\PathWidget;
 use Drupal\Core\Form\FormStateInterface;
-
+use Drupal\Core\Url;
 /**
  * Plugin implementation of the 'pathauto' widget.
  *
@@ -68,12 +68,14 @@ class PathautoWidget extends PathWidget {
         $entity->path->pathauto = TRUE;
       }
     }
+    // Add a shortcut link to configure URL alias patterns.
+    $admin_link = \Drupal::l(t('Configure URL alias patterns.'), new Url('pathauto.patterns.form'));
 
     $element['pathauto'] = array(
       '#type' => 'checkbox',
       '#title' => t('Generate automatic URL alias'),
       '#default_value' => $entity->path->pathauto,
-      '#description' => t('Uncheck this to create a custom alias below.'),
+      '#description' => t('Uncheck this to create a custom alias below. !admin_link', array('!admin_link' => $admin_link)),
       '#weight' => -1,
     );
 
@@ -86,10 +88,6 @@ class PathautoWidget extends PathWidget {
     $element['alias']['#attached']['js'] = array(
       'vertical-tabs' => drupal_get_path('module', 'pathauto') . '/pathauto.js',
     );
-
-    // Add a shortcut link to configure URL alias patterns.
-    $element['pathauto']['#description'] .= ' ' . \Drupal::l(t('Configure URL alias patterns.'), 'pathauto.patterns.form');
-
 
     if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
       $element['alias']['#default_value'] = $entity->old_alias;
