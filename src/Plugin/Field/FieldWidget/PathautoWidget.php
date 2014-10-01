@@ -7,6 +7,7 @@
 namespace Drupal\pathauto\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Url;
 use Drupal\path\Plugin\Field\FieldWidget\PathWidget;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -88,7 +89,7 @@ class PathautoWidget extends PathWidget {
     );
 
     // Add a shortcut link to configure URL alias patterns.
-    $element['pathauto']['#description'] .= ' ' . \Drupal::l(t('Configure URL alias patterns.'), 'pathauto.patterns.form');
+    $element['pathauto']['#description'] .= ' ' . \Drupal::l(t('Configure URL alias patterns.'), new Url('pathauto.patterns.form'));
 
 
     if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
