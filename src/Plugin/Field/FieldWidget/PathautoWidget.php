@@ -37,7 +37,7 @@ class PathautoWidget extends PathWidget {
     /*
     $form['path'] += array(
       '#type' => 'fieldset',
-      '#title' => t('URL path settings'),
+      '#title' => $this->t('URL path settings'),
       '#collapsible' => TRUE,
       '#collapsed' => empty($form['path']['alias']),
       '#group' => 'additional_settings',
@@ -74,9 +74,9 @@ class PathautoWidget extends PathWidget {
 
     $element['pathauto'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Generate automatic URL alias'),
+      '#title' => $this->t('Generate automatic URL alias'),
       '#default_value' => $entity->path->pathauto,
-      '#description' => t('Uncheck this to create a custom alias below. !admin_link', array('!admin_link' => $admin_link)),
+      '#description' => $this->t('Uncheck this to create a custom alias below. !admin_link', array('!admin_link' => $admin_link)),
       '#weight' => -1,
     );
 
