@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\path\Plugin\Field\FieldWidget\PathWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+
 /**
  * Plugin implementation of the 'pathauto' widget.
  *
