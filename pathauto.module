@@ -19,12 +19,12 @@
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
-use Drupal\user\UserInterface;
 
 /**
  * The default ignore word list.
@@ -69,10 +69,9 @@ function pathauto_module_implements_alter(&$implementations, $hook) {
 /**
  * Implements hook_help().
  */
-function pathauto_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#pathauto':
-      module_load_include('inc', 'pathauto');
+function pathauto_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.pathauto':
       $output = '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('Provides a mechanism for modules to automatically generate aliases for the content they manage.') . '</p>';
       $output .= '<h3>' . t('Settings') . '</h3>';
@@ -82,7 +81,7 @@ function pathauto_help($path, $arg) {
       $output .= '</dl>';
       return $output;
 
-    case 'admin/config/search/path/update_bulk':
+    case 'pathauto.bulk.update.form':
       $output = '<p>' . t('Bulk generation will only generate URL aliases for items that currently have no aliases. This is typically used when installing Pathauto on a site that has existing un-aliased content that needs to be aliased in bulk.') . '</p>';
       return $output;
   }
