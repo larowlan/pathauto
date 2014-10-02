@@ -79,7 +79,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('max_length'),
       '#min' => 1,
       '#max' => $max_length,
-      '#description' => t('Maximum length of aliases to generate. 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'), '@max' => $max_length)),
+      '#description' => t('Maximum length of aliases to generate. 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => $this->getUrlGenerator()->generateFromPath('admin/help/pathauto'), '@max' => $max_length)),
     );
 
     $form['max_component_length'] = array(
@@ -90,7 +90,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('max_component_length'),
       '#min' => 1,
       '#max' => $max_length,
-      '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => url('admin/help/pathauto'), '@max' => $max_length)),
+      '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => $this->getUrlGenerator()->generateFromPath('admin/help/pathauto'), '@max' => $max_length)),
     );
 
     $description = t('What should Pathauto do when updating an existing content item which already has an alias?');
