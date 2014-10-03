@@ -69,14 +69,11 @@ class PathautoWidget extends PathWidget {
         $entity->path->pathauto = TRUE;
       }
     }
-    // Add a shortcut link to configure URL alias patterns.
-    $admin_link = \Drupal::l(t('Configure URL alias patterns.'), new Url('pathauto.patterns.form'));
-
     $element['pathauto'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Generate automatic URL alias'),
       '#default_value' => $entity->path->pathauto,
-      '#description' => $this->t('Uncheck this to create a custom alias below. !admin_link', array('!admin_link' => $admin_link)),
+      '#description' => $this->t('Uncheck this to create a custom alias below. <a href="@admin_link">Configure URL alias patterns.</a>', array('@admin_link' =>  new Url('pathauto.patterns.form'))),
       '#weight' => -1,
     );
 
