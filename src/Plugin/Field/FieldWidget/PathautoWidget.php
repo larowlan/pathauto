@@ -37,7 +37,7 @@ class PathautoWidget extends PathWidget {
     /*
     $form['path'] += array(
       '#type' => 'fieldset',
-      '#title' => t('URL path settings'),
+      '#title' => $this->t('URL path settings'),
       '#collapsible' => TRUE,
       '#collapsed' => empty($form['path']['alias']),
       '#group' => 'additional_settings',
@@ -69,12 +69,11 @@ class PathautoWidget extends PathWidget {
         $entity->path->pathauto = TRUE;
       }
     }
-
     $element['pathauto'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Generate automatic URL alias'),
+      '#title' => $this->t('Generate automatic URL alias'),
       '#default_value' => $entity->path->pathauto,
-      '#description' => t('Uncheck this to create a custom alias below.'),
+      '#description' => $this->t('Uncheck this to create a custom alias below. <a href="@admin_link">Configure URL alias patterns.</a>', array('@admin_link' => \Drupal::url('pathauto.patterns.form'))),
       '#weight' => -1,
     );
 
@@ -87,10 +86,6 @@ class PathautoWidget extends PathWidget {
     $element['alias']['#attached']['js'] = array(
       'vertical-tabs' => drupal_get_path('module', 'pathauto') . '/pathauto.js',
     );
-
-    // Add a shortcut link to configure URL alias patterns.
-    $element['pathauto']['#description'] .= ' ' . \Drupal::l(t('Configure URL alias patterns.'), new Url('pathauto.patterns.form'));
-
 
     if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
       $element['alias']['#default_value'] = $entity->old_alias;
