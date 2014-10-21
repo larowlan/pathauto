@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @AliasType(
  *   id = "node",
  *   label = @Translation("Content"),
+ *   types = {"node"},
  *   provider = "node",
  * )
  */
