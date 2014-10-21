@@ -21,7 +21,7 @@ class NodeAliasTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = array('pathauto','path');
+  public static $modules = array('pathauto','path', 'node', 'user');
 
   /**
    *
@@ -30,8 +30,13 @@ class NodeAliasTest extends KernelTestBase {
     /** @var \Drupal\pathauto\AliasTypeManager $manager */
     $manager = $this->container->get('plugin.manager.alias_type');
     $definitions = $manager->getDefinitions();
-    $node_type = $manager->createInstance('node');
 
+    /** @var \Drupal\pathauto\AliasTypeInterface $node_type */
+    $node_type = $manager->createInstance('node');
+    $patterns = $node_type->getPatterns();
+    $token_types = $node_type->getTokenTypes();
+    $label = $node_type->getLabel();
+    $description = $node_type->getPatternDescription();
   }
 
 }
