@@ -46,4 +46,5 @@ interface AliasTypeInterface extends ConfigurablePluginInterface, PluginFormInte
    *   The token types.
    */
   public function getTokenTypes();
+
 }

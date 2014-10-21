@@ -21,7 +21,7 @@ class NodeAliasTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = array('pathauto','path', 'node', 'user');
+  public static $modules = array('pathauto','path', 'node', 'user', 'token');
 
   /**
    *
@@ -29,14 +29,25 @@ class NodeAliasTest extends KernelTestBase {
   public function testNodeAlias() {
     /** @var \Drupal\pathauto\AliasTypeManager $manager */
     $manager = $this->container->get('plugin.manager.alias_type');
-    $definitions = $manager->getDefinitions();
 
     /** @var \Drupal\pathauto\AliasTypeInterface $node_type */
     $node_type = $manager->createInstance('node');
+
     $patterns = $node_type->getPatterns();
+    $this->assertTrue((array_key_exists('node', $patterns)), "Node pattern exists.");
+    $this->assertEqual($patterns['node'], 'Pattern for all Content paths', "Node pattern description matches.");
+
     $token_types = $node_type->getTokenTypes();
+    $this->assertTrue(in_array('node', $token_types), "Node token type exists.");
+
     $label = $node_type->getLabel();
-    $description = $node_type->getPatternDescription();
+    $this->assertEqual($label, 'Content', "Plugin label matches.");
+
+    $default_config = $node_type->defaultConfiguration();
+
+    $this->assertTrue(array_key_exists('patternitems', $default_config), "Patternitems key exists.");
+    $this->assertEqual($default_config['patternitems'][0], 'content/[node:title]', "Default content pattern matches.");
+
   }
 
 }

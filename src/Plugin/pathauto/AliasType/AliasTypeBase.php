@@ -52,7 +52,7 @@ abstract class AliasTypeBase extends PluginBase implements AliasTypeInterface {
    */
   public function getTokenTypes() {
     $definition = $this->getPluginDefinition();
-    return $definition['token_types'];
+    return $definition['types'];
   }
 
   /**

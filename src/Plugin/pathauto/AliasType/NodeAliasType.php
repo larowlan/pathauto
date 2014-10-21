@@ -97,15 +97,15 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
   public function getPatterns() {
     $patterns = [];
     $languages = $this->languageManager->getLanguages();
-    foreach ($this->getNodeTypeNames() as $node_type => $node_name) {
+    foreach ($this->getNodeTypeNames() as $node_type => $node_type_name) {
       if (count($languages) && $this->isContentTranslationEnabled($node_type)) {
-        $patterns[$node_type] = $this->t('Default path pattern for @node_type (applies to all @node_type content types with blank patterns below)', array('@node_type' => $node_name));
+        $patterns[$node_type] = $this->t('Default path pattern for @node_type (applies to all @node_type content types with blank patterns below)', array('@node_type' => $node_type_name));
         foreach ($languages as $language) {
-          $patterns[$node_type . '_' . $language->getId()] = $this->t('Pattern for all @language @node_type paths', array('@node_type' => $node_name, '@language' => $language->getName()));
+          $patterns[$node_type . '_' . $language->getId()] = $this->t('Pattern for all @language @node_type paths', array('@node_type' => $node_type_name, '@language' => $language->getName()));
         }
       }
       else {
-        $patterns[$node_type] = $this->t('Pattern for all @node_type paths', array('@node_type' => $node_name));
+        $patterns[$node_type] = $this->t('Pattern for all @node_type paths', array('@node_type' => $node_type_name));
       }
     }
     return $patterns;

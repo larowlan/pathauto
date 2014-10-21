@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\pathauto;
+
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -31,4 +32,5 @@ class AliasTypeManager extends DefaultPluginManager {
     $this->alterInfo('pathauto_alias_types');
     $this->setCacheBackend($cache_backend, 'pathauto_alias_types');
   }
+
 }
