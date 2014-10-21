@@ -5,12 +5,14 @@
  * Contains Drupal\pathauto\Plugin\Annotation\AliasType
  */
 
-namespace Drupal\pathauto\Plugin\Annotation;
+namespace Drupal\pathauto\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
 
 /**
  * Defines an AliasType annotation.
+ *
+ * @Annotation
  */
 class AliasType extends Plugin {
 

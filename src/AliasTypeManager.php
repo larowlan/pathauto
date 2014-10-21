@@ -29,6 +29,6 @@ class AliasTypeManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/pathauto/AliasType', $namespaces, $module_handler, 'Drupal\pathauto\AliasTypeInterface', 'Drupal\pathauto\Annotation\AliasType');
     $this->alterInfo('pathauto_alias_types');
-    $this->setCacheBackend($cache_backend, 'pathauto');
+    $this->setCacheBackend($cache_backend, 'pathauto_alias_types');
   }
 }
