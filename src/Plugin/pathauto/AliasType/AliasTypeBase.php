@@ -14,7 +14,7 @@ use Drupal\pathauto\AliasTypeInterface;
 /**
  * A base class for Alias Type plugins.
  */
-abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
+abstract class AliasTypeBase extends PluginBase implements AliasTypeInterface {
 
   /**
    * {@inheritdoc}
@@ -35,20 +35,6 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
    */
   public function defaultConfiguration() {
     return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function calculateDependencies() {
-    return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return $form_state;
   }
 
   /**
@@ -129,6 +115,24 @@ abstract class AliasTypeBase  extends PluginBase implements AliasTypeInterface {
       '#theme' => 'token_tree',
       '#token_types' => array($this->getTokenTypes()),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
   }
 
 }

@@ -7,8 +7,8 @@
 
 namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -18,9 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * A pathauto alias type plugin for content entities.
  *
  * @AliasType(
- *   id = "content_entity_alias_type",
- *   label = @Translation("Pathauto alias for nodes."),
- *   types = {"node"},
+ *   id = "node",
+ *   label = @Translation("Content"),
+ *   provider = "node",
  * )
  */
 class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInterface {
@@ -40,6 +40,13 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
   protected $languageManager;
 
   /**
+   * The entity manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
    * Constructs a NodeAliasType instance.
    *
    * @param array $configuration
@@ -52,11 +59,14 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
    *   The module handler service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager service.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, EntityManagerInterface $entity_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;
+    $this->entityManager = $entity_manager;
   }
 
   /**
@@ -68,7 +78,8 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
       $plugin_id,
       $plugin_definition,
       $container->get('module_handler'),
-      $container->get('language_manager')
+      $container->get('language_manager'),
+      $container->get('entity.manager')
     );
   }
 
@@ -84,12 +95,12 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
    */
   public function getPatterns() {
     $patterns = [];
-    $languages = $this->getLanguages();
+    $languages = $this->languageManager->getLanguages();
     foreach ($this->getNodeTypeNames() as $node_type => $node_name) {
       if (count($languages) && $this->isContentTranslationEnabled($node_type)) {
         $patterns[$node_type] = $this->t('Default path pattern for @node_type (applies to all @node_type content types with blank patterns below)', array('@node_type' => $node_name));
-        foreach ($languages as $lang_code => $lang_name) {
-          $patterns[$node_type . '_' . $lang_code] = $this->t('Pattern for all @language @node_type paths', array('@node_type' => $node_name, '@language' => $lang_name));
+        foreach ($languages as $language) {
+          $patterns[$node_type . '_' . $language->getId()] = $this->t('Pattern for all @language @node_type paths', array('@node_type' => $node_name, '@language' => $language->getName()));
         }
       }
       else {
@@ -97,13 +108,6 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
       }
     }
     return $patterns;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // tODO: Implement submitConfigurationForm() method.
   }
 
   /**
@@ -120,21 +124,9 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
    *   An array of node type names, keyed by type.
    */
   protected function getNodeTypeNames() {
-    return node_type_get_names();
-  }
-
-  /**
-   * Gets a list of languages if locale module is enabled.
-   *
-   * @return \Drupal\Core\Language\LanguageInterface[]
-   *   An array of languages. An empty array if locale module is disabled.
-   */
-  protected function getLanguages() {
-    $languages = array();
-    if ($this->moduleHandler->moduleExists('locale')) {
-      $languages = array(LanguageInterface::LANGCODE_NOT_SPECIFIED => $this->t('language neutral')) + $this->languageManager->getLanguages('name');
-    }
-    return $languages;
+    return array_map(function ($bundle_info) {
+      return $bundle_info['label'];
+    }, $this->entityManager->getBundleInfo('node'));
   }
 
   /**
