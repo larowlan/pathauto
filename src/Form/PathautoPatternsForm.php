@@ -7,13 +7,44 @@
 
 namespace Drupal\pathauto\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\pathauto\AliasTypeManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure file system settings for this site.
  */
 class PathautoPatternsForm extends ConfigFormBase {
+
+  /**
+   * The alias type manager.
+   *
+   * @var \Drupal\pathauto\AliasTypeManager
+   */
+  protected $aliasTypeManager;
+
+  /**
+   * Constructs a PathautoPatternsForm object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, AliasTypeManager $alias_type_manager) {
+    parent::__construct($config_factory);
+    $this->aliasTypeManager = $alias_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('plugin.manager.alias_type')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -26,9 +57,10 @@ class PathautoPatternsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->configFactory()->get('pathauto.pattern');
 
-    $form = array();
+    $definitions = $this->aliasTypeManager->getDefinitions();
+
+    $config = $this->configFactory()->get('pathauto.pattern');
 
     $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
 
