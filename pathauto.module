@@ -26,6 +26,10 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
 
+// @todo Hack until hook_module_implements_alter() works again, see
+//   https://www.drupal.org/node/2353357
+require_once __DIR__ . '/pathauto.pathauto.inc';
+
 /**
  * The default ignore word list.
  */
