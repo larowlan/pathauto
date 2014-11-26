@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\pathauto\Tests;
+use Drupal\Component\Utility\Unicode;
 use Drupal\simpletest\WebTestBase;
 use Drupal\views\Views;
 
@@ -87,7 +88,7 @@ class PathautoUserWebTest extends WebTestBase {
       '%action' => 'Update URL-Alias',
     )));
 
-    $this->assertEntityAlias($account, 'users/' . drupal_strtolower($account->getUsername()));
+    $this->assertEntityAlias($account, 'users/' . Unicode::strtolower($account->getUsername()));
     $this->assertEntityAlias($this->adminUser, 'user/' . $this->adminUser->id());
   }
 

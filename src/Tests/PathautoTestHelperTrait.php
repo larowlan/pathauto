@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Tests;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\taxonomy\VocabularyInterface;
@@ -92,7 +93,7 @@ trait PathautoTestHelperTrait {
    * @return \Drupal\taxonomy\VocabularyInterface
    */
   public function addVocabulary(array $values = array()) {
-    $name = drupal_strtolower($this->randomMachineName(5));
+    $name = Unicode::strtolower($this->randomMachineName(5));
     $values += array(
       'name' => $name,
       'vid' => $name,
@@ -105,7 +106,7 @@ trait PathautoTestHelperTrait {
 
   public function addTerm(VocabularyInterface $vocabulary, array $values = array()) {
     $values += array(
-      'name' => drupal_strtolower($this->randomMachineName(5)),
+      'name' => Unicode::strtolower($this->randomMachineName(5)),
       'vid' => $vocabulary->id(),
     );
 
