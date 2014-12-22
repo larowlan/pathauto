@@ -83,9 +83,7 @@ class PathautoWidget extends PathWidget {
 
 
     // Override path.module's vertical tabs summary.
-    $element['alias']['#attached']['js'] = array(
-      'vertical-tabs' => drupal_get_path('module', 'pathauto') . '/pathauto.js',
-    );
+    $element['alias']['#attached']['library'] = ['pathauto/widget'];
 
     if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
       $element['alias']['#default_value'] = $entity->old_alias;
