@@ -292,7 +292,7 @@ class PathautoUnitTest extends KernelTestBase {
 
     // Rename the vocabulary's machine name, which should cause its pattern
     // variable to also be renamed.
-    $vocab->vid = 'new_name';
+    $vocab->set('vid', 'new_name');
     $vocab->save();
     $this->assertEntityPattern('taxonomy_term', 'new_name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
     $this->assertEntityPattern('taxonomy_term', 'old_name', Language::LANGCODE_NOT_SPECIFIED, 'base');

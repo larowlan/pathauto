@@ -145,7 +145,7 @@ function taxonomy_pathauto($op) {
             continue;
           }*/
 
-          $settings['patternitems'][$vocabulary->vid] = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabulary->name));
+          $settings['patternitems'][$vocabulary->id()] = t('Pattern for all %vocab-name paths', array('%vocab-name' => $vocabulary->label()));
         }
       }
       return (object) $settings;
