@@ -170,7 +170,7 @@ class PathautoManager implements PathautoManagerInterface {
       // Generate and cache the punctuation replacements for strtr().
       $punctuation = $this->getPunctuationCharacters();
       foreach ($punctuation as $name => $details) {
-        $action = $config->get('punctuation_' . $name);
+        $action = $config->get('punctuation.' . $name);
         switch ($action) {
           case PathautoManagerInterface::PUNCTUATION_REMOVE:
             $cache['punctuation'][$details['value']] = '';
@@ -431,15 +431,15 @@ class PathautoManager implements PathautoManagerInterface {
       $pattern = '';
       $variables = array();
       if ($language != LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-        $variables[] = "{$entity_type_id}.{$bundle}.{$language}";
+        $variables[] = "{$entity_type_id}.bundles.{$bundle}.languages.{$language}";
       }
       if ($bundle) {
-        $variables[] = "{$entity_type_id}.{$bundle}._default";
+        $variables[] = "{$entity_type_id}.bundles.{$bundle}.default";
       }
-      $variables[] = "{$entity_type_id}._default";
+      $variables[] = "{$entity_type_id}.default";
 
       foreach ($variables as $variable) {
-        if ($pattern = trim($config->get($variable))) {
+        if ($pattern = trim($config->get('patterns.' . $variable))) {
           break;
         }
       }

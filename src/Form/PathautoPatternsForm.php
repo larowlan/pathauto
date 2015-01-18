@@ -56,11 +56,18 @@ class PathautoPatternsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  protected function getEditableConfigNames() {
+    return ['pathauto.pattern'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $definitions = $this->aliasTypeManager->getDefinitions();
 
-    $config = $this->configFactory()->get('pathauto.pattern');
+    $config = $this->config('pathauto.pattern');
 
     $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
 
@@ -78,12 +85,12 @@ class PathautoPatternsForm extends ConfigFormBase {
       );
 
       // Prompt for the default pattern for this module.
-      $key = '_default';
+      $key = 'default';
 
       $form[$module][$key] = array(
         '#type' => 'textfield',
         '#title' => $patterndescr,
-        '#default_value' => $config->get($module . '.' . $key),
+        '#default_value' => $config->get('patterns.' . $module . '.' . $key),
         '#size' => 65,
         '#maxlength' => 1280,
         '#element_validate' => array('token_element_validate'),
@@ -96,12 +103,12 @@ class PathautoPatternsForm extends ConfigFormBase {
       // them up here.
       if (isset($settings->patternitems)) {
         foreach ($settings->patternitems as $itemname => $itemlabel) {
-          $key = '_default';
+          $key = 'default';
 
-          $form[$module][$itemname][$key] = array(
+          $form[$module]['bundles'][$itemname][$key] = array(
             '#type' => 'textfield',
             '#title' => $itemlabel,
-            '#default_value' => $config->get($module . '.' . $itemname . '.' . $key),
+            '#default_value' => $config->get($module . '.bundles.' . $itemname . '.' . $key),
             '#size' => 65,
             '#maxlength' => 1280,
             '#element_validate' => array('token_element_validate'),
@@ -134,13 +141,13 @@ class PathautoPatternsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    $config = $this->configFactory()->get('pathauto.pattern');
+    $config = $this->config('pathauto.pattern');
 
     $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
 
     foreach ($all_settings as $settings) {
       $module = $settings->module;
-      $config->set($module, $form_state->getValue($module));
+      $config->set('patterns.' . $module, $form_state->getValue($module));
     }
 
     $config->save();

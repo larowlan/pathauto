@@ -37,9 +37,16 @@ class PathautoSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  protected function getEditableConfigNames() {
+    return ['pathauto.settings'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
     module_load_include('inc', 'pathauto');
-    $config = $this->configFactory()->get('pathauto.settings');
+    $config = $this->config('pathauto.settings');
 
     $form = array();
 
@@ -140,6 +147,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#title' => t('Punctuation'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
+      '#tree' => TRUE,
     );
 
     $punctuation = \Drupal::service('pathauto.manager')->getPunctuationCharacters();
@@ -149,7 +157,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       if ($details['value'] == $config->get('separator')) {
         $details['default'] = PathautoManagerInterface::PUNCTUATION_REPLACE;
       }
-      $form['punctuation']['punctuation_' . $name] = array(
+      $form['punctuation']['punctuation' . $name] = array(
         '#type' => 'select',
         '#title' => $details['name'] . ' (<code>' . String::checkPlain($details['value']) . '</code>)',
         '#default_value' => $details['default'],
@@ -169,9 +177,9 @@ class PathautoSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    $config = $this->configFactory()->get('pathauto.settings');
+    $config = $this->config('pathauto.settings');
 
-    form_state_values_clean($form_state);
+    $form_state->cleanValues();
     foreach ($form_state->getValues() as $key => $value) {
       $config->set($key, $value);
     }

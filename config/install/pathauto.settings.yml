@@ -1,4 +1,5 @@
-punctuation_hyphen : 1
+punctuation:
+  hyphen: 1
 verbose : FALSE
 separator : '-'
 max_length : 100

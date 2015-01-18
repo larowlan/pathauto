@@ -54,10 +54,10 @@ class PathautoUnitTest extends KernelTestBase {
    * Test pathauto_pattern_load_by_entity().
    */
   public function testPatternLoadByEntity() {
-    \Drupal::config('pathauto.pattern')
-      ->set('node.article._default', 'article/[node:title]')
-      ->set('node.article.en', 'article/en/[node:title]')
-      ->set('node.page._default', '[node:title]')
+    $this->config('pathauto.pattern')
+      ->set('patterns.node.bundles.article.default', 'article/[node:title]')
+      ->set('patterns.node.bundles.article.languages.en', 'article/en/[node:title]')
+      ->set('patterns.node.bundles.page.default', '[node:title]')
       ->save();
 
     $tests = array(
@@ -115,7 +115,7 @@ class PathautoUnitTest extends KernelTestBase {
    */
   public function testCleanString() {
 
-    $config = \Drupal::configFactory()->get('pathauto.settings');
+    $config = $this->config('pathauto.settings');
 
     $tests = array();
     $config->set('ignore_words', ', in, is,that, the  , this, with, ');
@@ -190,7 +190,7 @@ class PathautoUnitTest extends KernelTestBase {
    * Test the different update actions in \Drupal::service('pathauto.manager')->createAlias().
    */
   public function testUpdateActions() {
-    $config = \Drupal::configFactory()->get('pathauto.settings');
+    $config = $this->config('pathauto.settings');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'insert'.
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
@@ -262,8 +262,8 @@ class PathautoUnitTest extends KernelTestBase {
    * Test the handling of path vs non-path tokens in pathauto_clean_token_values().
    */
   public function testPathTokens() {
-    $config = \Drupal::configFactory()->get('pathauto.pattern');
-    $config->set('taxonomy_term._default', '[term:parent:url:path]/[term:name]');
+    $config = $this->config('pathauto.pattern');
+    $config->set('patterns.taxonomy_term.default', '[term:parent:url:path]/[term:name]');
     $config->save();
 
     $vocab = $this->addVocabulary();
@@ -280,12 +280,12 @@ class PathautoUnitTest extends KernelTestBase {
   }
 
   public function testEntityBundleRenamingDeleting() {
-    $config = \Drupal::configFactory()->get('pathauto.pattern');
+    $config = $this->config('pathauto.pattern');
 
     // Create a vocabulary and test that it's pattern variable works.
     $vocab = $this->addVocabulary(array('vid' => 'old_name'));
-    $config->set('taxonomy_term._default', 'base');
-    $config->set('taxonomy_term.old_name._default', 'bundle');
+    $config->set('patterns.taxonomy_term.default', 'base');
+    $config->set('patterns.taxonomy_term.bundles.old_name.default', 'bundle');
     $config->save();
 
     $this->assertEntityPattern('taxonomy_term', 'old_name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
@@ -305,11 +305,11 @@ class PathautoUnitTest extends KernelTestBase {
 
   function testNoExistingPathAliases() {
 
-    \Drupal::configFactory()->get('pathauto.settings')
-      ->set('punctuation_period', PathautoManagerInterface::PUNCTUATION_DO_NOTHING)
+    $this->config('pathauto.settings')
+      ->set('punctuation.period', PathautoManagerInterface::PUNCTUATION_DO_NOTHING)
       ->save();
-    \Drupal::configFactory()->get('pathauto.pattern')
-      ->set('node.page._default', '[node:title]')
+    $this->config('pathauto.pattern')
+      ->set('patterns.node.bundles.page.default', '[node:title]')
       ->save();
     \Drupal::service('pathauto.manager')->resetCaches();
 

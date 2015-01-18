@@ -116,8 +116,8 @@ class PathautoNodeWebTest extends WebTestBase {
 
     // Remove the pattern for nodes, the pathauto checkbox should not be
     // displayed.
-    $config = \Drupal::configFactory()->get('pathauto.pattern');
-    $config->set('node', array('_default' => ''));
+    $config = $this->config('pathauto.pattern');
+    $config->set('patterns.node.default', '');
     $config->save();
     \Drupal::service('pathauto.manager')->resetCaches();
 

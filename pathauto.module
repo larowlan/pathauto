@@ -26,10 +26,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
 
-// @todo Hack until hook_module_implements_alter() works again, see
-//   https://www.drupal.org/node/2353357
-require_once __DIR__ . '/pathauto.pathauto.inc';
-
 /**
  * The default ignore word list.
  */
@@ -92,44 +88,6 @@ function pathauto_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Load an URL alias pattern by entity, bundle, and language.
- *
- * @param $entity
- *   An entity (e.g. node, taxonomy, user, etc.)
- * @param $bundle
- *   A bundle (e.g. content type, vocabulary ID, etc.)
- * @param $language
- *   A language code, defaults to the LANGUAGE_NONE constant.
- */
-function pathauto_pattern_load_by_entity($entity, $bundle = '', $language = Language::LANGCODE_NOT_SPECIFIED) {
-  $config = \Drupal::configFactory()->get('pathauto.pattern');
-
-  $patterns = &drupal_static(__FUNCTION__, array());
-
-  $pattern_id = "$entity:$bundle:$language";
-  if (!isset($patterns[$pattern_id])) {
-    $variables = array();
-    if ($language != Language::LANGCODE_NOT_SPECIFIED) {
-      $variables[] = "{$entity}.{$bundle}.{$language}";
-    }
-    if ($bundle) {
-      $variables[] = "{$entity}.{$bundle}._default";
-    }
-    $variables[] = "{$entity}._default";
-
-    foreach ($variables as $variable) {
-      if ($pattern = trim($config->get($variable))) {
-        break;
-      }
-    }
-
-    $patterns[$pattern_id] = $pattern;
-  }
-
-  return $patterns[$pattern_id];
-}
-
-/**
  * Delete multiple URL aliases.
  *
  * Intent of this is to abstract a potential path_delete_multiple() function
@@ -184,13 +142,13 @@ function pathauto_entity_path_delete_all(EntityInterface $entity, $default_uri =
  * Implements hook_entity_bundle_rename().
  */
 function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new) {
-  $config = \Drupal::config('pathauto.pattern');
-  $bundle_settings = $config->get($entity_type_id);
+  $config = \Drupal::configFactory()->getEditable('pathauto.pattern');
+  $bundle_settings = $config->get('patterns.' . $entity_type_id . '.bundles');
 
   if (isset($bundle_settings[$bundle_old])) {
     $bundle_settings[$bundle_new] = $bundle_settings[$bundle_old];
     unset($bundle_settings[$bundle_old]);
-    $config->set($entity_type_id, $bundle_settings);
+    $config->set('patterns.' . $entity_type_id . '.bundles', $bundle_settings);
     $config->save();
   }
 }
@@ -199,8 +157,8 @@ function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new
  * Implements hook__entity_bundle_delete().
  */
 function pathauto_entity_bundle_delete($entity_type, $bundle) {
-  $config = \Drupal::config('pathauto.pattern');
-  $config->clear($entity_type . '.' . $bundle);
+  $config = \Drupal::configFactory()->getEditable('pathauto.pattern');
+  $config->clear('patterns.' . $entity_type . '.bundles.' . $bundle);
   $config->save();
 }
 
