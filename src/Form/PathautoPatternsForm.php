@@ -108,7 +108,7 @@ class PathautoPatternsForm extends ConfigFormBase {
           $form[$module]['bundles'][$itemname][$key] = array(
             '#type' => 'textfield',
             '#title' => $itemlabel,
-            '#default_value' => $config->get($module . '.bundles.' . $itemname . '.' . $key),
+            '#default_value' => $config->get('patterns.'. $module . '.bundles.' . $itemname . '.' . $key),
             '#size' => 65,
             '#maxlength' => 1280,
             '#element_validate' => array('token_element_validate'),
