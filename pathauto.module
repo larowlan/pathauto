@@ -52,7 +52,7 @@ function pathauto_hook_info() {
  * Adds pathauto support for core modules.
  */
 function pathauto_module_implements_alter(&$implementations, $hook) {
-  if (in_array($hook, array('pathauto', 'path_alias_types'))) {
+  if (in_array($hook, array('pathauto'))) {
     $modules = array('node', 'taxonomy', 'user', 'forum');
     foreach ($modules as $module) {
       if (\Drupal::moduleHandler()->moduleExists($module)) {
