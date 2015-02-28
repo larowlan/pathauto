@@ -207,8 +207,8 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     $langcode = NULL;
-    if (!empty($options['language']->language)) {
-      $langcode = $options['language']->language;
+    if (!empty($options['language'])) {
+      $langcode = $options['language']->getId();
     }
     elseif (!empty($options['langcode'])) {
       $langcode = $options['langcode'];
@@ -328,11 +328,11 @@ class PathautoManager implements PathautoManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function createAlias($module, $op, $source, $data, $type = NULL, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
+  public function createAlias($module, $op, $source, $data, $type = NULL, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
     $config = $this->configFactory->get('pathauto.settings');
 
     // Retrieve and apply the pattern for this content type.
-    $pattern = $this->getPatternByEntity($module, $type, $language);
+    $pattern = $this->getPatternByEntity($module, $type, $langcode);
 
     // Allow other modules to alter the pattern.
     $context = array(
@@ -341,7 +341,7 @@ class PathautoManager implements PathautoManagerInterface {
       'source' => $source,
       'data' => $data,
       'type' => $type,
-      'language' => &$language,
+      'language' => &$langcode,
     );
     $this->moduleHandler->alter('pathauto_pattern', $pattern, $context);
 
@@ -353,7 +353,7 @@ class PathautoManager implements PathautoManagerInterface {
     // Special handling when updating an item which is already aliased.
     $existing_alias = NULL;
     if ($op == 'update' || $op == 'bulkupdate') {
-      if ($existing_alias = $this->aliasStorageHelper->loadBySource($source, $language)) {
+      if ($existing_alias = $this->aliasStorageHelper->loadBySource($source, $langcode)) {
         switch ($config->get('update_action')) {
           case PathautoManagerInterface::UPDATE_ACTION_NO_NEW:
             // If an alias already exists,
@@ -370,7 +370,7 @@ class PathautoManager implements PathautoManagerInterface {
       'sanitize' => FALSE,
       'clear' => TRUE,
       'callback' => array($this, 'cleanTokenValues'),
-      'language' => (object) array('language' => $language),
+      'langcode' => $langcode,
       'pathauto' => TRUE,
     ));
 
@@ -396,7 +396,7 @@ class PathautoManager implements PathautoManagerInterface {
 
     // If the alias already exists, generate a new, hopefully unique, variant.
     $original_alias = $alias;
-    $this->aliasUniquifier->uniquify($alias, $source, $language);
+    $this->aliasUniquifier->uniquify($alias, $source, $langcode);
     if ($original_alias != $alias) {
       // Alert the user why this happened.
       $this->messenger->addMessage($this->t('The automatically generated alias %original_alias conflicted with an existing alias. Alias changed to %alias.', array(
@@ -414,7 +414,7 @@ class PathautoManager implements PathautoManagerInterface {
     $path = array(
       'source' => $source,
       'alias' => $alias,
-      'language' => $language,
+      'language' => $langcode,
     );
 
     return $this->aliasStorageHelper->save($path, $existing_alias, $op);

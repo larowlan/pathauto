@@ -111,7 +111,7 @@ interface PathautoManagerInterface {
    *   For modules which provided pattern items in hook_pathauto(),
    *   the relevant identifier for the specific item to be aliased
    *   (e.g., $node->type).
-   * @param string $language
+   * @param string $langcode
    *   A string specify the path's language.
    *
    * @return array|string
@@ -119,7 +119,7 @@ interface PathautoManagerInterface {
    *
    * @see _pathauto_set_alias()
    */
-  public function createAlias($module, $op, $source, $data, $type = NULL, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
+  public function createAlias($module, $op, $source, $data, $type = NULL, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED);
 
   /**
    * Return an array of arrays for punctuation values.
