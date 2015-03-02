@@ -207,6 +207,13 @@ function pathauto_entity_update(EntityInterface $entity) {
 
 
 /**
+ * Implements hook_entity_update().
+ */
+function pathauto_entity_delete(EntityInterface $entity) {
+  pathauto_entity_path_delete_all($entity);
+}
+
+/**
  * Update the URL aliases for multiple nodes.
  *
  * @param array $nids

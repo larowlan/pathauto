@@ -36,11 +36,4 @@ class PathautoItem extends PathItem {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function delete() {
-    pathauto_entity_path_delete_all($this->getEntity());
-  }
-
 } 
