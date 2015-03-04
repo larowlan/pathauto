@@ -134,13 +134,13 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
    * Wraps content_translation_enabled().
    *
    * @param string $node_type
-   *   the node type.
+   *   The node type.
    *
    * @return bool
-   *   tRUE if content translation is enabled for the content type.
+   *   TRUE if content translation is enabled for the content type.
    */
   protected function isContentTranslationEnabled($node_type) {
-    return $this->moduleHandler->moduleExists('content_translation') && content_translation_enabled('node', $node_type);
+    return $this->moduleHandler->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled('node', $node_type);
   }
 
 }
