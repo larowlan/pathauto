@@ -62,7 +62,7 @@ function node_pathauto($op) {
       }
 
       foreach (node_type_get_names() as $node_type => $node_name) {
-        if (count($languages) && \Drupal::moduleHandler()->moduleExists('content_translation') && content_translation_enabled('node', $node_type)) {
+        if (count($languages) && \Drupal::moduleHandler()->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled('node', $node_type)) {
           $settings['patternitems'][$node_type] = t('Default path pattern for @node_type (applies to all @node_type content types with blank patterns below)', array('@node_type' => $node_name));
           foreach ($languages as $lang_code => $lang_name) {
             $settings['patternitems'][$node_type . '_' . $lang_code] = t('Pattern for all @language @node_type paths', array('@node_type' => $node_name, '@language' => $lang_name));
