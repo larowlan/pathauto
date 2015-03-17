@@ -64,17 +64,11 @@ function pathauto_patterns_form($form, $form_state) {
       }
     }
 
-    // Display the user documentation of placeholders supported by
-    // this module, as a description on the last pattern
+    // Show the token help relevant to this pattern type.
     $form[$module]['token_help'] = array(
-      '#title' => t('Replacement patterns'),
-      '#type' => 'fieldset',
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form[$module]['token_help']['help'] = array(
       '#theme' => 'token_tree',
       '#token_types' => array($settings->token_type),
+      '#dialog' => TRUE,
     );
   }
 
