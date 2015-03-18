@@ -45,6 +45,9 @@ namespace Drupal\Tests\pathauto {
       $this->assertTrue($this->messenger->addMessage("Test message"), "The message was added");
     }
 
+    /**
+     * @covers ::addMessage
+     */
     public function testDoNotAddMessageWhileBulkupdate() {
       $this->assertFalse($this->messenger->addMessage("Test message", "bulkupdate"), "The message was NOT added");
     }
