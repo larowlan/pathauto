@@ -34,7 +34,6 @@ namespace Drupal\Tests\pathauto {
         ->withAnyParameters()
         ->willReturn(TRUE);
 
-      // The messenger under test.
       $this->messenger = new VerboseMessenger($config_factory, $account);
     }
 
@@ -43,16 +42,10 @@ namespace Drupal\Tests\pathauto {
      * @covers ::addMessage
      */
     public function testAddMessage() {
-      // Test adding a message.
       $this->assertTrue($this->messenger->addMessage("Test message"), "The message was added");
     }
 
-    /**
-     * Tests add messages.
-     * @covers ::addMessage
-     */
-    public function testNotAddMessage() {
-      // Test adding a message.
+    public function testDoNotAddMessageWhileBulkupdate() {
       $this->assertFalse($this->messenger->addMessage("Test message", "bulkupdate"), "The message was NOT added");
     }
   }
