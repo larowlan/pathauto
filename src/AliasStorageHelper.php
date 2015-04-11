@@ -26,7 +26,7 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
    *
    * @var int
    */
-  protected $aliasSchemaMaxLength;
+  protected $aliasSchemaMaxLength = 255;
 
   /**
    * Config factory.
@@ -82,10 +82,6 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
    * {@inheritdoc}
    */
   public function getAliasSchemaMaxLength() {
-    if (!isset($this->aliasSchemaMaxLength)) {
-      $schema = drupal_get_schema('url_alias');
-      $this->aliasSchemaMaxLength = $schema['fields']['alias']['length'];
-    }
     return $this->aliasSchemaMaxLength;
   }
 
