@@ -8,6 +8,7 @@
 namespace Drupal\pathauto;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
