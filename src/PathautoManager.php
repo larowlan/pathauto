@@ -7,7 +7,6 @@
 
 namespace Drupal\pathauto;
 
-use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -221,7 +220,7 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     // Remove all HTML tags from the string.
-    $output = strip_tags(String::decodeEntities($string));
+    $output = strip_tags(Html::decodeEntities($string));
 
     // Optionally transliterate.
     if ($this->cleanStringCache['transliterate']) {

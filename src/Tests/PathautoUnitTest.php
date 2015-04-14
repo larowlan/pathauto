@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Tests;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\String;
 use Drupal\pathauto\PathautoManagerInterface;
@@ -134,7 +135,7 @@ class PathautoUnitTest extends KernelTestBase {
 
     // Test that HTML tags are removed.
     $tests['This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.'] = 'text-has-html-tags';
-    $tests[String::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
+    $tests[SafeMarkup::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
 
     // Transliteration.
     $tests['ľščťžýáíéňô'] = 'lsctzyaieno';
