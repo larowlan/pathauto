@@ -9,7 +9,6 @@ namespace Drupal\pathauto\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Language\Language;
-use Drupal\Component\Utility\String;
 use Drupal\pathauto\PathautoManagerInterface;
 use Drupal\simpletest\KernelTestBase;
 
