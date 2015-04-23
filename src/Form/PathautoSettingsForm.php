@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Form;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Component\Utility\String;
 use Drupal\pathauto\PathautoManagerInterface;
@@ -159,7 +160,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       }
       $form['punctuation']['punctuation' . $name] = array(
         '#type' => 'select',
-        '#title' => $details['name'] . ' (<code>' . String::checkPlain($details['value']) . '</code>)',
+        '#title' => $details['name'] . ' (<code>' . SafeMarkup::checkPlain($details['value']) . '</code>)',
         '#default_value' => $details['default'],
         '#options' => array(
           PathautoManagerInterface::PUNCTUATION_REMOVE => t('Remove'),

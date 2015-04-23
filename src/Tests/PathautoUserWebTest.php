@@ -73,8 +73,10 @@ class PathautoUserWebTest extends WebTestBase {
     $view = Views::getView('user_admin_people');
     $view->initDisplay();
     $view->preview('page_1');
+
+
     foreach ($view->result as $key => $row) {
-      if ($row->users_field_data_name == $account->getUsername()) {
+      if ($view->field['name']->getValue($row) == $account->getUsername()) {
         break;
       }
     }
