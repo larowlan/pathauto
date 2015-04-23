@@ -9,7 +9,6 @@ namespace Drupal\pathauto\Form;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Component\Utility\String;
 use Drupal\pathauto\PathautoManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
