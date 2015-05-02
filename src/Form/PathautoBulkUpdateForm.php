@@ -9,11 +9,40 @@ namespace Drupal\pathauto\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\pathauto\AliasTypeBatchUpdateInterface;
+use Drupal\pathauto\AliasTypeManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure file system settings for this site.
  */
 class PathautoBulkUpdateForm extends FormBase {
+
+  /**
+   * The alias type manager.
+   *
+   * @var \Drupal\pathauto\AliasTypeManager
+   */
+  protected $aliasTypeManager;
+
+  /**
+   * Constructs a PathautoPatternsForm object.
+   *
+   * @param \Drupal\pathauto\AliasTypeManager $alias_type_manager
+   *   The alias type manager.
+   */
+  public function __construct(AliasTypeManager $alias_type_manager) {
+    $this->aliasTypeManager = $alias_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('plugin.manager.alias_type')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -38,12 +67,12 @@ class PathautoBulkUpdateForm extends FormBase {
       '#default_value' => array(),
     );
 
-    $pathauto_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
+    $definitions = $this->aliasTypeManager->getDefinitions();
 
-    foreach ($pathauto_settings as $settings) {
-      if (!empty($settings->batch_update_callback)) {
-        $form['#update_callbacks'][$settings->batch_update_callback] = $settings;
-        $form['update']['#options'][$settings->batch_update_callback] = $settings->groupheader;
+    foreach ($definitions as $id => $definition) {
+      $alias_type = $this->aliasTypeManager->createInstance($id);
+      if ($alias_type instanceof AliasTypeBatchUpdateInterface) {
+        $form['update']['#options'][$id] = $alias_type->getLabel();
       }
     }
 
@@ -68,15 +97,9 @@ class PathautoBulkUpdateForm extends FormBase {
       'finished' => 'Drupal\pathauto\Form\PathautoBulkUpdateForm::batchFinished',
     );
 
-    foreach ($form_state->getValue('update') as $callback) {
-      if (!empty($callback)) {
-        $settings = $form['#update_callbacks'][$callback];
-        if (!empty($settings->batch_file)) {
-          $batch['operations'][] = array('Drupal\pathauto\Form\PathautoBulkUpdateForm::batchProcess', array($callback, $settings));
-        }
-        else {
-          $batch['operations'][] = array($callback, array());
-        }
+    foreach ($form_state->getValue('update') as $id) {
+      if (!empty($id)) {
+        $batch['operations'][] = array('Drupal\pathauto\Form\PathautoBulkUpdateForm::batchProcess', array($id));
       }
     }
 
@@ -95,11 +118,10 @@ class PathautoBulkUpdateForm extends FormBase {
    *
    * Required to load our include the proper batch file.
    */
-  public static function batchProcess($callback, $settings, &$context) {
-    if (!empty($settings->batch_file)) {
-      require_once DRUPAL_ROOT . '/' . $settings->batch_file;
-    }
-    return $callback($context);
+  public static function batchProcess($id, &$context) {
+    /** @var \Drupal\pathauto\AliasTypeBatchUpdateInterface $alias_type */
+    $alias_type = \Drupal::service('plugin.manager.alias_type')->createInstance($id);
+    $alias_type->batchUpdate($context);
   }
 
   /**
