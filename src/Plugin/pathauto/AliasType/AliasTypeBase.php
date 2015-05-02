@@ -120,6 +120,13 @@ abstract class AliasTypeBase extends PluginBase implements AliasTypeInterface {
   /**
    * {@inheritdoc}
    */
+  public function getPatterns() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function calculateDependencies() {
   }
 
