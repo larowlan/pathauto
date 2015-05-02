@@ -69,16 +69,13 @@ class PathautoPatternsForm extends ConfigFormBase {
 
     $config = $this->config('pathauto.pattern');
 
-    $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
+    foreach ($definitions as $id => $definition) {
+      /** @var \Drupal\pathauto\AliasTypeInterface $alias_type */
+      $alias_type = $this->aliasTypeManager->createInstance($id);
 
-    foreach ($all_settings as $settings) {
-      $module = $settings->module;
-      $patterndescr = $settings->patterndescr;
-      $groupheader = $settings->groupheader;
-
-      $form[$module] = array(
+      $form[$id] = array(
         '#type' => 'fieldset',
-        '#title' => $groupheader,
+        '#title' => $alias_type->getLabel(),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
         '#tree' => TRUE,
@@ -87,33 +84,33 @@ class PathautoPatternsForm extends ConfigFormBase {
       // Prompt for the default pattern for this module.
       $key = 'default';
 
-      $form[$module][$key] = array(
+      $form[$id][$key] = array(
         '#type' => 'textfield',
-        '#title' => $patterndescr,
-        '#default_value' => $config->get('patterns.' . $module . '.' . $key),
+        '#title' => $alias_type->getPatternDescription(),
+        '#default_value' => $config->get('patterns.' . $id . '.' . $key),
         '#size' => 65,
         '#maxlength' => 1280,
         '#element_validate' => array('token_element_validate'),
         '#after_build' => array('token_element_validate'),
-        '#token_types' => array($settings->token_type),
+        '#token_types' => $alias_type->getTokenTypes(),
         '#min_tokens' => 1,
       );
 
       // If the module supports a set of specialized patterns, set
       // them up here.
-      if (isset($settings->patternitems)) {
-        foreach ($settings->patternitems as $itemname => $itemlabel) {
+      if ($alias_type->getPatterns()) {
+        foreach ($alias_type->getPatterns() as $itemname => $itemlabel) {
           $key = 'default';
 
-          $form[$module]['bundles'][$itemname][$key] = array(
+          $form[$id]['bundles'][$itemname][$key] = array(
             '#type' => 'textfield',
             '#title' => $itemlabel,
-            '#default_value' => $config->get('patterns.'. $module . '.bundles.' . $itemname . '.' . $key),
+            '#default_value' => $config->get('patterns.'. $id . '.bundles.' . $itemname . '.' . $key),
             '#size' => 65,
             '#maxlength' => 1280,
             '#element_validate' => array('token_element_validate'),
             '#after_build' => array('token_element_validate'),
-            '#token_types' => array($settings->token_type),
+            '#token_types' => $alias_type->getTokenTypes(),
             '#min_tokens' => 1,
           );
         }
@@ -121,15 +118,15 @@ class PathautoPatternsForm extends ConfigFormBase {
 
       // Display the user documentation of placeholders supported by
       // this module, as a description on the last pattern.
-      $form[$module]['token_help'] = array(
+      $form[$id]['token_help'] = array(
         '#title' => t('Replacement patterns'),
         '#type' => 'fieldset',
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       );
-      $form[$module]['token_help']['help'] = array(
+      $form[$id]['token_help']['help'] = array(
         '#theme' => 'token_tree',
-        '#token_types' => array($settings->token_type),
+        '#token_types' => $alias_type->getTokenTypes(),
       );
     }
 
@@ -143,11 +140,10 @@ class PathautoPatternsForm extends ConfigFormBase {
 
     $config = $this->config('pathauto.pattern');
 
-    $all_settings = \Drupal::moduleHandler()->invokeAll('pathauto', array('settings'));
+    $definitions = $this->aliasTypeManager->getDefinitions();
 
-    foreach ($all_settings as $settings) {
-      $module = $settings->module;
-      $config->set('patterns.' . $module, $form_state->getValue($module));
+    foreach ($definitions as $id => $definition) {
+      $config->set('patterns.' . $id, $form_state->getValue($id));
     }
 
     $config->save();
