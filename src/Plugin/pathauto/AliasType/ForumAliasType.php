@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\pathauto\Plugin\AliasType\NodeAliasType.
+ * Contains \Drupal\pathauto\Plugin\AliasType\ForumAliasType.
  */
 
 namespace Drupal\pathauto\Plugin\pathauto\AliasType;
@@ -15,16 +15,16 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * A pathauto alias type plugin for content entities.
+ * A pathauto alias type plugin for forum terms.
  *
  * @AliasType(
- *   id = "node",
- *   label = @Translation("Content"),
- *   types = {"node"},
- *   provider = "node",
+ *   id = "forum",
+ *   label = @Translation("Forum"),
+ *   types = {"term"},
+ *   provider = "forum",
  * )
  */
-class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInterface {
+class UserAliasType extends AliasTypeBase implements ContainerFactoryPluginInterface {
 
   /**
    * The module handler service.
@@ -88,59 +88,14 @@ class NodeAliasType extends AliasTypeBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function getPatternDescription() {
-    $this->t('Default path pattern (applies to all content types with blank patterns below)');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPatterns() {
-    $patterns = [];
-    $languages = $this->languageManager->getLanguages();
-    foreach ($this->getNodeTypeNames() as $node_type => $node_type_name) {
-      if (count($languages) && $this->isContentTranslationEnabled($node_type)) {
-        $patterns[$node_type] = $this->t('Default path pattern for @node_type (applies to all @node_type content types with blank patterns below)', array('@node_type' => $node_type_name));
-        foreach ($languages as $language) {
-          $patterns[$node_type . '_' . $language->getId()] = $this->t('Pattern for all @language @node_type paths', array('@node_type' => $node_type_name, '@language' => $language->getName()));
-        }
-      }
-      else {
-        $patterns[$node_type] = $this->t('Pattern for all @node_type paths', array('@node_type' => $node_type_name));
-      }
-    }
-    return $patterns;
+    $this->t('Pattern for forums and forum containers');
   }
 
   /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('patternitems' => array('content/[node:title]')) + parent::defaultConfiguration();
-  }
-
-  /**
-   * Wraps node_type_get_names().
-   *
-   * @return array
-   *   An array of node type names, keyed by type.
-   */
-  protected function getNodeTypeNames() {
-    return array_map(function ($bundle_info) {
-      return $bundle_info['label'];
-    }, $this->entityManager->getBundleInfo('node'));
-  }
-
-  /**
-   * Wraps content_translation_enabled().
-   *
-   * @param string $node_type
-   *   The node type.
-   *
-   * @return bool
-   *   TRUE if content translation is enabled for the content type.
-   */
-  protected function isContentTranslationEnabled($node_type) {
-    return $this->moduleHandler->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled('node', $node_type);
+    return array('patternitems' => array('[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
   }
 
 }
