@@ -116,7 +116,7 @@ class NodeAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('patternitems' => array('content/[node:title]')) + parent::defaultConfiguration();
+    return array('default' => array('content/[node:title]')) + parent::defaultConfiguration();
   }
 
   /**

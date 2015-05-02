@@ -96,7 +96,7 @@ class UserAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('patternitems' => array('users/[user:name]')) + parent::defaultConfiguration();
+    return array('default' => array('users/[user:name]')) + parent::defaultConfiguration();
   }
 
   /**

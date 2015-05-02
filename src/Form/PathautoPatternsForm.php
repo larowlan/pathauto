@@ -71,63 +71,9 @@ class PathautoPatternsForm extends ConfigFormBase {
 
     foreach ($definitions as $id => $definition) {
       /** @var \Drupal\pathauto\AliasTypeInterface $alias_type */
-      $alias_type = $this->aliasTypeManager->createInstance($id);
+      $alias_type = $this->aliasTypeManager->createInstance($id, $config->get('patterns.' . $id));
 
-      $form[$id] = array(
-        '#type' => 'fieldset',
-        '#title' => $alias_type->getLabel(),
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-        '#tree' => TRUE,
-      );
-
-      // Prompt for the default pattern for this module.
-      $key = 'default';
-
-      $form[$id][$key] = array(
-        '#type' => 'textfield',
-        '#title' => $alias_type->getPatternDescription(),
-        '#default_value' => $config->get('patterns.' . $id . '.' . $key),
-        '#size' => 65,
-        '#maxlength' => 1280,
-        '#element_validate' => array('token_element_validate'),
-        '#after_build' => array('token_element_validate'),
-        '#token_types' => $alias_type->getTokenTypes(),
-        '#min_tokens' => 1,
-      );
-
-      // If the module supports a set of specialized patterns, set
-      // them up here.
-      if ($alias_type->getPatterns()) {
-        foreach ($alias_type->getPatterns() as $itemname => $itemlabel) {
-          $key = 'default';
-
-          $form[$id]['bundles'][$itemname][$key] = array(
-            '#type' => 'textfield',
-            '#title' => $itemlabel,
-            '#default_value' => $config->get('patterns.'. $id . '.bundles.' . $itemname . '.' . $key),
-            '#size' => 65,
-            '#maxlength' => 1280,
-            '#element_validate' => array('token_element_validate'),
-            '#after_build' => array('token_element_validate'),
-            '#token_types' => $alias_type->getTokenTypes(),
-            '#min_tokens' => 1,
-          );
-        }
-      }
-
-      // Display the user documentation of placeholders supported by
-      // this module, as a description on the last pattern.
-      $form[$id]['token_help'] = array(
-        '#title' => t('Replacement patterns'),
-        '#type' => 'fieldset',
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-      );
-      $form[$id]['token_help']['help'] = array(
-        '#theme' => 'token_tree',
-        '#token_types' => $alias_type->getTokenTypes(),
-      );
+      $form[$id] = $alias_type->buildConfigurationForm([], $form_state);
     }
 
     return parent::buildForm($form, $form_state);
