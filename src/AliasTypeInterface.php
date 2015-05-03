@@ -47,4 +47,12 @@ interface AliasTypeInterface extends ConfigurablePluginInterface, PluginFormInte
    */
   public function getTokenTypes();
 
+  /**
+   * Returns the source prefix; used for bulk delete.
+   *
+   * @return string
+   *   The source path prefix.
+   */
+  public function getSourcePrefix();
+
 }

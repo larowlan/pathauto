@@ -36,34 +36,11 @@ define('PATHAUTO_IGNORE_WORDS', 'a, an, as, at, before, but, by, for, from, is, 
  */
 function pathauto_hook_info() {
   $hooks = array(
-    'pathauto',
-    'path_alias_types',
     'pathauto_pattern_alter',
     'pathauto_alias_alter',
     'pathauto_is_alias_reserved',
   );
   return array_fill_keys($hooks, array('group' => 'pathauto'));
-}
-
-
-/**
- * Implements hook_module_implements_alter().
- *
- * Adds pathauto support for core modules.
- */
-function pathauto_module_implements_alter(&$implementations, $hook) {
-  if (in_array($hook, array('pathauto'))) {
-    $modules = array('node', 'taxonomy', 'user', 'forum');
-    foreach ($modules as $module) {
-      if (\Drupal::moduleHandler()->moduleExists($module)) {
-        $implementations[$module] = TRUE;
-      }
-    }
-    // Move pathauto.module to get included first since it is responsible for
-    // other modules.
-    unset($implementations['pathauto']);
-    $implementations = array_merge(array('pathauto' => 'pathauto'), $implementations);
-  }
 }
 
 /**

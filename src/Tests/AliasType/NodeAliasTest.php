@@ -45,8 +45,8 @@ class NodeAliasTest extends KernelTestBase {
 
     $default_config = $node_type->defaultConfiguration();
 
-    $this->assertTrue(array_key_exists('patternitems', $default_config), "Patternitems key exists.");
-    $this->assertEqual($default_config['patternitems'][0], 'content/[node:title]', "Default content pattern matches.");
+    $this->assertTrue(array_key_exists('default', $default_config), "Default key exists.");
+    $this->assertEqual($default_config['default'][0], 'content/[node:title]', "Default content pattern matches.");
 
   }
 

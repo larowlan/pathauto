@@ -69,8 +69,8 @@ class PathautoBulkUpdateTest extends WebTestBase {
 
     // Bulk create aliases.
     $edit = array(
-      'update[node_pathauto_bulk_update_batch_process]' => TRUE,
-      'update[user_pathauto_bulk_update_batch_process]' => TRUE,
+      'update[node]' => TRUE,
+      'update[user]' => TRUE,
     );
     $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, t('Update'));
     $this->assertText('Generated 7 URL aliases.'); // 5 nodes + 2 users

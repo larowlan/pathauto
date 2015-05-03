@@ -9,10 +9,14 @@ use Drupal\Core\Language\Language;
  * @see hook_tokens
  */
 
-function hook_path_alias_types() {
-}
-
-function hook_pathauto($op) {
+/**
+ * Alter pathauto alias type definitions.
+ *
+ * @param array &$definitions
+ *   Alias type definitions.
+ *
+ */
+function hook_path_alias_types_alter(array &$definitions) {
 }
 
 /**
@@ -59,7 +63,7 @@ function hook_pathauto_is_alias_reserved($alias, $source, $langcode) {
  */
 function hook_pathauto_pattern_alter(&$pattern, array &$context) {
   // Switch out any [node:created:*] tokens with [node:updated:*] on update.
-  if ($module == 'node' && ($context['op'] == 'update')) {
+  if ($context['module'] == 'node' && ($context['op'] == 'update')) {
     $pattern = preg_replace('/\[node:created(\:[^]]*)?\]/', '[node:updated$1]', $pattern);
   }
 }

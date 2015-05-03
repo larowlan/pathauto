@@ -9,11 +9,39 @@ namespace Drupal\pathauto\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\pathauto\AliasTypeManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Configure file system settings for this site.
+ * Alias mass delete form.
  */
 class PathautoAdminDelete extends FormBase {
+
+  /**
+   * The alias type manager.
+   *
+   * @var \Drupal\pathauto\AliasTypeManager
+   */
+  protected $aliasTypeManager;
+
+  /**
+   * Constructs a PathautoPatternsForm object.
+   *
+   * @param \Drupal\pathauto\AliasTypeManager $alias_type_manager
+   *   The alias type manager.
+   */
+  public function __construct(AliasTypeManager $alias_type_manager) {
+    $this->aliasTypeManager = $alias_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('plugin.manager.alias_type')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -26,14 +54,10 @@ class PathautoAdminDelete extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-
-    $form = array();
-
     $form['delete'] = array(
       '#type' => 'fieldset',
       '#title' => t('Choose aliases to delete'),
-      '#collapsible' => FALSE,
-      '#collapsed' => FALSE,
+      '#tree' => TRUE,
     );
 
     // First we do the "all" case.
@@ -45,20 +69,18 @@ class PathautoAdminDelete extends FormBase {
       '#description' => t('Delete all aliases. Number of aliases which will be deleted: %count.', array('%count' => $total_count)),
     );
 
-    // Next, iterate over an array of objects/alias types
-    // which can be deleted and provide checkboxes.
-    $args = func_get_args();
-    // Remove $hook from the arguments.
-    unset($args[0]);
-    $objects = \Drupal::moduleHandler()->invokeAll('path_alias_types', $args);
+    // Next, iterate over all alias types
+    $definitions = $this->aliasTypeManager->getDefinitions();
 
-    foreach ($objects as $internal_name => $label) {
-      $count = db_query("SELECT count(1) FROM {url_alias} WHERE source LIKE :src", array(':src' => "$internal_name%"))->fetchField();
-      $form['delete'][$internal_name] = array(
+    foreach ($definitions as $id => $definition) {
+      /** @var \Drupal\pathauto\AliasTypeInterface $alias_type */
+      $alias_type = $this->aliasTypeManager->createInstance($id);
+      $count = db_query("SELECT count(1) FROM {url_alias} WHERE source LIKE :src", array(':src' => $alias_type->getSourcePrefix() . '%'))->fetchField();
+      $form['delete']['plugins'][$id] = array(
         '#type' => 'checkbox',
-        '#title' => $label, // This label is sent through t() in the hard coded function where it is defined.
+        '#title' => (string) $definition['label'],
         '#default_value' => FALSE,
-        '#description' => t('Delete aliases for all @label. Number of aliases which will be deleted: %count.', array('@label' => $label, '%count' => $count)),
+        '#description' => t('Delete aliases for all @label. Number of aliases which will be deleted: %count.', array('@label' => (string) $definition['label'], '%count' => $count)),
       );
     }
 
@@ -76,24 +98,18 @@ class PathautoAdminDelete extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach ($form_state->getValues() as $key => $value) {
-      if ($value) {
-        if ($key === 'all_aliases') {
-          db_delete('url_alias')
-            ->execute();
-          drupal_set_message(t('All of your path aliases have been deleted.'));
-        }
-        $args = func_get_args();
-        // Remove $hook from the arguments.
-        unset($args[0]);
-        $objects = \Drupal::moduleHandler()->invokeAll('path_alias_types', $args);
-        if (array_key_exists($key, $objects)) {
-          db_delete('url_alias')
-            ->condition('source', db_like($key) . '%', 'LIKE')
-            ->execute();
-          drupal_set_message(t('All of your %type path aliases have been deleted.', array('%type' => $objects[$key])));
-        }
-      }
+    if ($form_state->getValue(['delete', 'all_aliases'])) {
+      db_delete('url_alias')
+        ->execute();
+      drupal_set_message($this->t('All of your path aliases have been deleted.'));
+    }
+    foreach (array_keys(array_filter($form_state->getValue(['delete', 'plugins']))) as $id) {
+      /** @var \Drupal\pathauto\AliasTypeInterface $alias_type */
+      $alias_type = $this->aliasTypeManager->createInstance($id);
+      db_delete('url_alias')
+        ->condition('source', db_like($alias_type->getSourcePrefix()) . '%', 'LIKE')
+        ->execute();
+      drupal_set_message(t('All of your %label path aliases have been deleted.', array('%label' => $alias_type->getLabel())));
     }
     $form_state->setRedirect('pathauto.bulk.update.form');
   }
