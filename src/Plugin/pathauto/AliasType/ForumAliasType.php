@@ -88,7 +88,7 @@ class ForumAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterf
    * {@inheritdoc}
    */
   public function getPatternDescription() {
-    $this->t('Pattern for forums and forum containers');
+    return $this->t('Pattern for forums and forum containers');
   }
 
   /**

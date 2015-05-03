@@ -88,7 +88,7 @@ class TaxonomyTermAliasType extends AliasTypeBase implements AliasTypeBatchUpdat
    * {@inheritdoc}
    */
   public function getPatternDescription() {
-    $this->t('Default path pattern (applies to all vocabularies with blank patterns below)');
+    return $this->t('Default path pattern (applies to all vocabularies with blank patterns below)');
   }
 
   /**

@@ -9,7 +9,6 @@ namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\pathauto\AliasTypeBatchUpdateInterface;
@@ -89,7 +88,7 @@ class NodeAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
    * {@inheritdoc}
    */
   public function getPatternDescription() {
-    $this->t('Default path pattern (applies to all content types with blank patterns below)');
+    return $this->t('Default path pattern (applies to all content types with blank patterns below)');
   }
 
   /**

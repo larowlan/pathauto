@@ -71,7 +71,7 @@ abstract class AliasTypeBase extends PluginBase implements AliasTypeInterface {
     );
 
     // Prompt for the default pattern for this module.
-    $key = '_default';
+    $key = 'default';
 
     $form[$key] = array(
       '#type' => 'textfield',
@@ -89,9 +89,8 @@ abstract class AliasTypeBase extends PluginBase implements AliasTypeInterface {
     // them up here.
     $patterns = $this->getPatterns();
     foreach ($patterns as $itemname => $itemlabel) {
-      $key = '_default';
-
-      $form[$itemname][$key] = array(
+      $key = 'default';
+      $form['bundles'][$itemname][$key] = array(
         '#type' => 'textfield',
         '#title' => $itemlabel,
         '#default_value' => isset($this->configuration[$itemname . '.' . $key]) ? $this->configuration[$itemname . '.' . $key] : NULL,

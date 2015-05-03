@@ -88,7 +88,7 @@ class UserAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
    * {@inheritdoc}
    */
   public function getPatternDescription() {
-    $this->t('Pattern for user account page paths');
+    return $this->t('Pattern for user account page paths');
   }
 
   /**
