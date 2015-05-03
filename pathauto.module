@@ -36,7 +36,6 @@ define('PATHAUTO_IGNORE_WORDS', 'a, an, as, at, before, but, by, for, from, is, 
  */
 function pathauto_hook_info() {
   $hooks = array(
-    'path_alias_types',
     'pathauto_pattern_alter',
     'pathauto_alias_alter',
     'pathauto_is_alias_reserved',
