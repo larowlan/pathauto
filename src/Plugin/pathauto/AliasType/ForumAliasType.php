@@ -9,7 +9,6 @@ namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\pathauto\AliasTypeBatchUpdateInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   provider = "forum",
  * )
  */
-class UserAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterface, ContainerFactoryPluginInterface {
+class ForumAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterface, ContainerFactoryPluginInterface {
 
   /**
    * The module handler service.
@@ -142,6 +141,13 @@ class UserAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
     if ($context['sandbox']['count'] != $context['sandbox']['total']) {
       $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourcePrefix() {
+    return 'forum/';
   }
 
 }

@@ -9,7 +9,6 @@ namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\pathauto\AliasTypeBatchUpdateInterface;
@@ -141,6 +140,13 @@ class UserAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
     if ($context['sandbox']['count'] != $context['sandbox']['total']) {
       $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourcePrefix() {
+    return 'user/';
   }
 
 }

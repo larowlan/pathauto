@@ -162,6 +162,13 @@ class NodeAliasType extends AliasTypeBase implements AliasTypeBatchUpdateInterfa
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getSourcePrefix() {
+    return 'node/';
+  }
+
+  /**
    * Wraps node_type_get_names().
    *
    * @return array
