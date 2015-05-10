@@ -9,6 +9,7 @@ namespace Drupal\pathauto;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasStorageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -173,6 +174,44 @@ class AliasStorageHelper implements AliasStorageHelperInterface {
       ':language' => $language,
       ':language_none' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
     ))->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteAll($source) {
+    $pids = $this->loadBySourcePrefix($source);
+    if ($pids) {
+      $this->deleteMultiple($pids);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteEntityPathAll(EntityInterface $entity, $default_uri = NULL) {
+    $this->deleteAll($entity->urlInfo()->toString());
+    if (isset($default_uri) && $entity->urlInfo()->toString() != $default_uri) {
+      $this->deleteAll($default_uri);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteMultiple($pids) {
+    foreach ($pids as $pid) {
+      $this->aliasStorage->delete(array('pid' => $pid));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadBySourcePrefix($source) {
+    return $this->database->query("SELECT pid FROM {url_alias} WHERE source = :source OR source LIKE :source_wildcard",
+      [':source' => $source, ':source_wildcard' => $source . '/%'])
+      ->fetchCol();
   }
 
 }
