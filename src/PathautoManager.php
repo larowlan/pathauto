@@ -228,7 +228,7 @@ class PathautoManager implements PathautoManagerInterface {
       // If the reduce strings to letters and numbers is enabled, don't bother
       // replacing unknown characters with a question mark. Use an empty string
       // instead.
-      $output = \Drupal::service('transliteration')->transliterate($output, $this->cleanStringCache['reduce_ascii'] ? '' : '?', $langcode);
+      $output = \Drupal::service('transliteration')->transliterate($output, $langcode, $this->cleanStringCache['reduce_ascii'] ? '' : '?');
     }
 
     // Replace or drop punctuation based on user settings.
