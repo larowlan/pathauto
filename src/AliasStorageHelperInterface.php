@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\pathauto;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
@@ -71,4 +72,48 @@ interface AliasStorageHelperInterface {
    */
   public function exists($alias, $source, $language = LanguageInterface::LANGCODE_NOT_SPECIFIED);
 
+  /**
+   * Delete all aliases by source url.
+   *
+   * Can use wildcard patterns, e.g.
+   *
+   * @param string $source
+   *   The URL alias source.
+   */
+  public function deleteAll($source);
+
+  /**
+   * Delete an entity URL alias and any of its sub-paths.
+   *
+   * This function also checks to see if the default entity URI is different
+   * from the current entity URI and will delete any of the default aliases.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   An entity object.
+   * @param string $default_uri
+   *   The optional default uri path for the entity.
+   */
+  public function deleteEntityPathAll(EntityInterface $entity, $default_uri = NULL);
+
+  /**
+   * Delete multiple URL aliases.
+   *
+   * Intent of this is to abstract a potential path_delete_multiple() function
+   * for Drupal 7 or 8.
+   *
+   * @param integer[] $pids
+   *   An array of path IDs to delete.
+   */
+  public function deleteMultiple($pids);
+
+  /**
+   * Fetches an existing URL alias given a path prefix.
+   *
+   * @param string $source
+   *   An internal Drupal path prefix.
+   *
+   * @return integer[]
+   *   An array of PIDs.
+   */
+  public function loadBySourcePrefix($source);
 }

@@ -180,7 +180,7 @@ class PathautoUnitTest extends KernelTestBase {
     $this->saveAlias('node/1', 'node-1-alias-fr', 'fr');
     $this->saveAlias('node/2', 'node-2-alias');
 
-    pathauto_path_delete_all('node/1');
+    \Drupal::service('pathauto.alias_storage_helper')->deleteAll('node/1');
     $this->assertNoAliasExists(array('source' => "node/1"));
     $this->assertNoAliasExists(array('source' => "node/1/view"));
     $this->assertAliasExists(array('source' => "node/2"));

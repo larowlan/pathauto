@@ -65,57 +65,6 @@ function pathauto_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Delete multiple URL aliases.
- *
- * Intent of this is to abstract a potential path_delete_multiple() function
- * for Drupal 7 or 8.
- *
- * @param $pids
- *   An array of path IDs to delete.
- */
-function pathauto_path_delete_multiple($pids) {
-  foreach ($pids as $pid) {
-    \Drupal::service('path.alias_storage')->delete(array('pid' => $pid));
-  }
-}
-
-/**
- * Delete an URL alias and any of its sub-paths.
- *
- * Given a source like 'node/1' this function will delete any alias that have
- * that specific source or any sources that match 'node/1/%'.
- *
- * @param $source
- *   An string with a source URL path.
- */
-function pathauto_path_delete_all($source) {
-  $sql = "SELECT pid FROM {url_alias} WHERE source = :source OR source LIKE :source_wildcard";
-  $pids = db_query($sql, array(':source' => $source, ':source_wildcard' => $source . '/%'))->fetchCol();
-  if ($pids) {
-    pathauto_path_delete_multiple($pids);
-  }
-}
-
-/**
- * Delete an entity URL alias and any of its sub-paths.
- *
- * This function also checks to see if the default entity URI is different from
- * the current entity URI and will delete any of the default aliases.
- *
- * @param EntityInterface $entity
- *   An entity object.
- * @param string $default_uri
- *   The optional default uri path for the entity.
- */
-function pathauto_entity_path_delete_all(EntityInterface $entity, $default_uri = NULL) {
-  pathauto_path_delete_all($entity->getSystemPath());
-  if (isset($default_uri) && $entity->getSystemPath() != $default_uri) {
-    pathauto_path_delete_all($default_uri);
-  }
-}
-
-
-/**
  * Implements hook_entity_bundle_rename().
  */
 function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new) {
@@ -187,7 +136,7 @@ function pathauto_entity_update(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function pathauto_entity_delete(EntityInterface $entity) {
-  pathauto_entity_path_delete_all($entity);
+  \Drupal::service('pathauto.alias_storage_helper')->deleteEntityPathAll($entity);
 }
 
 /**
