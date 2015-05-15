@@ -21,7 +21,7 @@ class PathautoUnitTest extends KernelTestBase {
 
   use PathautoTestHelperTrait;
 
-  public static $modules = array('system', 'entity', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token', 'menu_link', 'filter');
+  public static $modules = array('system', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token', 'filter');
 
   protected $currentUser;
 
