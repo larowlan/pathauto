@@ -155,7 +155,7 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
       $form['bundles'][$itemname][$key] = array(
         '#type' => 'textfield',
         '#title' => $itemlabel,
-        '#default_value' => isset($this->configuration[$itemname . '.' . $key]) ? $this->configuration[$itemname . '.' . $key] : NULL,
+        '#default_value' => isset($this->configuration['bundles'][$itemname][$key]) ? $this->configuration['bundles'][$itemname][$key] : NULL,
         '#size' => 65,
         '#maxlength' => 1280,
         '#element_validate' => array('token_element_validate'),
