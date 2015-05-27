@@ -7,5 +7,3 @@
 - pathauto_path_alias_types() => Plugins
 
 - INSTALL.txt: Update
-
-- Update hook_help(): https://drupal.org/node/2250345
