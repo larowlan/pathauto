@@ -82,7 +82,7 @@ class PathautoNodeWebTest extends WebTestBase {
       'path[0][pathauto]' => FALSE,
       'path[0][alias]' => $manual_alias,
     );
-    $this->drupalPostForm("{$node->getSystemPath()}/edit", $edit, t('Save and keep published'));
+    $this->drupalPostForm($node->urlInfo('edit-form'), $edit, t('Save and keep published'));
     $this->assertRaw(t('@type %title has been updated.', array('@type' => 'page', '%title' => $title)));
 
     // Check that the automatic alias checkbox is now unchecked by default.
@@ -132,7 +132,7 @@ class PathautoNodeWebTest extends WebTestBase {
     $node = $this->drupalGetNodeByTitle($edit['title']);
 
     // Pathauto checkbox should still not exist.
-    $this->drupalGet($node->getSystemPath() . '/edit');
+    $this->drupalGet($node->urlInfo('edit-form'));
     $this->assertNoFieldById('edit-path-0-pathauto');
     $this->assertFieldByName('path[0][alias]', '');
     $this->assertNoEntityAlias($node);

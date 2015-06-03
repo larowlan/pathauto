@@ -214,7 +214,7 @@ class PathautoUnitTest extends KernelTestBase {
     $node->setTitle('Third title');
     $node->save();
     $this->assertEntityAlias($node, 'content/third-title');
-    $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
+    $this->assertAliasExists(array('source' => $node->urlInfo()->getInternalPath(), 'alias' => 'content/second-title'));
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
@@ -223,7 +223,7 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/third-title'));
     // The older second alias is not deleted yet.
-    $older_path = $this->assertAliasExists(array('source' => $node->getSystemPath(), 'alias' => 'content/second-title'));
+    $older_path = $this->assertAliasExists(array('source' => $node->urlInfo()->getInternalPath(), 'alias' => 'content/second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);

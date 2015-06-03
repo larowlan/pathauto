@@ -491,7 +491,7 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     $result = $this->createAlias(
-      $type, $op, $entity->getSystemPath(), array($type => $entity), $bundle, $options['language']);
+      $type, $op, $entity->urlInfo()->getInternalPath(), array($type => $entity), $bundle, $options['language']);
 
     if ($type == 'taxonomy_term' && empty($options['is_child'])) {
       // For all children generate new aliases.
