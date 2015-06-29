@@ -413,7 +413,7 @@ function pathauto_action_info() {
  * Returns the language code of the given entity.
  *
  * Backward compatibility layer to ensure that installations running an older
- * version of core where entity_language() is not avilable do not break.
+ * version of core where entity_language() is not available do not break.
  *
  * @param string $entity_type
  *   An entity type.

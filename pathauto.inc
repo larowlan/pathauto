@@ -170,7 +170,7 @@ function pathauto_cleanstring($string, array $options = array()) {
     }
   }
 
-  // Empty strings do not need any proccessing.
+  // Empty strings do not need any processing.
   if ($string === '' || $string === NULL) {
     return '';
   }
