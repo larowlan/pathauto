@@ -55,9 +55,9 @@ class PathautoUnitTest extends KernelTestBase {
    */
   public function testPatternLoadByEntity() {
     $this->config('pathauto.pattern')
-      ->set('patterns.node.bundles.article.default', 'article/[node:title]')
-      ->set('patterns.node.bundles.article.languages.en', 'article/en/[node:title]')
-      ->set('patterns.node.bundles.page.default', '[node:title]')
+      ->set('patterns.node.bundles.article.default', '/article/[node:title]')
+      ->set('patterns.node.bundles.article.languages.en', '/article/en/[node:title]')
+      ->set('patterns.node.bundles.page.default', '/[node:title]')
       ->save();
 
     $tests = array(
@@ -65,31 +65,31 @@ class PathautoUnitTest extends KernelTestBase {
         'entity' => 'node',
         'bundle' => 'article',
         'language' => 'fr',
-        'expected' => 'article/[node:title]',
+        'expected' => '/article/[node:title]',
       ),
       array(
         'entity' => 'node',
         'bundle' => 'article',
         'language' => 'en',
-        'expected' => 'article/en/[node:title]',
+        'expected' => '/article/en/[node:title]',
       ),
       array(
         'entity' => 'node',
         'bundle' => 'article',
         'language' => Language::LANGCODE_NOT_SPECIFIED,
-        'expected' => 'article/[node:title]',
+        'expected' => '/article/[node:title]',
       ),
       array(
         'entity' => 'node',
         'bundle' => 'page',
         'language' => 'en',
-        'expected' => '[node:title]',
+        'expected' => '/[node:title]',
       ),
       array(
         'entity' => 'user',
         'bundle' => 'user',
         'language' => Language::LANGCODE_NOT_SPECIFIED,
-        'expected' => 'users/[user:name]',
+        'expected' => '/users/[user:name]',
       ),
       array(
         'entity' => 'invalid-entity',
@@ -155,7 +155,7 @@ class PathautoUnitTest extends KernelTestBase {
   public function testCleanAlias() {
     $tests = array();
     $tests['one/two/three'] = 'one/two/three';
-    $tests['/one/two/three/'] = 'one/two/three';
+    $tests['/one/two/three/'] = '/one/two/three';
     $tests['one//two///three'] = 'one/two/three';
     $tests['one/two--three/-/--/-/--/four---five'] = 'one/two-three/four-five';
     $tests['one/-//three--/four'] = 'one/three/four';
@@ -174,16 +174,16 @@ class PathautoUnitTest extends KernelTestBase {
    * Test pathauto_path_delete_multiple().
    */
   public function testPathDeleteMultiple() {
-    $this->saveAlias('node/1', 'node-1-alias');
-    $this->saveAlias('node/1/view', 'node-1-alias/view');
-    $this->saveAlias('node/1', 'node-1-alias-en', 'en');
-    $this->saveAlias('node/1', 'node-1-alias-fr', 'fr');
-    $this->saveAlias('node/2', 'node-2-alias');
+    $this->saveAlias('/node/1', '/node-1-alias');
+    $this->saveAlias('/node/1/view', '/node-1-alias/view');
+    $this->saveAlias('/node/1', '/node-1-alias-en', 'en');
+    $this->saveAlias('/node/1', '/node-1-alias-fr', 'fr');
+    $this->saveAlias('/node/2', '/node-2-alias');
 
-    \Drupal::service('pathauto.alias_storage_helper')->deleteAll('node/1');
-    $this->assertNoAliasExists(array('source' => "node/1"));
-    $this->assertNoAliasExists(array('source' => "node/1/view"));
-    $this->assertAliasExists(array('source' => "node/2"));
+    \Drupal::service('pathauto.alias_storage_helper')->deleteAll('/node/1');
+    $this->assertNoAliasExists(array('source' => "/node/1"));
+    $this->assertNoAliasExists(array('source' => "/node/1/view"));
+    $this->assertAliasExists(array('source' => "/node/2"));
   }
 
   /**
@@ -196,7 +196,7 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
     $config->save();
     $node = $this->drupalCreateNode(array('title' => 'First title'));
-    $this->assertEntityAlias($node, 'content/first-title');
+    $this->assertEntityAlias($node, '/content/first-title');
 
     $node->path->pathauto = TRUE;
 
@@ -205,16 +205,16 @@ class PathautoUnitTest extends KernelTestBase {
     $config->save();
     $node->setTitle('Second title');
     $node->save();
-    $this->assertEntityAlias($node, 'content/second-title');
-    $this->assertNoAliasExists(array('alias' => 'content/first-title'));
+    $this->assertEntityAlias($node, '/content/second-title');
+    $this->assertNoAliasExists(array('alias' => '/content/first-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_LEAVE
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_LEAVE);
     $config->save();
     $node->setTitle('Third title');
     $node->save();
-    $this->assertEntityAlias($node, 'content/third-title');
-    $this->assertAliasExists(array('source' => $node->urlInfo()->getInternalPath(), 'alias' => 'content/second-title'));
+    $this->assertEntityAlias($node, '/content/third-title');
+    $this->assertAliasExists(array('source' => '/' . $node->urlInfo()->getInternalPath(), 'alias' => 'content/second-title'));
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
@@ -223,26 +223,26 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($node, 'content/fourth-title');
     $this->assertNoAliasExists(array('alias' => 'content/third-title'));
     // The older second alias is not deleted yet.
-    $older_path = $this->assertAliasExists(array('source' => $node->urlInfo()->getInternalPath(), 'alias' => 'content/second-title'));
+    $older_path = $this->assertAliasExists(array('source' => $node->urlInfo()->getInternalPath(), 'alias' => '/content/second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
     $config->save();
     $node->setTitle('Fifth title');
     $node->save();
-    $this->assertEntityAlias($node, 'content/fourth-title');
-    $this->assertNoAliasExists(array('alias' => 'content/fifth-title'));
+    $this->assertEntityAlias($node, '/content/fourth-title');
+    $this->assertNoAliasExists(array('alias' => '/content/fifth-title'));
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'update'.
     $this->deleteAllAliases();
     $node->save();
-    $this->assertEntityAlias($node, 'content/fifth-title');
+    $this->assertEntityAlias($node, '/content/fifth-title');
 
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
     $node->setTitle('Sixth title');
     \Drupal::service('pathauto.manager')->updateAlias($node, 'bulkupdate');
-    $this->assertEntityAlias($node, 'content/sixth-title');
+    $this->assertEntityAlias($node, '/content/sixth-title');
   }
 
   /**
@@ -255,7 +255,7 @@ class PathautoUnitTest extends KernelTestBase {
 
     $node->setTitle('hello');
     $node->save();
-    $this->assertEntityAlias($node, 'content/hello');
+    $this->assertEntityAlias($node, '/content/hello');
   }
 
   /**
@@ -269,14 +269,14 @@ class PathautoUnitTest extends KernelTestBase {
     $vocab = $this->addVocabulary();
 
     $term1 = $this->addTerm($vocab, array('name' => 'Parent term'));
-    $this->assertEntityAlias($term1, 'parent-term');
+    $this->assertEntityAlias($term1, '/parent-term');
 
     $term2 = $this->addTerm($vocab, array('name' => 'Child term', 'parent' => $term1->id()));
-    $this->assertEntityAlias($term2, 'parent-term/child-term');
+    $this->assertEntityAlias($term2, '/parent-term/child-term');
 
-    $this->saveEntityAlias($term1, 'My Crazy/Alias/');
+    $this->saveEntityAlias($term1, '/My Crazy/Alias/');
     $term2->save();
-    $this->assertEntityAlias($term2, 'My Crazy/Alias/child-term');
+    $this->assertEntityAlias($term2, '/My Crazy/Alias/child-term');
   }
 
   public function testEntityBundleRenamingDeleting() {
@@ -339,11 +339,11 @@ class PathautoUnitTest extends KernelTestBase {
    */
   function testProgrammaticEntityCreation() {
     $node = $this->drupalCreateNode(array('title' => 'Test node', 'path' => array('pathauto' => TRUE)));
-    $this->assertEntityAlias($node, 'content/test-node');
+    $this->assertEntityAlias($node, '/content/test-node');
 
     $vocabulary = $this->addVocabulary(array('name' => 'Tags'));
     $term = $this->addTerm($vocabulary, array('name' => 'Test term', 'path' => array('pathauto' => TRUE)));
-    $this->assertEntityAlias($term, 'tags/test-term');
+    $this->assertEntityAlias($term, '/tags/test-term');
 
     $edit['name'] = 'Test user';
     $edit['mail'] = 'test-user@example.com';
@@ -352,7 +352,7 @@ class PathautoUnitTest extends KernelTestBase {
     $edit['status'] = 1;
     $account = entity_create('user', $edit);
     $account->save();
-    $this->assertEntityAlias($account, 'users/test-user');
+    $this->assertEntityAlias($account, '/users/test-user');
   }
 
   protected function drupalCreateNode(array $settings = array()) {

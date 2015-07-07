@@ -29,11 +29,11 @@ class PathautoTokenTest extends KernelTestBase {
 
     $array = array(
       'test first arg',
-      'The Array / value',
+      'the Array / value',
     );
 
     $tokens = array(
-      'join-path' => 'test-first-arg/array-value',
+      'join' => 'test-first-arg/array-value',
     );
     $data['array'] = $array;
     $replacements = $this->assertTokens('array', $data, $tokens);
@@ -42,7 +42,7 @@ class PathautoTokenTest extends KernelTestBase {
     /* @var \Drupal\pathauto\PathautoManagerInterface $manager */
     $manager = \Drupal::service('pathauto.manager');
     $manager->cleanTokenValues($replacements, $data, array());
-    $this->assertEqual($replacements['[array:join-path]'], 'test-first-arg/array-value');
+    $this->assertEqual($replacements['[array:join]'], 'test-first-arg/array-value');
   }
 
   /**

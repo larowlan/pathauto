@@ -89,7 +89,7 @@ class AliasCleaner implements AliasCleanerInterface {
 
     if (strlen($separator)) {
       // Trim any leading or trailing separators.
-      $output = trim($output, $separator);
+      $output = rtrim($output, $separator);
 
       // Escape the separator for use in regular expressions.
       $seppattern = preg_quote($separator, '/');

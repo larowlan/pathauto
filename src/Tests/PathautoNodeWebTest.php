@@ -63,7 +63,7 @@ class PathautoNodeWebTest extends WebTestBase {
 
     // Create a node by saving the node form.
     $title = ' Testing: node title [';
-    $automatic_alias = 'content/testing-node-title';
+    $automatic_alias = '/content/testing-node-title';
     $this->drupalPostForm(NULL, array('title[0][value]' => $title), t('Save and publish'));
     $node = $this->drupalGetNodeByTitle($title);
 
@@ -77,7 +77,7 @@ class PathautoNodeWebTest extends WebTestBase {
     $this->assertText($title, 'Node accessible through automatic alias.');
 
     // Manually set the node's alias.
-    $manual_alias = 'content/' . $node->id();
+    $manual_alias = '/content/' . $node->id();
     $edit = array(
       'path[0][pathauto]' => FALSE,
       'path[0][alias]' => $manual_alias,
@@ -107,12 +107,13 @@ class PathautoNodeWebTest extends WebTestBase {
     $edit = array(
       'title[0][value]' => $title,
       'path[0][pathauto]' => TRUE,
-      'path[0][alias]' => 'should-not-get-created',
+      'path[0][alias]' => '/should-not-get-created',
     );
     $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
     $this->assertNoAliasExists(array('alias' => 'should-not-get-created'));
     $node = $this->drupalGetNodeByTitle($title);
-    $this->assertEntityAlias($node, 'content/automatic-title');
+    debug($node);
+    $this->assertEntityAlias($node, '/content/automatic-title');
 
     // Remove the pattern for nodes, the pathauto checkbox should not be
     // displayed.
@@ -158,8 +159,8 @@ class PathautoNodeWebTest extends WebTestBase {
       '%action' => 'Update URL-Alias',
     )));
 
-    $this->assertEntityAlias($node1, 'content/' . $node1->getTitle());
-    $this->assertEntityAlias($node2, 'node/' . $node2->id());
+    $this->assertEntityAlias($node1, '/content/' . $node1->getTitle());
+    $this->assertEntityAlias($node2, '/node/' . $node2->id());
   }
 
 }

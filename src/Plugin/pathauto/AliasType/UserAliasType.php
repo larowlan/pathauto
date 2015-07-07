@@ -33,7 +33,7 @@ class UserAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('default' => array('users/[user:name]')) + parent::defaultConfiguration();
+    return array('default' => array('/users/[user:name]')) + parent::defaultConfiguration();
   }
 
   /**
@@ -46,7 +46,7 @@ class UserAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
     }
 
     $query = db_select('users', 'u');
-    $query->leftJoin('url_alias', 'ua', "CONCAT('user/', u.uid) = ua.source");
+    $query->leftJoin('url_alias', 'ua', "CONCAT('/user/', u.uid) = ua.source");
     $query->addField('u', 'uid');
     $query->isNull('ua.source');
     $query->condition('u.uid', $context['sandbox']['current'], '>');
@@ -84,7 +84,7 @@ class UserAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
    * {@inheritdoc}
    */
   public function getSourcePrefix() {
-    return 'user/';
+    return '/user/';
   }
 
 }

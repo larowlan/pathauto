@@ -61,7 +61,7 @@ class PathautoTaxonomyWebTest extends WebTestBase {
 
     // Create term for testing.
     $name = 'Testing: term name [';
-    $automatic_alias = 'tags/testing-term-name';
+    $automatic_alias = '/tags/testing-term-name';
     $this->drupalPostForm('admin/structure/taxonomy/manage/tags/add', array('name[0][value]' => $name), 'Save');
     $name = trim($name);
     $this->assertText("Created new term $name.");
@@ -77,7 +77,7 @@ class PathautoTaxonomyWebTest extends WebTestBase {
     $this->assertText($name, 'Term accessible through automatic alias.');
 
     // Manually set the term's alias.
-    $manual_alias = 'tags/' . $term->id();
+    $manual_alias = '/tags/' . $term->id();
     $edit = array(
       'path[0][pathauto]' => FALSE,
       'path[0][alias]' => $manual_alias,
