@@ -112,7 +112,6 @@ class PathautoNodeWebTest extends WebTestBase {
     $this->drupalPostForm('node/add/page', $edit, t('Save and publish'));
     $this->assertNoAliasExists(array('alias' => 'should-not-get-created'));
     $node = $this->drupalGetNodeByTitle($title);
-    debug($node);
     $this->assertEntityAlias($node, '/content/automatic-title');
 
     // Remove the pattern for nodes, the pathauto checkbox should not be
