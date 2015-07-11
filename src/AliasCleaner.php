@@ -89,7 +89,7 @@ class AliasCleaner implements AliasCleanerInterface {
 
     if (strlen($separator)) {
       // Trim any leading or trailing separators.
-      $output = rtrim($output, $separator);
+      $output = trim($output, $separator);
 
       // Escape the separator for use in regular expressions.
       $seppattern = preg_quote($separator, '/');
@@ -100,6 +100,11 @@ class AliasCleaner implements AliasCleanerInterface {
       // Replace trailing separators around slashes.
       if ($separator !== '/') {
         $output = preg_replace("/\/+$seppattern\/+|$seppattern\/+|\/+$seppattern/", "/", $output);
+      }
+      else {
+        // If the separator is a slash, we need to re-add the leading slash
+        // dropped by the trim function.
+        $output = '/' . $output;
       }
     }
 
