@@ -33,7 +33,7 @@ class NodeAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('default' => array('content/[node:title]')) + parent::defaultConfiguration();
+    return array('default' => array('/content/[node:title]')) + parent::defaultConfiguration();
   }
 
   /**

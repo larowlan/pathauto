@@ -33,7 +33,7 @@ class TaxonomyTermAliasType extends EntityAliasTypeBase implements AliasTypeBatc
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('default' => array('[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
+    return array('default' => array('/[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
   }
 
   /**

@@ -7,8 +7,8 @@
 
 namespace Drupal\pathauto;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -491,7 +491,7 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     $result = $this->createAlias(
-      $type, $op, $entity->urlInfo()->getInternalPath(), array($type => $entity), $bundle, $options['language']);
+      $type, $op, '/' . $entity->urlInfo()->getInternalPath(), array($type => $entity), $bundle, $options['language']);
 
     if ($type == 'taxonomy_term' && empty($options['is_child'])) {
       // For all children generate new aliases.

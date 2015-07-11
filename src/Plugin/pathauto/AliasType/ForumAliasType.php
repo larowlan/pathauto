@@ -40,7 +40,7 @@ class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdate
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array('default' => array('[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
+    return array('default' => array('/[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
   }
 
   /**

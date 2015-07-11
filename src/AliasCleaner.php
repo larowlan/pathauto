@@ -101,6 +101,11 @@ class AliasCleaner implements AliasCleanerInterface {
       if ($separator !== '/') {
         $output = preg_replace("/\/+$seppattern\/+|$seppattern\/+|\/+$seppattern/", "/", $output);
       }
+      else {
+        // If the separator is a slash, we need to re-add the leading slash
+        // dropped by the trim function.
+        $output = '/' . $output;
+      }
     }
 
     return $output;

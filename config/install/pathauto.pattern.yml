@@ -1,12 +1,12 @@
 patterns:
   node:
-    default: 'content/[node:title]'
+    default: '/content/[node:title]'
 
   taxonomy_term:
-    default: '[term:vocabulary]/[term:name]'
+    default: '/[term:vocabulary]/[term:name]'
 
   forum:
-    default: '[term:vocabulary]/[term:name]'
+    default: '/[term:vocabulary]/[term:name]'
 
   user:
-    default: 'users/[user:name]'
+    default: '/users/[user:name]'

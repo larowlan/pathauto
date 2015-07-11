@@ -90,8 +90,8 @@ class PathautoUserWebTest extends WebTestBase {
       '%action' => 'Update URL-Alias',
     )));
 
-    $this->assertEntityAlias($account, 'users/' . Unicode::strtolower($account->getUsername()));
-    $this->assertEntityAlias($this->adminUser, 'user/' . $this->adminUser->id());
+    $this->assertEntityAlias($account, '/users/' . Unicode::strtolower($account->getUsername()));
+    $this->assertEntityAlias($this->adminUser, '/user/' . $this->adminUser->id());
   }
 
 }
