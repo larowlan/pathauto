@@ -29,7 +29,7 @@ class PathautoTokenTest extends KernelTestBase {
 
     $array = array(
       'test first arg',
-      'the Array / value',
+      'The Array / value',
     );
 
     $tokens = array(

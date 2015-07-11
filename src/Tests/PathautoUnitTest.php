@@ -154,11 +154,11 @@ class PathautoUnitTest extends KernelTestBase {
    */
   public function testCleanAlias() {
     $tests = array();
-    $tests['one/two/three'] = 'one/two/three';
+    $tests['one/two/three'] = '/one/two/three';
     $tests['/one/two/three/'] = '/one/two/three';
-    $tests['one//two///three'] = 'one/two/three';
-    $tests['one/two--three/-/--/-/--/four---five'] = 'one/two-three/four-five';
-    $tests['one/-//three--/four'] = 'one/three/four';
+    $tests['one//two///three'] = '/one/two/three';
+    $tests['one/two--three/-/--/-/--/four---five'] = '/one/two-three/four-five';
+    $tests['one/-//three--/four'] = '/one/three/four';
 
     foreach ($tests as $input => $expected) {
       $output = \Drupal::service('pathauto.alias_cleaner')->cleanAlias($input);
@@ -214,16 +214,16 @@ class PathautoUnitTest extends KernelTestBase {
     $node->setTitle('Third title');
     $node->save();
     $this->assertEntityAlias($node, '/content/third-title');
-    $this->assertAliasExists(array('source' => '/' . $node->urlInfo()->getInternalPath(), 'alias' => 'content/second-title'));
+    $this->assertAliasExists(array('source' => '/' . $node->urlInfo()->getInternalPath(), 'alias' => '/content/second-title'));
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
     $config->save();
     $node->setTitle('Fourth title');
     $node->save();
-    $this->assertEntityAlias($node, 'content/fourth-title');
-    $this->assertNoAliasExists(array('alias' => 'content/third-title'));
+    $this->assertEntityAlias($node, '/content/fourth-title');
+    $this->assertNoAliasExists(array('alias' => '/content/third-title'));
     // The older second alias is not deleted yet.
-    $older_path = $this->assertAliasExists(array('source' => $node->urlInfo()->getInternalPath(), 'alias' => '/content/second-title'));
+    $older_path = $this->assertAliasExists(array('source' => '/' . $node->urlInfo()->getInternalPath(), 'alias' => '/content/second-title'));
     \Drupal::service('path.alias_storage')->delete($older_path);
 
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_NO_NEW);
@@ -263,7 +263,7 @@ class PathautoUnitTest extends KernelTestBase {
    */
   public function testPathTokens() {
     $config = $this->config('pathauto.pattern');
-    $config->set('patterns.taxonomy_term.default', '[term:parent:url:path]/[term:name]');
+    $config->set('patterns.taxonomy_term.default', '/[term:parent:url:path]/[term:name]');
     $config->save();
 
     $vocab = $this->addVocabulary();
@@ -315,23 +315,23 @@ class PathautoUnitTest extends KernelTestBase {
 
     // Check that Pathauto does not create an alias of '/admin'.
     $node = $this->drupalCreateNode(array('title' => 'Admin', 'type' => 'page'));
-    $this->assertEntityAlias($node, 'admin-0');
+    $this->assertEntityAlias($node, '/admin-0');
 
     // Check that Pathauto does not create an alias of '/modules'.
     $node->setTitle('Modules');
     $node->save();
-    $this->assertEntityAlias($node, 'modules-0');
+    $this->assertEntityAlias($node, '/modules-0');
 
     // Check that Pathauto does not create an alias of '/index.php'.
     $node->setTitle('index.php');
     $node->save();
-    $this->assertEntityAlias($node, 'index.php-0');
+    $this->assertEntityAlias($node, '/index.php-0');
 
     // Check that a safe value gets an automatic alias. This is also a control
     // to ensure the above tests work properly.
     $node->setTitle('Safe value');
     $node->save();
-    $this->assertEntityAlias($node, 'safe-value');
+    $this->assertEntityAlias($node, '/safe-value');
   }
 
   /**

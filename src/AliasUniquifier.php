@@ -143,7 +143,7 @@ class AliasUniquifier implements AliasUniquifierInterface {
     }
 
     try {
-      $this->urlMatcher->match('/' . $path);
+      $this->urlMatcher->match($path);
       return TRUE;
     }
     catch (ResourceNotFoundException $e) {
