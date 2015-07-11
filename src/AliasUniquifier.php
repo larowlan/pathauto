@@ -29,6 +29,13 @@ class AliasUniquifier implements AliasUniquifierInterface {
   protected $configFactory;
 
   /**
+   * The alias storage helper.
+   *
+   * @var \Drupal\pathauto\AliasStorageHelperInterface
+   */
+  protected $aliasStorageHelper;
+
+  /**
    * The module handler.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -54,13 +61,16 @@ class AliasUniquifier implements AliasUniquifierInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
+   * @param \Drupal\pathauto\AliasStorageHelperInterface $alias_storage_helper
+   *   The alias storage helper.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $url_matcher
    *   The url matcher service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UrlMatcherInterface $url_matcher, AliasManagerInterface $alias_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageHelperInterface $alias_storage_helper, ModuleHandlerInterface $module_handler, UrlMatcherInterface $url_matcher, AliasManagerInterface $alias_manager) {
     $this->configFactory = $config_factory;
+    $this->aliasStorageHelper = $alias_storage_helper;
     $this->moduleHandler = $module_handler;
     $this->urlMatcher = $url_matcher;
     $this->aliasManager = $alias_manager;
