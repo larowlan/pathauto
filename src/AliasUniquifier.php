@@ -11,6 +11,8 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Path\AliasManagerInterface;
+use Drupal\Core\Path\AliasStorageInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
@@ -27,13 +29,6 @@ class AliasUniquifier implements AliasUniquifierInterface {
   protected $configFactory;
 
   /**
-   * The alias storage helper.
-   *
-   * @var \Drupal\pathauto\AliasStorageHelperInterface
-   */
-  protected $aliasStorageHelper;
-
-  /**
    * The module handler.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -48,22 +43,27 @@ class AliasUniquifier implements AliasUniquifierInterface {
   protected $urlMatcher;
 
   /**
+   * The alias manager.
+   *
+   * @var \Drupal\Core\Path\AliasManagerInterface
+   */
+  protected $aliasManager;
+
+  /**
    * Creates a new AliasUniquifier.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\pathauto\AliasStorageHelperInterface $alias_storage_helper
-   *   The alias storage helper.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $url_matcher
    *   The url matcher service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AliasStorageHelperInterface $alias_storage_helper, ModuleHandlerInterface $module_handler, UrlMatcherInterface $url_matcher) {
+  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UrlMatcherInterface $url_matcher, AliasManagerInterface $alias_manager) {
     $this->configFactory = $config_factory;
-    $this->aliasStorageHelper = $alias_storage_helper;
     $this->moduleHandler = $module_handler;
     $this->urlMatcher = $url_matcher;
+    $this->aliasManager = $alias_manager;
   }
 
   /**
@@ -94,10 +94,13 @@ class AliasUniquifier implements AliasUniquifierInterface {
    * {@inheritdoc}
    */
   public function isReserved($alias, $source, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-    // First check whether the alias exists for another source.
-    if ($this->aliasStorageHelper->exists($alias, $source, $langcode)) {
-      return TRUE;
+    // Check if this alias already exists.
+    if ($existing_source = $this->aliasManager->getPathByAlias($alias, $langcode)) {
+      // If it is an alias for the provided source, it is allowed to keep using
+      // it. If not, then it is reserved.
+      return $existing_source != $source;
     }
+
     // Then check if there is a route with the same path.
     if ($this->isRoute($alias)) {
       return TRUE;
@@ -125,8 +128,6 @@ class AliasUniquifier implements AliasUniquifierInterface {
 
   /**
    * Verify if the given path is a valid route.
-   *
-   * Taken from menu_execute_active_handler().
    *
    * @param string $path
    *   A string containing a relative path.
