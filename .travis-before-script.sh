@@ -6,7 +6,12 @@ set -e $DRUPAL_TI_DEBUG
 # Note: This function is re-entrant.
 drupal_ti_ensure_drupal
 
-# Download token 8.x-1.x
+# Add needed dependencies.
 cd "$DRUPAL_TI_DRUPAL_DIR"
-cd modules
+
+# These variables come from environments/drupal-*.sh
+mkdir -p "$DRUPAL_TI_MODULES_PATH"
+cd "$DRUPAL_TI_MODULES_PATH"
+
+# Download token 8.x-1.x
 git clone --depth 1 --branch 8.x-1.x http://git.drupal.org/project/token.git
