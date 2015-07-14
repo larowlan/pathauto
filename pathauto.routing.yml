@@ -1,5 +1,5 @@
 pathauto.patterns.form:
-  path: 'admin/config/search/path/patterns'
+  path: '/admin/config/search/path/patterns'
   defaults:
     _form: '\Drupal\pathauto\Form\PathautoPatternsForm'
     _title: 'Patterns'
@@ -7,7 +7,7 @@ pathauto.patterns.form:
     _permission: 'administer pathauto'
 
 pathauto.settings.form:
-  path: 'admin/config/search/path/settings'
+  path: '/admin/config/search/path/settings'
   defaults:
     _form: '\Drupal\pathauto\Form\PathautoSettingsForm'
     _title: 'Settings'
@@ -15,7 +15,7 @@ pathauto.settings.form:
     _permission: 'administer pathauto'
 
 pathauto.bulk.update.form:
-  path: 'admin/config/search/path/update_bulk'
+  path: '/admin/config/search/path/update_bulk'
   defaults:
     _form: '\Drupal\pathauto\Form\PathautoBulkUpdateForm'
     _title: 'Bulk generate'
@@ -23,7 +23,7 @@ pathauto.bulk.update.form:
     _permission: 'administer url aliases'
 
 pathauto.admin.delete:
-  path: 'admin/config/search/path/delete_bulk'
+  path: '/admin/config/search/path/delete_bulk'
   defaults:
     _form: '\Drupal\pathauto\Form\PathautoAdminDelete'
     _title: 'Delete aliases'
