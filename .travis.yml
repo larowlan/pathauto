@@ -98,6 +98,7 @@ install:
   - drupal-ti install
 
 before_script:
+  # Install token 8.x-1.x
   - drupal-ti --include .travis-before-script.sh
   - drupal-ti before_script
 
