@@ -8,8 +8,7 @@
 
 language: php
 
-# Comment out this line if you only use unit tests.
-sudo: required
+sudo: false
 
 php:
   - 5.5
@@ -62,6 +61,9 @@ env:
     - DRUPAL_TI_BEHAT_SCREENSIZE_COLOR="1280x1024x16"
     # The version of seleniumthat should be used.
     - DRUPAL_TI_BEHAT_SELENIUM_VERSION="2.44"
+    # Set DRUPAL_TI_BEHAT_DRIVER to "selenium" to use "firefox" or "chrome" here.
+    - DRUPAL_TI_BEHAT_DRIVER="phantomjs"
+    - DRUPAL_TI_BEHAT_BROWSER="firefox"
 
     # PHPUnit specific commandline arguments.
     - DRUPAL_TI_PHPUNIT_ARGS=""
