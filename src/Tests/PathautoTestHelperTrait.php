@@ -10,6 +10,7 @@ namespace Drupal\pathauto\Tests;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\taxonomy\VocabularyInterface;
 
 /**
@@ -18,7 +19,8 @@ use Drupal\taxonomy\VocabularyInterface;
 trait PathautoTestHelperTrait {
 
   public function assertToken($type, $object, $token, $expected) {
-    $tokens = \Drupal::token()->generate($type, array($token => $token), array($type => $object));
+    $bubbleable_metadata = new BubbleableMetadata();
+    $tokens = \Drupal::token()->generate($type, array($token => $token), array($type => $object), [], $bubbleable_metadata);
     $tokens += array($token => '');
     $this->assertIdentical($tokens[$token], $expected, t("Token value for [@type:@token] was '@actual', expected value '@expected'.", array('@type' => $type, '@token' => $token, '@actual' => $tokens[$token], '@expected' => $expected)));
   }

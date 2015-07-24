@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\BubbleableMetadata;
 
 /**
  * Implements hook_token_info().
@@ -24,7 +25,7 @@ function pathauto_token_info() {
 /**
  * Implements hook_tokens().
  */
-function pathauto_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function pathauto_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $replacements = array();
 
   if ($type == 'array' && !empty($data['array'])) {

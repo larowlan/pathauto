@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Tests;
 
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\simpletest\KernelTestBase;
 
 /**
@@ -50,7 +51,8 @@ class PathautoTokenTest extends KernelTestBase {
    */
   public function assertTokens($type, array $data, array $tokens, array $options = array()) {
     $input = $this->mapTokenNames($type, array_keys($tokens));
-    $replacements = \Drupal::token()->generate($type, $input, $data, $options);
+    $bubbleable_metadata = new BubbleableMetadata();
+    $replacements = \Drupal::token()->generate($type, $input, $data, $options, $bubbleable_metadata);
     foreach ($tokens as $name => $expected) {
       $token = $input[$name];
       if (!isset($expected)) {
