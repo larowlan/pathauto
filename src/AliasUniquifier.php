@@ -57,6 +57,15 @@ class AliasUniquifier implements AliasUniquifierInterface {
   protected $aliasManager;
 
   /**
+   * Stores the last matching route name.
+   *
+   * Used to prevent a loop if the same route matches a given pattern.
+   *
+   * @var
+   */
+  protected $lastRouteName;
+
+  /**
    * Creates a new AliasUniquifier.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -147,6 +156,8 @@ class AliasUniquifier implements AliasUniquifierInterface {
    *
    * @return bool
    *   TRUE if the path already exists.
+   *
+   * @throws \InvalidArgumentException
    */
   public function isRoute($path) {
     if (is_file(DRUPAL_ROOT . '/' . $path) || is_dir(DRUPAL_ROOT . '/' . $path)) {
@@ -157,10 +168,17 @@ class AliasUniquifier implements AliasUniquifierInterface {
     }
 
     try {
-      $this->urlMatcher->match($path);
+      $route = $this->urlMatcher->match($path);
+
+      if ($route['_route'] == $this->lastRouteName) {
+        throw new \InvalidArgumentException('The given alias pattern (' . $path . ') always matches the route ' . $this->lastRouteName);
+      }
+
+      $this->lastRouteName = $route['_route'];
       return TRUE;
     }
     catch (ResourceNotFoundException $e) {
+      $this->lastRouteName = NULL;
       return FALSE;
     }
   }
