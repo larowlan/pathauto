@@ -1,5 +1,5 @@
 pathauto.pattern:
-  type: mapping
+  type: config_object
   mapping:
     patterns:
       type: sequence
@@ -22,7 +22,7 @@ pathauto.pattern:
 
 
 pathauto.settings:
-  type: mapping
+  type: config_object
   mapping:
     punctuation:
       type: sequence
