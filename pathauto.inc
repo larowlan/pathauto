@@ -61,13 +61,14 @@ define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
  *   A string that is the internal path.
  * @param $langcode
  *   A string indicating the path's language.
- * @return
+ *
+ * @return bool
  *   TRUE if an alias exists, FALSE if not.
  *
  * @deprecated Use path_pathauto_is_alias_reserved() instead.
  */
 function _pathauto_alias_exists($alias, $source, $langcode = LANGUAGE_NONE) {
-  return path_pathauto_is_alias_reserved();
+  return path_pathauto_is_alias_reserved($alias, $source, $langcode);
 }
 
 /**
