@@ -74,11 +74,12 @@ function _pathauto_alias_exists($alias, $source, $langcode = LANGUAGE_NONE) {
 /**
  * Fetches an existing URL alias given a path and optional language.
  *
- * @param $source
+ * @param string $source
  *   An internal Drupal path.
- * @param $language
+ * @param string $language
  *   An optional language code to look up the path in.
- * @return
+ *
+ * @return bool|array
  *   FALSE if no alias was found or an associative array containing the
  *   following keys:
  *   - pid: Unique path alias identifier.
@@ -107,14 +108,14 @@ function _pathauto_existing_alias_data($source, $language = LANGUAGE_NONE) {
  * This function should *not* be called on URL alias or path strings because it
  * is assumed that they are already clean.
  *
- * @param $string
+ * @param string $string
  *   A string to clean.
  * @param array $options
  *   (optional) A keyed array of settings and flags to control the Pathauto
  *   clean string replacement process. Supported options are:
  *   - langcode: A language code to be used when translating strings.
  *
- * @return
+ * @return string
  *   The cleaned string.
  */
 function pathauto_cleanstring($string, array $options = array()) {
@@ -240,11 +241,12 @@ function pathauto_cleanstring($string, array $options = array()) {
 /**
  * Trims duplicate, leading, and trailing separators from a string.
  *
- * @param $string
+ * @param string $string
  *   The string to clean path separators from.
- * @param $separator
+ * @param string $separator
  *   The path separator to use when cleaning.
- * @return
+ *
+ * @return string
  *   The cleaned version of the string.
  *
  * @see pathauto_cleanstring()
@@ -289,9 +291,10 @@ function _pathauto_clean_separators($string, $separator = NULL) {
  * - Trim duplicate, leading, and trailing separators.
  * - Shorten to a desired length and logical position based on word boundaries.
  *
- * @param $alias
+ * @param string $alias
  *   A string with the URL alias to clean up.
- * @return
+ *
+ * @return string
  *   The cleaned URL alias.
  */
 function pathauto_clean_alias($alias) {
