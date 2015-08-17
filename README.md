@@ -9,13 +9,15 @@ If you are upgrading, check the CHANGELOG.txt for major changes.
 
 The Pathauto module provides support functions for other modules to
 automatically generate aliases based on appropriate criteria, with a
-central settings path for site administrators.
+central settings path for site administrators. This features is 
+available at  Administration > Configuration > Search and metadata
 
 Implementations are provided for core entity types: content, taxonomy terms,
 and users (including blogs and tracker pages).
 
 Pathauto also provides a way to delete large numbers of aliases.  This feature
-is available at  Administer > Site building > URL aliases > Delete aliases
+is available at 
+Administration > Configuration > Search and metadata > Delete aliases
 
 ##Benefits
 
