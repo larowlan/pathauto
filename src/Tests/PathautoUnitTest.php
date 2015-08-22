@@ -9,6 +9,7 @@ namespace Drupal\pathauto\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Language\Language;
+use Drupal\node\Entity\NodeType;
 use Drupal\pathauto\PathautoManagerInterface;
 use Drupal\simpletest\KernelTestBase;
 
@@ -28,7 +29,7 @@ class PathautoUnitTest extends KernelTestBase {
   public function setUp() {
     parent::setup();
 
-    $this->installConfig(array('pathauto', 'taxonomy', 'system'));
+    $this->installConfig(array('pathauto', 'taxonomy', 'system', 'node'));
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
@@ -36,6 +37,10 @@ class PathautoUnitTest extends KernelTestBase {
 
     $this->installSchema('node', array('node_access'));
     $this->installSchema('system', array('url_alias', 'sequences', 'router'));
+
+    $type = NodeType::create(['type' => 'page']);
+    $type->save();
+    node_add_body_field($type);
 
     \Drupal::service('router.builder')->rebuild();
 
@@ -250,10 +255,14 @@ class PathautoUnitTest extends KernelTestBase {
    * that does not get any tokens replaced.
    */
   public function testNoTokensNoAlias() {
-    $node = $this->drupalCreateNode(array('title' => ''));
+    $config = $this->config('pathauto.pattern');
+    $config->set('patterns.node.default', '/content/[node:body]');
+    $config->save();
+
+    $node = $this->drupalCreateNode();
     $this->assertNoEntityAliasExists($node);
 
-    $node->setTitle('hello');
+    $node->body->value = 'hello';
     $node->save();
     $this->assertEntityAlias($node, '/content/hello');
   }
