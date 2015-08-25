@@ -367,6 +367,8 @@ class PathautoManager implements PathautoManagerInterface {
 
     // Replace any tokens in the pattern.
     // Uses callback option to clean replacements. No sanitization.
+    // Pass empty BubbleableMetadata object to explicitly ignore cacheablity,
+    // as the result is never rendered.
     $alias = $this->token->replace($pattern, $data, array(
       'sanitize' => FALSE,
       'clear' => TRUE,
