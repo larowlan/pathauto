@@ -16,6 +16,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
@@ -366,13 +367,15 @@ class PathautoManager implements PathautoManagerInterface {
 
     // Replace any tokens in the pattern.
     // Uses callback option to clean replacements. No sanitization.
+    // Pass empty BubbleableMetadata object to explicitly ignore cacheablity,
+    // as the result is never rendered.
     $alias = $this->token->replace($pattern, $data, array(
       'sanitize' => FALSE,
       'clear' => TRUE,
       'callback' => array($this, 'cleanTokenValues'),
       'langcode' => $langcode,
       'pathauto' => TRUE,
-    ));
+    ), new BubbleableMetadata());
 
     // Check if the token replacement has not actually replaced any values. If
     // that is the case, then stop because we should not generate an alias.
