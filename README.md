@@ -12,10 +12,11 @@ automatically generate aliases based on appropriate criteria, with a
 central settings path for site administrators.
 
 Implementations are provided for core entity types: content, taxonomy terms,
-and users (including blogs and tracker pages).
+and users (including blogs and forum pages).
 
 Pathauto also provides a way to delete large numbers of aliases.  This feature
-is available at  Administer > Site building > URL aliases > Delete aliases
+is available at  Administer > Configuration > Search and metadata > URL aliases
+> Delete aliases.
 
 ##Benefits
 
@@ -69,20 +70,6 @@ When the pattern for a content type is left blank, the default pattern will be
 used. But if the default pattern is also blank, Pathauto will be disabled
 for that content type.
 
-## Bulk Updates Must be Run Multiple Times
-
-As of 5.x-2.x Pathauto now performs bulk updates in a manner which is more
-likely to succeed on large sites.  The drawback is that it needs to be run
-multiple times.  If you want to reduce the number of times that you need to
-run Pathauto you can increase the "Maximum number of objects to alias in a
-bulk update:" setting under General Settings.
-
-##WYSIWYG Conflicts - FCKEditor, TinyMCE, etc.
-
-If you use a WYSIWYG editor, please disable it for the Pathauto admin page.
-Failure to do so may cause errors about "preg_replace" problems due to the <p>
-tag being added to the "strings to replace".  See http://drupal.org/node/175772
-
 ##Credits:
 
 The original module combined the functionality of Mike Ryan's autopath with
@@ -90,7 +77,8 @@ Tommy Sundstrom's path_automatic.
 
 Significant enhancements were contributed by jdmquin @ www.bcdems.net.
 
-Matt England added the tracker support.
+Matt England added the tracker support (tracker support has been removed in
+recent changes).
 
 Other suggestions and patches contributed by the Drupal community.
 

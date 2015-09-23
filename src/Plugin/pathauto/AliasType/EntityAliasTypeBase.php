@@ -165,16 +165,11 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
       );
     }
 
-    // Display the user documentation of placeholders supported by
-    // this module, as a description on the last pattern.
+    // Show the token help relevant to this pattern type.
     $form['token_help'] = array(
-      '#title' => t('Replacement patterns'),
-      '#type' => 'details',
-      '#open' => FALSE,
-    );
-    $form['token_help']['help'] = array(
       '#theme' => 'token_tree',
       '#token_types' => $this->getTokenTypes(),
+      '#dialog' => TRUE,
     );
     return $form;
   }

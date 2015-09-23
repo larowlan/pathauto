@@ -1,12 +1,54 @@
 <?php
+
 use Drupal\Core\Language\Language;
 
 /**
  * @file
  * Documentation for pathauto API.
  *
- * @see hook_token_info
- * @see hook_tokens
+ * @todo Update for 8.x-1.x
+ *
+ * It may be helpful to review some examples of integration from
+ * pathauto.pathauto.inc.
+ *
+ * Pathauto works by using tokens in path patterns.  Thus the simplest
+ * integration is just to provide tokens.  Token support is provided by Drupal
+ * core. To provide additional token from your module, implement the following
+ * hooks:
+ *
+ * hook_tokens() - http://api.drupal.org/api/function/hook_tokens
+ * hook_token_info() - http://api.drupal.org/api/function/hook_token_info
+ *
+ * If you wish to provide pathauto integration for custom paths provided by your
+ * module, there are a few steps involved.
+ *
+ * 1. hook_pathauto()
+ *    Provide information required by pathauto for the settings form as well as
+ *    bulk generation.  See the documentation for hook_pathauto() for more
+ *    details.
+ *
+ * 2. pathauto_create_alias()
+ *    At the appropriate time (usually when a new item is being created for
+ *    which a generated alias is desired), call pathauto_create_alias() with the
+ *    appropriate parameters to generate and create the alias. See the user,
+ *    taxonomy, and node hook implementations in pathauto.module for examples.
+ *    Also see the documentation for pathauto_create_alias().
+ *
+ * 3. pathauto_path_delete_all()
+ *    At the appropriate time (usually when an item is being deleted), call
+ *    pathauto_path_delete_all() to remove any aliases that were created for the
+ *    content being removed.  See the documentation for
+ *    pathauto_path_delete_all() for more details.
+ *
+ * 4. hook_path_alias_types()
+ *    For modules that create new types of content that can be aliased with
+ *    pathauto, a hook implementation is needed to allow the user to delete them
+ *    all at once.  See the documentation for hook_path_alias_types() below for
+ *    more information.
+ *
+ * There are other integration points with pathauto, namely alter hooks that
+ * allow you to change the data used by pathauto at various points in the
+ * process.  See the below hook documentation for details.
  */
 
 /**
@@ -32,7 +74,7 @@ function hook_path_alias_types_alter(array &$definitions) {
  * @param string $langcode
  *   The language code for the alias (e.g. 'en').
  *
- * @return
+ * @return bool
  *   TRUE if $alias conflicts with an existing, reserved path, or FALSE/NULL if
  *   it does not match any reserved paths.
  *
@@ -61,7 +103,7 @@ function hook_pathauto_is_alias_reserved($alias, $source, $langcode) {
  *   - 'language': A string of the language code for the alias (e.g. 'en').
  *     This can be altered by reference.
  */
-function hook_pathauto_pattern_alter(&$pattern, array &$context) {
+function hook_pathauto_pattern_alter(&$pattern, array $context) {
   // Switch out any [node:created:*] tokens with [node:updated:*] on update.
   if ($context['module'] == 'node' && ($context['op'] == 'update')) {
     $pattern = preg_replace('/\[node:created(\:[^]]*)?\]/', '[node:updated$1]', $pattern);
