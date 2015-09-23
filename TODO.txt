@@ -1,9 +1,0 @@
-- Creating a new node with a manually set alias and not unchecking
-  the checkbox results in two aliases, one saved by pathauto and one by
-  PathItem. A possible clean way to do this might be to replace the PathItem
-  class with a ustom one and completely replace the logic there. Or fix core to
-  make sure that it sets ->pid after saving a new alias.
-
-- pathauto_path_alias_types() => Plugins
-
-- INSTALL.txt: Update
