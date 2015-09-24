@@ -63,6 +63,7 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;
     $this->entityManager = $entity_manager;
+    $this->setConfiguration($configuration);
   }
 
   /**
