@@ -71,7 +71,7 @@ class PathautoPatternsForm extends ConfigFormBase {
 
     foreach ($definitions as $id => $definition) {
       /** @var \Drupal\pathauto\AliasTypeInterface $alias_type */
-      $alias_type = $this->aliasTypeManager->createInstance($id, $config->get('patterns.' . $id));
+      $alias_type = $this->aliasTypeManager->createInstance($id, $config->get('patterns.' . $id) ?: []);
 
       $form[$id] = $alias_type->buildConfigurationForm([], $form_state);
     }
