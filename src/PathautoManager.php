@@ -194,6 +194,7 @@ class PathautoManager implements PathautoManagerInterface {
       if ($ignore_words_regex) {
         $this->cleanStringCache['ignore_words_regex'] = '\b' . $ignore_words_regex . '\b';
         if (function_exists('mb_eregi_replace')) {
+          mb_regex_encoding('UTF-8');
           $this->cleanStringCache['ignore_words_callback'] = 'mb_eregi_replace';
         }
         else {
