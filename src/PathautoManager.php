@@ -217,8 +217,8 @@ class PathautoManager implements PathautoManagerInterface {
 
     // Check if the string has already been processed, and if so return the
     // cached result.
-    if (isset($this->cleanStringCache['strings'][$langcode][$string])) {
-      return $this->cleanStringCache['strings'][$langcode][$string];
+    if (isset($this->cleanStringCache['strings'][$langcode][(string) $string])) {
+      return $this->cleanStringCache['strings'][$langcode][(string) $string];
     }
 
     // Remove all HTML tags from the string.
@@ -263,7 +263,7 @@ class PathautoManager implements PathautoManagerInterface {
     $output = Unicode::truncate($output, $this->cleanStringCache['maxlength'], TRUE);
 
     // Cache this result in the static array.
-    $this->cleanStringCache['strings'][$langcode][$string] = $output;
+    $this->cleanStringCache['strings'][$langcode][(string) $string] = $output;
 
     return $output;
   }

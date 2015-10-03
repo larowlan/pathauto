@@ -65,21 +65,6 @@ function pathauto_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Implements hook_entity_bundle_rename().
- */
-function pathauto_entity_bundle_rename($entity_type_id, $bundle_old, $bundle_new) {
-  $config = \Drupal::configFactory()->getEditable('pathauto.pattern');
-  $bundle_settings = $config->get('patterns.' . $entity_type_id . '.bundles');
-
-  if (isset($bundle_settings[$bundle_old])) {
-    $bundle_settings[$bundle_new] = $bundle_settings[$bundle_old];
-    unset($bundle_settings[$bundle_old]);
-    $config->set('patterns.' . $entity_type_id . '.bundles', $bundle_settings);
-    $config->save();
-  }
-}
-
-/**
  * Implements hook__entity_bundle_delete().
  */
 function pathauto_entity_bundle_delete($entity_type, $bundle) {

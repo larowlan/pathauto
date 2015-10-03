@@ -139,7 +139,7 @@ class PathautoUnitTest extends KernelTestBase {
 
     // Test that HTML tags are removed.
     $tests['This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.'] = 'text-has-html-tags';
-    $tests[SafeMarkup::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
+    $tests[(string) SafeMarkup::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
 
     // Transliteration.
     $tests['ľščťžýáíéňô'] = 'lsctzyaieno';
@@ -255,6 +255,7 @@ class PathautoUnitTest extends KernelTestBase {
    * that does not get any tokens replaced.
    */
   public function testNoTokensNoAlias() {
+    $this->installConfig(['filter']);
     $config = $this->config('pathauto.pattern');
     $config->set('patterns.node.default', '/content/[node:body]');
     $config->save();
@@ -288,28 +289,21 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($term2, '/My Crazy/Alias/child-term');
   }
 
-  public function testEntityBundleRenamingDeleting() {
+  public function testEntityBundleDeleting() {
     $config = $this->config('pathauto.pattern');
 
     // Create a vocabulary and test that it's pattern variable works.
-    $vocab = $this->addVocabulary(array('vid' => 'old_name'));
+    $vocab = $this->addVocabulary(array('vid' => 'name'));
     $config->set('patterns.taxonomy_term.default', 'base');
-    $config->set('patterns.taxonomy_term.bundles.old_name.default', 'bundle');
+    $config->set('patterns.taxonomy_term.bundles.name.default', 'bundle');
     $config->save();
 
-    $this->assertEntityPattern('taxonomy_term', 'old_name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
-
-    // Rename the vocabulary's machine name, which should cause its pattern
-    // variable to also be renamed.
-    $vocab->set('vid', 'new_name');
-    $vocab->save();
-    $this->assertEntityPattern('taxonomy_term', 'new_name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
-    $this->assertEntityPattern('taxonomy_term', 'old_name', Language::LANGCODE_NOT_SPECIFIED, 'base');
+    $this->assertEntityPattern('taxonomy_term', 'name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
 
     // Delete the vocabulary, which should cause its pattern variable to also
     // be deleted.
     $vocab->delete();
-    $this->assertEntityPattern('taxonomy_term', 'new_name', Language::LANGCODE_NOT_SPECIFIED, 'base');
+    $this->assertEntityPattern('taxonomy_term', 'name', Language::LANGCODE_NOT_SPECIFIED, 'base');
   }
 
   function testNoExistingPathAliases() {
