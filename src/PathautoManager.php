@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto;
 
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -222,7 +223,7 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     // Remove all HTML tags from the string.
-    $output = strip_tags(Html::decodeEntities($string));
+    $output = PlainTextOutput::renderFromHtml($string);
 
     // Optionally transliterate.
     if ($this->cleanStringCache['transliterate']) {
@@ -370,7 +371,6 @@ class PathautoManager implements PathautoManagerInterface {
     // Pass empty BubbleableMetadata object to explicitly ignore cacheablity,
     // as the result is never rendered.
     $alias = $this->token->replace($pattern, $data, array(
-      'sanitize' => FALSE,
       'clear' => TRUE,
       'callback' => array($this, 'cleanTokenValues'),
       'langcode' => $langcode,
