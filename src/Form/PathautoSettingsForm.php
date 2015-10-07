@@ -9,6 +9,7 @@ namespace Drupal\pathauto\Form;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Url;
 use Drupal\pathauto\PathautoManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -78,6 +79,11 @@ class PathautoSettingsForm extends ConfigFormBase {
 
     $max_length = \Drupal::service('pathauto.alias_storage_helper')->getAliasSchemaMaxlength();
 
+    $help_link = '';
+    if (\Drupal::moduleHandler()->moduleExists('help')) {
+      $help_link = ' ' . t('See <a href=":pathauto-help">Pathauto help</a> for details.', [':pathauto-help' => Url::fromRoute('help.page', ['name' => 'pathauto'])->toString()]);
+    }
+
     $form['max_length'] = array(
       '#type' => 'number',
       '#title' => t('Maximum alias length'),
@@ -86,7 +92,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('max_length'),
       '#min' => 1,
       '#max' => $max_length,
-      '#description' => t('Maximum length of aliases to generate. 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => $this->getUrlGenerator()->generateFromPath('admin/help/pathauto'), '@max' => $max_length)),
+      '#description' => t('Maximum length of aliases to generate. 100 is the recommended length. @max is the maximum possible length.', array('@max' => $max_length)) . $help_link,
     );
 
     $form['max_component_length'] = array(
@@ -97,7 +103,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('max_component_length'),
       '#min' => 1,
       '#max' => $max_length,
-      '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is the recommended length. @max is the maximum possible length. See <a href="@pathauto-help">Pathauto help</a> for details.', array('@pathauto-help' => $this->getUrlGenerator()->generateFromPath('admin/help/pathauto'), '@max' => $max_length)),
+      '#description' => t('Maximum text length of any component in the alias (e.g., [title]). 100 is the recommended length. @max is the maximum possible length.', ['@max' => $max_length]) . $help_link,
     );
 
     $description = t('What should Pathauto do when updating an existing content item which already has an alias?');
