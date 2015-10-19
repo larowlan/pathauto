@@ -8,6 +8,7 @@
 namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\simpletest\WebTestBase;
 
@@ -71,6 +72,14 @@ class PathautoLocaleTest extends WebTestBase {
     $this->assertEntityAlias($node, '/content/english-node-0', 'en');
     $this->assertEntityAlias($node, '/french-node', 'fr');
     $this->assertAliasExists(array('pid' => $english_alias['pid'], 'alias' => '/content/english-node-0'));
+
+    // Create a new node with the same title as before but without
+    // specifying a language.
+    $node = $this->drupalCreateNode(array('title' => 'English node', 'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED));
+
+    // Check that the new node had a unique alias generated with the '-1'
+    // suffix.
+    $this->assertEntityAlias($node, '/content/english-node-1', LanguageInterface::LANGCODE_NOT_SPECIFIED);
   }
 }
 
