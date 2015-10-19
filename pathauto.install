@@ -6,6 +6,40 @@
  *
  * @ingroup pathauto
  */
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_schema().
+ */
+function pathauto_schema() {
+  $schema['pathauto_state'] = array(
+    'description' => 'The status of each entity alias (whether it was automatically generated or not).',
+    'fields' => array(
+      'entity_type' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'description' => 'An entity type.',
+      ),
+      'entity_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'An entity ID.',
+      ),
+      'pathauto' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The automatic alias status of the entity.',
+      ),
+    ),
+    'primary key' => array('entity_type', 'entity_id'),
+  );
+
+  return $schema;
+}
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
@@ -22,14 +56,13 @@ function pathauto_install() {
  * Updates pathauto widgets to use the path widget ID.
  */
 function pathauto_update_8001() {
-
   // Replace values in the 'entity.definitions.installed' keyvalue collection.
-  $collection = \Drupal::service('keyvalue')->get('entity.definitions.installed');
+  $collection = \Drupal::service('keyvalue')
+    ->get('entity.definitions.installed');
   foreach ($collection->getAll() as $key => $definitions) {
     if (!is_array($definitions) || empty($definitions['path'])) {
       continue;
     }
-
     // Retrieve and change path base field definition.
     $path_definition = $definitions['path'];
     if (($options = $path_definition->getDisplayOptions('form')) && $options['type'] = 'pathauto') {
@@ -38,9 +71,7 @@ function pathauto_update_8001() {
       // Save the new value.
       $collection->set($key, $path_definition);
     }
-
   }
-
   foreach (EntityFormDisplay::loadMultiple() as $form_display) {
     if ($component = $form_display->getComponent('path')) {
       if (isset($component['type']) && $component['type'] == 'pathauto') {
@@ -49,5 +80,39 @@ function pathauto_update_8001() {
         $form_display->save();
       }
     }
+  }
+}
+
+/**
+ * Create pathauto_state table, using data from pathauto_persist if it exists.
+ */
+function pathauto_update_8002() {
+  if (!Database::getConnection()->schema()->tableExists('pathauto_state')) {
+
+    $schema['pathauto_state'] = array(
+      'description' => 'The status of each entity alias (whether it was automatically generated or not).',
+      'fields' => array(
+        'entity_type' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'description' => 'The entity type.',
+        ),
+        'entity_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'description' => 'The entity ID.',
+        ),
+        'pathauto' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'The automatic alias status of the entity.',
+        ),
+      ),
+      'primary key' => array('entity_type', 'entity_id'),
+    );
   }
 }

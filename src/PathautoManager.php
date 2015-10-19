@@ -267,6 +267,8 @@ class PathautoManager implements PathautoManagerInterface {
       return NULL;
     }
 
+    pathauto_entity_state_save($entity, $entity->path->pathauto);
+
     $options += array('language' => $entity->language()->getId());
     $type = $entity->getEntityTypeId();
     $bundle = $entity->bundle();

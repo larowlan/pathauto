@@ -30,6 +30,7 @@ class PathautoUnitTest extends KernelTestBase {
     parent::setup();
 
     $this->installConfig(array('pathauto', 'taxonomy', 'system', 'node'));
+    $this->installSchema('pathauto', array('pathauto_state'));
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');

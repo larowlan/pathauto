@@ -84,10 +84,10 @@ class PathautoBulkUpdateTest extends WebTestBase {
     // Add a new node.
     $new_node = $this->drupalCreateNode(array('path' => array('alias' => '', 'pathauto' => FALSE)));
 
-    // Run the update again which should only run against the new node.
+    // Run the update again which should not run against any nodes.
     $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, t('Update'));
-    $this->assertText('Generated 1 URL alias.'); // 1 node + 0 users
+    $this->assertText('No new URL aliases to generate.');
 
-    $this->assertEntityAliasExists($new_node);
+    $this->assertNoEntityAliasExists($new_node);
   }
 }
