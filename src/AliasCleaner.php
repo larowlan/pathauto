@@ -30,13 +30,6 @@ class AliasCleaner implements AliasCleanerInterface {
   protected $aliasStorageHelper;
 
   /**
-   * Alias max length.
-   *
-   * @var int
-   */
-  protected $aliasMaxLength;
-
-  /**
    * Creates a new AliasCleaner.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -53,10 +46,8 @@ class AliasCleaner implements AliasCleanerInterface {
    * {@inheritdoc}
    */
   public function cleanAlias($alias) {
-    if (!isset($this->aliasMaxLength)) {
-      $config = $this->configFactory->get('pathauto.settings');
-      $this->aliasMaxLength = min($config->get('max_length'), $this->aliasStorageHelper->getAliasSchemaMaxLength());
-    }
+    $config = $this->configFactory->get('pathauto.settings');
+    $alias_max_length = min($config->get('max_length'), $this->aliasStorageHelper->getAliasSchemaMaxLength());
 
     $output = $alias;
 
@@ -70,7 +61,7 @@ class AliasCleaner implements AliasCleanerInterface {
     $output = $this->getCleanSeparators($output, '/');
 
     // Shorten to a logical place based on word boundaries.
-    $output = Unicode::truncate($output, $this->aliasMaxLength, TRUE);
+    $output = Unicode::truncate($output, $alias_max_length, TRUE);
 
     return $output;
   }

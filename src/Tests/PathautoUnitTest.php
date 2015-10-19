@@ -358,6 +358,24 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($account, '/users/test-user');
   }
 
+  /**
+   * Tests word safe alias truncating truncating.
+   */
+  function testPathAliasUniquifyWordsafe() {
+    $this->config('pathauto.settings')
+      ->set('max_length', 26)
+      ->save();
+
+    $node_1 = $this->drupalCreateNode(array('title' => 'thequick brownfox jumpedover thelazydog', 'type' => 'page'));
+    $node_2 = $this->drupalCreateNode(array('title' => 'thequick brownfox jumpedover thelazydog', 'type' => 'page'));
+
+    // Check that alias uniquifying is truncating with $wordsafe param set to
+    // TRUE.
+    // If it doesn't path alias result would be content/thequick-brownf-0
+    $this->assertEntityAlias($node_1, '/content/thequick-brownfox');
+    $this->assertEntityAlias($node_2, '/content/thequick-0');
+  }
+
   protected function drupalCreateNode(array $settings = array()) {
     // Populate defaults array.
     $settings += array(
