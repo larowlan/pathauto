@@ -206,17 +206,11 @@ function pathauto_field_info_alter(&$info) {
 }
 
 /**
- * Implements hook_entity_base_field_info_alter().
+ * Implements hook_field_widget_info_alter().
  */
-function pathauto_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
-  if (isset($fields['path']) && $fields['path']->getType() == 'path') {
-    $fields['path']->setDisplayOptions('form', array(
-      'type' => 'pathauto',
-      'weight' => 30,
-    ));
-  }
+function pathauto_field_widget_info_alter(&$widgets) {
+  $widgets['path']['class'] = 'Drupal\pathauto\PathautoWidget';
 }
-
 
 /**
  * Implements hook_entity_base_field_info().
@@ -230,7 +224,7 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', array(
-        'type' => 'pathauto',
+        'type' => 'path',
         'weight' => 30,
       ))
       ->setDisplayConfigurable('form', TRUE);
