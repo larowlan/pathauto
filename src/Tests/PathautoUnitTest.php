@@ -145,8 +145,8 @@ class PathautoUnitTest extends KernelTestBase {
     $tests['ľščťžýáíéňô'] = 'lsctzyaieno';
 
     foreach ($tests as $input => $expected) {
-      $output = \Drupal::service('pathauto.manager')->cleanString($input);
-      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.manager')->cleanString('@input') expected '@expected', actual '@output'", array(
+      $output = \Drupal::service('pathauto.alias_cleaner')->cleanString($input);
+      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.alias_cleaner')->cleanString('@input') expected '@expected', actual '@output'", array(
         '@input' => $input,
         '@expected' => $expected,
         '@output' => $output,
