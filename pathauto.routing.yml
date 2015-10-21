@@ -1,8 +1,61 @@
-pathauto.patterns.form:
+entity.pathauto_pattern.collection:
   path: '/admin/config/search/path/patterns'
   defaults:
-    _form: '\Drupal\pathauto\Form\PathautoPatternsForm'
+    _entity_list: 'pathauto_pattern'
     _title: 'Patterns'
+  requirements:
+    _permission: 'administer pathauto'
+
+entity.pathauto_pattern.add_form:
+  path: '/admin/config/search/path/patterns/add'
+  defaults:
+    _entity_wizard: 'pathauto_pattern.add'
+    _title: 'Add Pathauto pattern'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+entity.pathauto_pattern.edit_form:
+  path: '/admin/config/search/path/patterns/{machine_name}/{step}'
+  defaults:
+    _entity_wizard: 'pathauto_pattern.edit'
+    _title: 'Edit Pathauto pattern'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+entity.pathauto_pattern.delete_form:
+  path: '/admin/config/search/path/patterns/{pathauto_pattern}/delete'
+  defaults:
+    _entity_form: 'pathauto_pattern.delete'
+    _title: 'Delete Pathauto pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+pathauto.pattern.condition.add:
+  path: '/admin/config/search/path/patterns/{machine_name}/criteria/{condition}/add'
+  defaults:
+    _form: '\Drupal\pathauto\Form\CriteriaForm'
+    _title: 'Configure selection criteria'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+pathauto.pattern.condition.edit:
+  path: '/admin/config/search/path/patterns/{machine_name}/criteria/{condition}/edit'
+  defaults:
+    _form: '\Drupal\pathauto\Form\CriteriaForm'
+    _title: 'Configure selection criteria'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+pathauto.pattern.condition.delete:
+  path: '/admin/config/search/path/patterns/{machine_name}/criteria/{id}/delete'
+  defaults:
+    _form: '\Drupal\pathauto\Form\CriteriaDelete'
+    _title: 'Delete selection criteria'
+    tempstore_id: 'pathauto.pattern'
   requirements:
     _permission: 'administer pathauto'
 

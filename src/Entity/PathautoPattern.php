@@ -21,9 +21,11 @@ use Drupal\pathauto\PathautoPatternInterface;
  *   handlers = {
  *     "list_builder" = "Drupal\pathauto\PathautoPatternListBuilder",
  *     "form" = {
- *       "add" = "Drupal\pathauto\Form\PathautoPatternForm",
- *       "edit" = "Drupal\pathauto\Form\PathautoPatternForm",
  *       "delete" = "Drupal\pathauto\Form\PathautoPatternDeleteForm"
+ *     },
+ *     "wizard" = {
+ *       "add" = "Drupal\pathauto\Wizard\PatternWizardAdd",
+ *       "edit" = "Drupal\pathauto\Wizard\PatternWizard"
  *     }
  *   },
  *   config_prefix = "pathauto_pattern",
@@ -32,12 +34,6 @@ use Drupal\pathauto\PathautoPatternInterface;
  *     "id" = "id",
  *     "label" = "label",
  *     "uuid" = "uuid"
- *   },
- *   links = {
- *     "canonical" = "/admin/structure/pathauto_pattern/{pathauto_pattern}",
- *     "edit-form" = "/admin/structure/pathauto_pattern/{pathauto_pattern}/edit",
- *     "delete-form" = "/admin/structure/pathauto_pattern/{pathauto_pattern}/delete",
- *     "collection" = "/admin/structure/visibility_group"
  *   }
  * )
  */

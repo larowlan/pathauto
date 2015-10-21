@@ -1,0 +1,7 @@
+# Pathauto pattern menu items definition
+entity.pathauto_pattern.collection:
+  title: 'Pathauto pattern'
+  route_name: entity.pathauto_pattern.collection
+  description: 'List Pathauto pattern'
+  parent: system.admin_structure
+

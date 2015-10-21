@@ -4,10 +4,11 @@ core: 8.x
 type: module
 
 dependencies:
+- ctools
 - path
 - token
 
-configure: pathauto.patterns.form
+configure: entity.pathauto_pattern.collection
 
 recommends:
 - redirect
