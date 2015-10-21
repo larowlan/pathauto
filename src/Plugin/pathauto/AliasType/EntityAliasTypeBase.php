@@ -243,4 +243,15 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
     return $this->moduleHandler->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled($this->getPluginId(), $bundle);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($object) {
+    $definition = $this->entityManager->getDefinition($this->getDerivativeId());
+    $class = $definition->getClass();
+    if ($object instanceof $class) {
+      return TRUE;
+    }
+    return FALSE;
+  }
 }

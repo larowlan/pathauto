@@ -55,4 +55,14 @@ interface AliasTypeInterface extends ConfigurablePluginInterface, PluginFormInte
    */
   public function getSourcePrefix();
 
+  /**
+   * Determines if this plugin type can apply a given object.
+   *
+   * @param $object
+   *   The object used to determine if this plugin can apply.
+   *
+   * @return bool
+   */
+  public function applies($object);
+
 }
