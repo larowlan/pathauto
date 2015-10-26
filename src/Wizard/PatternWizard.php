@@ -8,6 +8,9 @@ namespace Drupal\pathauto\Wizard;
 
 
 use Drupal\ctools\Wizard\EntityFormWizardBase;
+use Drupal\pathauto\Form\ConfigurePatternForm;
+use Drupal\pathauto\Form\PathautoPatternForm;
+use Drupal\pathauto\Form\SelectionCriteriaForm;
 
 /**
  * Custom form wizard for pathauto pattern configuration.
@@ -49,16 +52,16 @@ class PatternWizard extends EntityFormWizardBase {
     return [
       'general' => [
         'title' => $this->t('General information'),
-        'form' => '\Drupal\pathauto\Form\PathautoPatternForm'
+        'form' => PathautoPatternForm::class,
       ],
       'selection_criteria' => [
         'title' => $this->t('Selection criteria'),
-        'form' => '\Drupal\pathauto\Form\SelectionCriteriaForm'
+        'form' => SelectionCriteriaForm::class,
       ],
       'pattern' => [
         'title' => $this->t('Configure pattern'),
-        'form' => '\Drupal\pathauto\Form\ConfigurePatternForm'
-      ]
+        'form' => ConfigurePatternForm::class,
+      ],
     ];
   }
 

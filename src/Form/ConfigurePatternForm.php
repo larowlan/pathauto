@@ -9,23 +9,10 @@ namespace Drupal\pathauto\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\pathauto\AliasTypeManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigurePatternForm extends FormBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  function __construct() {
-
-  }
 
   /**
    * {@inheritdoc}
@@ -38,6 +25,12 @@ class ConfigurePatternForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $cached_values = $form_state->getTemporaryValue('wizard');
+    /** @var $pathauto_pattern \Drupal\pathauto\PathautoPatternInterface */
+    $pathauto_pattern = $cached_values['pathauto_pattern'];
+    $aliasType = $pathauto_pattern->getAliasType();
+    $form = $aliasType->buildConfigurationForm($form, $form_state);
+    $form['default']['#default_value'] = $pathauto_pattern->getPattern();
     return $form;
   }
 
@@ -45,7 +38,10 @@ class ConfigurePatternForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-
+    $cached_values = $form_state->getTemporaryValue('wizard');
+    /** @var $pathauto_pattern \Drupal\pathauto\PathautoPatternInterface */
+    $pathauto_pattern = $cached_values['pathauto_pattern'];
+    $pathauto_pattern->setPattern($form_state->getValue('default'));
   }
 
 }

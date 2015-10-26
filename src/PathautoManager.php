@@ -330,15 +330,31 @@ class PathautoManager implements PathautoManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function createAlias($module, $op, $source, $data, $type = NULL, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-    $config = $this->configFactory->get('pathauto.settings');
-
+  public function createAlias(EntityInterface $entity, $op) {
     // Retrieve and apply the pattern for this content type.
-    $pattern = $this->getPatternByEntity($module, $type, $langcode);
+    $pattern = $this->getPatternByEntity($entity);
+    if (empty($pattern)) {
+      // No pattern? Do nothing (otherwise we may blow away existing aliases...)
+      return NULL;
+    }
+
+    $entity_type_id = $entity->getEntityTypeId();
+    $source = $entity->urlInfo()->toString();
+    $config = $this->configFactory->get('pathauto.settings');
+    $langcode = $entity->language()->getId();
+    if ($entity->getEntityType()->getBundleEntityType()) {
+      $type = $entity->bundle();
+    }
+    else {
+      $type = NULL;
+    }
+    $data = [
+      $entity_type_id => $entity
+    ];
 
     // Allow other modules to alter the pattern.
     $context = array(
-      'module' => $module,
+      'module' => $entity_type_id,
       'op' => $op,
       'source' => $source,
       'data' => $data,
@@ -346,11 +362,6 @@ class PathautoManager implements PathautoManagerInterface {
       'language' => &$langcode,
     );
     $this->moduleHandler->alter('pathauto_pattern', $pattern, $context);
-
-    if (empty($pattern)) {
-      // No pattern? Do nothing (otherwise we may blow away existing aliases...)
-      return NULL;
-    }
 
     // Special handling when updating an item which is already aliased.
     $existing_alias = NULL;
@@ -370,7 +381,7 @@ class PathautoManager implements PathautoManagerInterface {
     // Uses callback option to clean replacements. No sanitization.
     // Pass empty BubbleableMetadata object to explicitly ignore cacheablity,
     // as the result is never rendered.
-    $alias = $this->token->replace($pattern, $data, array(
+    $alias = $this->token->replace($pattern->getPattern(), $data, array(
       'clear' => TRUE,
       'callback' => array($this, 'cleanTokenValues'),
       'langcode' => $langcode,
@@ -380,7 +391,7 @@ class PathautoManager implements PathautoManagerInterface {
     // Check if the token replacement has not actually replaced any values. If
     // that is the case, then stop because we should not generate an alias.
     // @see token_scan()
-    $pattern_tokens_removed = preg_replace('/\[[^\s\]:]*:[^\s\]]*\]/', '', $pattern);
+    $pattern_tokens_removed = preg_replace('/\[[^\s\]:]*:[^\s\]]*\]/', '', $pattern->getPattern());
     if ($alias === $pattern_tokens_removed) {
       return NULL;
     }
@@ -426,31 +437,31 @@ class PathautoManager implements PathautoManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPatternByEntity($entity_type_id, $bundle = '', $language = LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-    $config = $this->configFactory->get('pathauto.pattern');
-
-    $pattern_id = "$entity_type_id:$bundle:$language";
-    if (!isset($this->patterns[$pattern_id])) {
-      $pattern = '';
-      $variables = array();
-      if ($language != LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-        $variables[] = "{$entity_type_id}.bundles.{$bundle}.languages.{$language}";
-      }
-      if ($bundle) {
-        $variables[] = "{$entity_type_id}.bundles.{$bundle}.default";
-      }
-      $variables[] = "{$entity_type_id}.default";
-
-      foreach ($variables as $variable) {
-        if ($pattern = trim($config->get('patterns.' . $variable))) {
-          break;
+  public function getPatternByEntity(EntityInterface $entity) {
+    if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()])) {
+      foreach (\Drupal::service('plugin.manager.alias_type')->getPluginDefinitionByType($entity->getEntityTypeId()) as $plugin_id => $plugin_definition) {
+        /** @var \Drupal\pathauto\PathautoPatternInterface[] $patterns */
+        $patterns = \Drupal::entityManager()
+          ->getStorage('pathauto_pattern')
+          ->loadByProperties(['type' => $plugin_id]);
+        uasort($patterns, function (PathautoPatternInterface $a, PathautoPatternInterface $b) {
+          if ($a->getWeight() == $b->getWeight()) {
+            return 0;
+          }
+          return ($a->getWeight() < $b->getWeight()) ? -1 : 1;
+        });
+        foreach ($patterns as $pattern) {
+          if ($pattern->applies($entity)) {
+            $this->patterns[$entity->getEntityTypeId()][$entity->id()] = $pattern;
+          }
         }
       }
-
-      $this->patterns[$pattern_id] = $pattern;
+      // If still not set.
+      if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()])) {
+        $this->patterns[$entity->getEntityTypeId()][$entity->id()] = NULL;
+      }
     }
-
-    return $this->patterns[$pattern_id];
+    return $this->patterns[$entity->getEntityTypeId()][$entity->id()];
   }
 
   /**
@@ -477,10 +488,9 @@ class PathautoManager implements PathautoManagerInterface {
 
     $options += array('language' => $entity->language()->getId());
     $type = $entity->getEntityTypeId();
-    $bundle = $entity->bundle();
 
     // Skip processing if the entity has no pattern.
-    if (!$this->getPatternByEntity($type, $bundle, $options['language'])) {
+    if (!$this->getPatternByEntity($entity)) {
       return NULL;
     }
 
@@ -493,8 +503,7 @@ class PathautoManager implements PathautoManagerInterface {
       }
     }
 
-    $result = $this->createAlias(
-      $type, $op, '/' . $entity->urlInfo()->getInternalPath(), array($type => $entity), $bundle, $options['language']);
+    $result = $this->createAlias($entity, $op);
 
     if ($type == 'taxonomy_term' && empty($options['is_child'])) {
       // For all children generate new aliases.

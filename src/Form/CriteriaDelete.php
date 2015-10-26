@@ -12,10 +12,17 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\ctools\Form\ConditionDelete;
 
 class CriteriaDelete extends ConditionDelete {
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getRouteInfo() {
     return ['entity.pathauto_pattern.edit_form', ['machine_name' => $this->machine_name, 'step' => 'selection_criteria']];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function getConditions($cached_values) {
     /** @var \Drupal\pathauto\PathautoPatternInterface $pattern */
     $pattern = $cached_values['pathauto_pattern'];
@@ -26,6 +33,9 @@ class CriteriaDelete extends ConditionDelete {
     return $conditions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setConditions($cached_values, $conditions) {
     $old_conditions = $this->getConditions($cached_values);
     $diff = array_diff(array_keys($old_conditions), array_keys($conditions));
@@ -38,16 +48,13 @@ class CriteriaDelete extends ConditionDelete {
     return $cached_values;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function getContexts($cached_values) {
     /** @var \Drupal\pathauto\PathautoPatternInterface $pattern */
     $pattern = $cached_values['pathauto_pattern'];
-    // @todo This is a total hack. The plugin that getType() represents should
-    // be responsible for this.
-    $type = $pattern->getType();
-    $context_definition = new ContextDefinition('entity:' . $type);
-    return [
-      $type => new Context($context_definition),
-    ];
+    return $pattern->getAliasType()->getContexts();
   }
 
 }

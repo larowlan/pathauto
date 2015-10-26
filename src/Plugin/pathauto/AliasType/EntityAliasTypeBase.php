@@ -12,14 +12,20 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\ContextAwarePluginBase;
 use Drupal\pathauto\AliasTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * A base class for Alias Type plugins.
+ * A pathauto alias type plugin for entities with canonical links.
+ *
+ * @AliasType(
+ *   id = "canonical_entities",
+ *   deriver = "\Drupal\pathauto\Plugin\Deriver\EntityAliasTypeDeriver"
+ * )
  */
-abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterface {
+class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInterface, ContainerFactoryPluginInterface {
 
   /**
    * The module handler service.
@@ -41,6 +47,13 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
   protected $entityManager;
+
+  /**
+   * The path prefix for this entity type.
+   *
+   * @var string
+   */
+  protected $prefix;
 
   /**
    * Constructs a NodeAliasType instance.
@@ -129,17 +142,12 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
     $form = array(
       '#type' => 'details',
       '#title' => $this->getLabel(),
-      '#open' => TRUE,
-      '#tree' => TRUE,
     );
 
-    // Prompt for the default pattern for this module.
-    $key = 'default';
-
-    $form[$key] = array(
+    $form['default'] = array(
       '#type' => 'textfield',
       '#title' => $this->getPatternDescription(),
-      '#default_value' => $this->configuration['default'],
+      '#default_value' => !empty($this->configuration['default']) ? $this->configuration['default'] : '',
       '#size' => 65,
       '#maxlength' => 1280,
       '#element_validate' => array('token_element_validate'),
@@ -148,24 +156,6 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
       '#min_tokens' => 1,
     );
 
-    // If the module supports a set of specialized patterns, set
-    // them up here.
-    $patterns = $this->getPatterns();
-    foreach ($patterns as $itemname => $itemlabel) {
-      $key = 'default';
-      $form['bundles'][$itemname][$key] = array(
-        '#type' => 'textfield',
-        '#title' => $itemlabel,
-        '#default_value' => isset($this->configuration['bundles'][$itemname][$key]) ? $this->configuration['bundles'][$itemname][$key] : NULL,
-        '#size' => 65,
-        '#maxlength' => 1280,
-        '#element_validate' => array('token_element_validate'),
-        '#after_build' => array('token_element_validate'),
-        '#token_types' => $this->getTokenTypes(),
-        '#min_tokens' => 1,
-      );
-    }
-
     // Show the token help relevant to this pattern type.
     $form['token_help'] = array(
       '#theme' => 'token_tree',
@@ -173,31 +163,6 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
       '#dialog' => TRUE,
     );
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPatterns() {
-    $patterns = [];
-    $languages = $this->languageManager->getLanguages();
-    if ($this->entityManager->getDefinition($this->getPluginId())->hasKey('bundle')) {
-      foreach ($this->getBundles() as $bundle => $bundle_label) {
-        if (count($languages) && $this->isContentTranslationEnabled($bundle)) {
-          $patterns[$bundle] = $this->t('Default path pattern for @bundle (applies to all @bundle fields with blank patterns below)', array('@bundle' => $bundle_label));
-          foreach ($languages as $language) {
-            $patterns[$bundle . '_' . $language->getId()] = $this->t('Pattern for all @language @bundle paths', array(
-              '@bundle' => $bundle_label,
-              '@language' => $language->getName()
-            ));
-          }
-        }
-        else {
-          $patterns[$bundle] = $this->t('Pattern for all @bundle paths', array('@bundle' => $bundle_label));
-        }
-      }
-    }
-    return $patterns;
   }
 
   /**
@@ -249,9 +214,33 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
   public function applies($object) {
     $definition = $this->entityManager->getDefinition($this->getDerivativeId());
     $class = $definition->getClass();
-    if ($object instanceof $class) {
-      return TRUE;
-    }
-    return FALSE;
+    return ($object instanceof $class);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPatternDescription() {
+    return $this->t('Replace this description with proper annotation effort.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourcePrefix() {
+    if (empty($this->prefix)) {
+      $entity_type = $this->entityManager->getDefinition($this->getDerivativeId());
+      $path = $entity_type->getLinkTemplate('canonical');
+      // Remove slug(s)... This could probably be done cleaner, but I'm not in the mood.
+      $path_parts = explode('/', $path);
+      foreach ($path_parts as $key => $value) {
+        if (strpos($value, '}') === 0 && strpos($value, '{') == -1) {
+          unset ($path_parts[$key]);
+        }
+      }
+      $this->prefix = implode('/', $path_parts);
+    }
+    return $this->prefix;
+  }
+
 }

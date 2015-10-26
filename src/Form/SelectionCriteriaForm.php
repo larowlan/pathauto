@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: kris
- * Date: 10/20/15
- * Time: 1:14 PM
+ * @file
+ * Contains \Drupal\pathauto\Form\SelectionCriteriaForm.
  */
 
 namespace Drupal\pathauto\Form;
@@ -69,13 +67,7 @@ class SelectionCriteriaForm extends ManageConditions {
   protected function getContexts($cached_values) {
     /** @var \Drupal\pathauto\PathautoPatternInterface $pattern */
     $pattern = $cached_values['pathauto_pattern'];
-    // @todo This is a total hack. The plugin that getType() represents should
-    // be responsible for this.
-    $type = $pattern->getType();
-    $context_definition = new ContextDefinition('entity:' . $type);
-    return [
-      $type => new Context($context_definition),
-    ];
+    return $pattern->getAliasType()->getContexts();
   }
 
 }

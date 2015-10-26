@@ -95,4 +95,16 @@ class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdate
     return 'forum/';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($object) {
+    if (parent::applies($object)) {
+      /** @var \Drupal\taxonomy\TermInterface $object */
+      $config_forum = $this->configFactory->get('forum.settings');
+      return $object->getVocabularyId() == $config_forum->get('vocabulary');
+    }
+    return FALSE;
+  }
+
 }

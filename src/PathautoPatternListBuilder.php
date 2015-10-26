@@ -9,6 +9,7 @@ namespace Drupal\pathauto;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a listing of Pathauto pattern entities.
@@ -31,6 +32,16 @@ class PathautoPatternListBuilder extends ConfigEntityListBuilder {
     $row['id'] = $entity->id();
     // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
+    $operations['edit']['url'] = new Url('entity.pathauto_pattern.edit_form', ['machine_name' => $entity->id(), 'step' => 'general']);
+
+    return $operations;
   }
 
 }

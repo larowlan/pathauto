@@ -36,6 +36,11 @@ interface PathautoPatternInterface extends ConfigEntityInterface {
   public function getType();
 
   /**
+   * @return \Drupal\pathauto\AliasTypeInterface
+   */
+  public function getAliasType();
+
+  /**
    * Gets the weight of this pattern (compared to other patterns of this type).
    *
    * @return int
@@ -97,5 +102,15 @@ interface PathautoPatternInterface extends ConfigEntityInterface {
    *   Either "and" or "or"; represents how the selection criteria are combined.
    */
   public function getSelectionLogic();
+
+  /**
+   * Determines if this pattern can apply a given object.
+   *
+   * @param $object
+   *   The object used to determine if this plugin can apply.
+   *
+   * @return bool
+   */
+  public function applies($object);
 
 }

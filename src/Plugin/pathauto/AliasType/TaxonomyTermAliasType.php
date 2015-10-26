@@ -89,4 +89,16 @@ class TaxonomyTermAliasType extends EntityAliasTypeBase implements AliasTypeBatc
     return 'taxonomy/term/';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($object) {
+    if (parent::applies($object)) {
+      /** @var \Drupal\taxonomy\TermInterface $object */
+      $config_forum = $this->configFactory->get('forum.settings');
+      return $object->getVocabularyId() != $config_forum->get('vocabulary');
+    }
+    return FALSE;
+  }
+
 }

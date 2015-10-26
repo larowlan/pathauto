@@ -7,9 +7,11 @@
 
 namespace Drupal\pathauto\Entity;
 
+use Drupal\Component\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\pathauto\PathautoPatternInterface;
 
 /**
@@ -34,6 +36,11 @@ use Drupal\pathauto\PathautoPatternInterface;
  *     "id" = "id",
  *     "label" = "label",
  *     "uuid" = "uuid"
+ *   },
+ *   links = {
+ *     "collection" = "/admin/config/search/path/patterns",
+ *     "edit-form" = "/admin/config/search/path/patterns/{machine_name}/{step}",
+ *     "delete-form" = "/admin/config/search/path/patterns/{pathauto_pattern}/delete"
  *   }
  * )
  */
@@ -62,6 +69,11 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
    * @var string
    */
   protected $type;
+
+  /**
+   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   */
+  protected $aliasTypeCollection;
 
   /**
    * A tokenized string for alias generation.
@@ -117,6 +129,8 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
   public function calculateDependencies() {
     parent::calculateDependencies();
 
+    // @todo get dependencies from the alias type plugin.
+
     foreach ($this->getSelectionConditions() as $instance) {
       $this->calculatePluginDependencies($instance);
     }
@@ -136,6 +150,7 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
    */
   public function setPattern($pattern) {
     $this->pattern = $pattern;
+    $this->getAliasType()->setConfiguration(['default' => $pattern]);
   }
 
   /**
@@ -143,6 +158,16 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
    */
   public function getType() {
     return $this->type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAliasType() {
+    if (!$this->aliasTypeCollection) {
+      $this->aliasTypeCollection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager.alias_type'), $this->getType(), ['default' => $this->getPattern()]);
+    }
+    return $this->aliasTypeCollection->get($this->getType());
   }
 
   /**
@@ -199,6 +224,39 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
    */
   public function getSelectionLogic() {
     return $this->selection_logic;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($object) {
+    if ($this->getAliasType()->applies($object)) {
+      $definitions = $this->getAliasType()->getContextDefinitions();
+      if (count($definitions) > 1) {
+        throw new \Exception("Alias types do not support more than one context.");
+      }
+      $keys = array_keys($definitions);
+      // Set the context object on our Alias plugin before retrieving contexts.
+      $this->getAliasType()->setContextValue($keys[0], $object);
+      $contexts = $this->getAliasType()->getContexts();
+      /** @var \Drupal\Core\Plugin\Context\ContextHandler $context_handler */
+      $context_handler = \Drupal::service('context.handler');
+      $conditions = $this->getSelectionConditions();
+      foreach ($conditions as $condition) {
+        if ($condition instanceof ContextAwarePluginInterface) {
+          $context_handler->applyContextMapping($condition, $contexts);
+        }
+        $result = $condition->execute();
+        if ($this->getSelectionLogic() == 'and' && !$result) {
+          return FALSE;
+        }
+        elseif ($this->getSelectionLogic() == 'or' && $result) {
+          return TRUE;
+        }
+      }
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
