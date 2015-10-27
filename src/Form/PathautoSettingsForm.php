@@ -183,7 +183,7 @@ class PathautoSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    $config = $this->config('pathauto.settings');
+    $config = $this->configFactory()->getEditable('pathauto.settings');
 
     $form_state->cleanValues();
     foreach ($form_state->getValues() as $key => $value) {

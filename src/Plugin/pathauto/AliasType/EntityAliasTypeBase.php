@@ -132,6 +132,12 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    */
   public function getTokenTypes() {
     $definition = $this->getPluginDefinition();
+    // For some reason, we didn't unify token keys with entity types...
+    foreach ($definition['types'] as $key => $type) {
+      if ($type == 'taxonomy_term') {
+        $definition['types'][$key] = 'term';
+      }
+    }
     return $definition['types'];
   }
 

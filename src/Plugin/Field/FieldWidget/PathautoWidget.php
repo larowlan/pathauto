@@ -52,7 +52,7 @@ class PathautoWidget extends PathWidget {
 
 
 
-    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity->getEntityTypeId(), $entity->bundle(), $entity->language()->getId());
+    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
     if (empty($pattern)) {
       return $element;
     }
@@ -62,7 +62,7 @@ class PathautoWidget extends PathWidget {
       if (!$entity->isNew()) {
         module_load_include('inc', 'pathauto');
         $path = \Drupal::service('path.alias_manager')->getAliasByPath('/' . $entity->urlInfo()->getInternalPath(), $entity->language()->getId());
-        $pathauto_alias = \Drupal::service('pathauto.manager')->createAlias($entity->getEntityTypeId(), 'return', '/' . $entity->urlInfo()->getInternalPath(), array($entity->getEntityType()->id() => $entity), $entity->bundle(), $entity->language()->getId());
+        $pathauto_alias = \Drupal::service('pathauto.manager')->createAlias($entity, 'return');
         $entity->path->pathauto = ($path != '/' . $entity->urlInfo()->getInternalPath() && $path == $pathauto_alias);
       }
       else {
