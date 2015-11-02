@@ -159,7 +159,12 @@ class PathautoSettingsForm extends ConfigFormBase {
     $punctuation = \Drupal::service('pathauto.manager')->getPunctuationCharacters();
 
     foreach ($punctuation as $name => $details) {
-      $details['default'] = PathautoManagerInterface::PUNCTUATION_REMOVE;
+      if (!$config->get('punctuation.punctuation'. $name)) {
+        $details['default'] = PathautoManagerInterface::PUNCTUATION_REMOVE;
+      }
+      else {
+        $details['default'] = $config->get('punctuation.punctuation'. $name);
+      }
       if ($details['value'] == $config->get('separator')) {
         $details['default'] = PathautoManagerInterface::PUNCTUATION_REPLACE;
       }
