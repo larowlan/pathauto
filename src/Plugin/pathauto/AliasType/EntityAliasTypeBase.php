@@ -43,7 +43,7 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
   protected $entityManager;
 
   /**
-   * Constructs a NodeAliasType instance.
+   * Constructs a EntityAliasTypeBase instance.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -225,7 +225,7 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
     if (!isset($context['sandbox']['total'])) {
       $context['sandbox']['total'] = $query->countQuery()->execute()->fetchField();
 
-      // If there are no nodes to update, the stop immediately.
+      // If there are no entities to update, then stop immediately.
       if (!$context['sandbox']['total']) {
         $context['finished'] = 1;
         return;
@@ -267,12 +267,12 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
     $options += array('message' => FALSE);
 
     $entities = $this->entityManager->getStorage($this->getEntityTypeId())->loadMultiple($ids);
-    foreach ($entities as $node) {
-      \Drupal::service('pathauto.manager')->updateAlias($node, 'bulkupdate', $options);
+    foreach ($entities as $entity) {
+      \Drupal::service('pathauto.manager')->updateAlias($entity, 'bulkupdate', $options);
     }
 
     if (!empty($options['message'])) {
-      drupal_set_message(\Drupal::translation()->formatPlural(count($ids), 'Updated URL alias for 1 node.', 'Updated URL aliases for @count nodes.'));
+      drupal_set_message(\Drupal::translation()->formatPlural(count($ids), 'Updated URL alias for 1 entity.', 'Updated URL aliases for @count entities.'));
     }
   }
 
