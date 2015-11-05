@@ -9,6 +9,7 @@ namespace Drupal\pathauto;
 
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Transliteration\TransliterationInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -229,7 +230,8 @@ class AliasCleaner implements AliasCleanerInterface {
     }
 
     // Remove all HTML tags from the string.
-    $output = PlainTextOutput::renderFromHtml($string);
+    $output = Html::decodeEntities($string);
+    $output = PlainTextOutput::renderFromHtml($output);
 
     // Optionally transliterate.
     if ($this->cleanStringCache['transliterate']) {
