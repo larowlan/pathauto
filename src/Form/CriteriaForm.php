@@ -59,7 +59,7 @@ class CriteriaForm extends ConditionConfigure {
   protected function getContexts($cached_values) {
     /** @var \Drupal\pathauto\PathautoPatternInterface $pattern */
     $pattern = $cached_values['pathauto_pattern'];
-    return $pattern->getAliasType()->getContexts();
+    return $pattern->getContexts();
   }
 
 }
