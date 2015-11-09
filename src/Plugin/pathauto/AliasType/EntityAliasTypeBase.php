@@ -272,7 +272,7 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
     }
 
     if (!empty($options['message'])) {
-      drupal_set_message(\Drupal::translation()->formatPlural(count($ids), 'Updated 1 URL alias for type %label.', 'Updated @count URL aliases for type %label.'), array('%label' => $entity->getLabel()));
+      drupal_set_message(\Drupal::translation()->formatPlural(count($ids), 'Updated 1 %label URL alias.', 'Updated @count %label URL aliases.'), array('%label' => $this->getLabel()));
     }
   }
 
