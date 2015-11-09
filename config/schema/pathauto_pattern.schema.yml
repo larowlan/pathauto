@@ -28,3 +28,9 @@ pathauto.pathauto_pattern.*:
     weight:
       type: integer
       label: 'Weight'
+    context_definitions:
+      type: sequence
+      label: 'Context definitions'
+      sequence:
+        - type: ctools.relationship
+          label: 'Context'
