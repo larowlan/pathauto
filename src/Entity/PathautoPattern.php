@@ -26,7 +26,7 @@ use Drupal\pathauto\PathautoPatternInterface;
  *   handlers = {
  *     "list_builder" = "Drupal\pathauto\PathautoPatternListBuilder",
  *     "form" = {
- *       "delete" = "Drupal\pathauto\Form\PathautoPatternDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "wizard" = {
  *       "add" = "Drupal\pathauto\Wizard\PatternWizardAdd",
@@ -34,7 +34,7 @@ use Drupal\pathauto\PathautoPatternInterface;
  *     }
  *   },
  *   config_prefix = "pathauto_pattern",
- *   admin_permission = "administer site configuration",
+ *   admin_permission = "administer pathauto",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
