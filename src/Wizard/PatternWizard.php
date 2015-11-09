@@ -8,6 +8,7 @@ namespace Drupal\pathauto\Wizard;
 
 
 use Drupal\ctools\Wizard\EntityFormWizardBase;
+use Drupal\pathauto\Form\AddContext;
 use Drupal\pathauto\Form\ConfigurePatternForm;
 use Drupal\pathauto\Form\PathautoPatternForm;
 use Drupal\pathauto\Form\SelectionCriteriaForm;
@@ -53,6 +54,10 @@ class PatternWizard extends EntityFormWizardBase {
       'general' => [
         'title' => $this->t('General information'),
         'form' => PathautoPatternForm::class,
+      ],
+      'contexts' => [
+        'title' => $this->t('Add contexts'),
+        'form' => AddContext::class,
       ],
       'selection_criteria' => [
         'title' => $this->t('Selection criteria'),
