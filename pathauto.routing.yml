@@ -32,6 +32,33 @@ entity.pathauto_pattern.delete_form:
   requirements:
     _permission: 'administer pathauto'
 
+pathauto.pattern.relationship.add:
+  path: '/admin/config/search/path/patterns/{machine_name}/relationship/{context}/add'
+  defaults:
+    _form: '\Drupal\pathauto\Form\ContextConfigure'
+    _title: 'Configure relationship'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+pathauto.pattern.relationship.edit:
+  path: '/admin/config/search/path/patterns/{machine_name}/relationship/{context}/edit'
+  defaults:
+    _form: '\Drupal\pathauto\Form\ContextConfigure'
+    _title: 'Configure relationship'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
+pathauto.pattern.relationship.delete:
+  path: '/admin/config/search/path/patterns/{machine_name}/relationship/{id}/delete'
+  defaults:
+    _form: '\Drupal\pathauto\Form\ContextDelete'
+    _title: 'Delete relationship'
+    tempstore_id: 'pathauto.pattern'
+  requirements:
+    _permission: 'administer pathauto'
+
 pathauto.pattern.condition.add:
   path: '/admin/config/search/path/patterns/{machine_name}/criteria/{condition}/add'
   defaults:
