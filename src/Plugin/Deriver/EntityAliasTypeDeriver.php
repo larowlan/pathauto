@@ -18,7 +18,7 @@ class EntityAliasTypeDeriver extends EntityDeriverBase {
         $this->derivatives[$entity_type_id]['types'] = [$entity_type_id];
         $this->derivatives[$entity_type_id]['provider'] = $entity_type->getProvider();
         $this->derivatives[$entity_type_id]['context'] = [
-          "$entity_type_id" => new ContextDefinition("entity:$entity_type_id", $this->t('@label', ['@label' => $entity_type->getLabel()]))
+          "$entity_type_id" => new ContextDefinition("entity:$entity_type_id", $this->t('@label being aliased', ['@label' => $entity_type->getLabel()]))
         ];
       }
     }
