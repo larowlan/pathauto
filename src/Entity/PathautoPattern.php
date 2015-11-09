@@ -7,10 +7,13 @@
 
 namespace Drupal\pathauto\Entity;
 
-use Drupal\Component\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\ContextInterface;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\pathauto\PathautoPatternInterface;
 
@@ -102,6 +105,16 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
   protected $weight = 0;
 
   /**
+   * @var \Drupal\Core\Plugin\Context\ContextInterface[]
+   */
+  protected $contexts = [];
+
+  /**
+   * @var array
+   */
+  protected $context_definitions = [];
+
+  /**
    * The plugin collection that holds the selection criteria condition plugins.
    *
    * @var \Drupal\Component\Plugin\LazyPluginCollection
@@ -121,6 +134,41 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
       $criteria[$id] = $condition->getConfiguration();
     }
     $this->selection_criteria = $criteria;
+
+    /** @var \Drupal\Core\Plugin\Context\ContextInterface[] $contexts */
+    $contexts = $this->getContexts();
+    foreach ($this->getAliasType()->getContexts() as $plugin_context_id => $plugin_context) {
+      unset($contexts[$plugin_context_id]);
+    }
+    $this->context_definitions = [];
+    foreach ($contexts as $context_id => $context) {
+      $this->context_definitions[] = [
+        'id' => $context_id,
+        'label' => $context->getContextDefinition()->getLabel()
+      ];
+    }
+  }
+
+  public static function postLoad(EntityStorageInterface $storage, array &$entities) {
+    /** @var \Drupal\ctools\TypedDataResolver $resolver */
+    $resolver = \Drupal::service('ctools.typed_data.resolver');
+    /** @var \Drupal\pathauto\Entity\PathautoPattern $entity */
+    foreach ($entities as $entity) {
+      foreach ($entity->getContextDefinitions() as $definition) {
+        $context = $resolver->convertTokenToContext($definition['id'], $entity->getContexts());
+        $new_definition = new ContextDefinition(
+          $context->getContextDefinition()->getDataType(),
+          $definition['label'],
+          $context->getContextDefinition()->isRequired(),
+          $context->getContextDefinition()->isMultiple(),
+          $context->getContextDefinition()->getDescription(),
+          $context->getContextDefinition()->getDefaultValue()
+        );
+        $new_context = new Context($new_definition, $context->hasContextValue() ? $context->getContextValue() : NULL);
+        $entity->addContext($definition['id'], $new_context);
+      }
+    }
+    parent::postLoad($storage, $entities);
   }
 
   /**
@@ -188,6 +236,70 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
   /**
    * {@inheritdoc}
    */
+  public function hasContext($token) {
+    $contexts = $this->getAliasType()->getContexts();
+    $contexts += $this->contexts;
+    return !empty($contexts[$token]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContext($token) {
+    $contexts = $this->getAliasType()->getContexts();
+    $contexts += $this->contexts;
+    return $contexts[$token];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContexts() {
+    $contexts = $this->getAliasType()->getContexts();
+    $contexts += $this->contexts;
+    return $contexts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addContext($token, ContextInterface $context) {
+    if (!$this->hasContext($token)) {
+      $this->contexts[$token] = $context;
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function replaceContext($token, ContextInterface $context) {
+    if ($this->hasContext($token)) {
+      $this->contexts[$token] = $context;
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeContext($token) {
+    if (isset($this->contexts[$token])) {
+      unset($this->contexts[$token]);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContextDefinitions() {
+    return $this->context_definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getSelectionConditions() {
     if (!$this->selectionConditionCollection) {
       $this->selectionConditionCollection = new ConditionPluginCollection(\Drupal::service('plugin.manager.condition'), $this->get('selection_criteria'));
@@ -238,7 +350,17 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
       $keys = array_keys($definitions);
       // Set the context object on our Alias plugin before retrieving contexts.
       $this->getAliasType()->setContextValue($keys[0], $object);
-      $contexts = $this->getAliasType()->getContexts();
+      /** @var \Drupal\Core\Plugin\Context\ContextInterface[] $base_contexts */
+      $base_contexts = $this->getAliasType()->getContexts();
+      $contexts = [];
+      foreach ($base_contexts as $context_id => $base_context) {
+        $contexts[$context_id] = new Context($base_context->getContextDefinition(), $object);
+      }
+      /** @var \Drupal\ctools\TypedDataResolver $resolver */
+      $resolver = \Drupal::service('ctools.typed_data.resolver');
+      foreach ($this->getContexts() as $token => $context) {
+        $contexts[$token] = $resolver->convertTokenToContext($token, $contexts);
+      }
       /** @var \Drupal\Core\Plugin\Context\ContextHandler $context_handler */
       $context_handler = \Drupal::service('context.handler');
       $conditions = $this->getSelectionConditions();

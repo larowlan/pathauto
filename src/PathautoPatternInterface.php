@@ -8,6 +8,7 @@
 namespace Drupal\pathauto;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Plugin\Context\ContextInterface;
 
 /**
  * Provides an interface for defining Pathauto pattern entities.
@@ -56,6 +57,46 @@ interface PathautoPatternInterface extends ConfigEntityInterface {
    * @return $this
    */
   public function setWeight($weight);
+
+  /**
+   * @return bool
+   */
+  public function hasContext($token);
+
+  /**
+   * @return \Drupal\Core\Plugin\Context\ContextInterface
+   */
+  public function getContext($token);
+
+  /**
+   * @return \Drupal\Core\Plugin\Context\ContextInterface[]
+   */
+  public function getContexts();
+
+  /**
+   * @param string $token
+   * @param \Drupal\Core\Plugin\Context\ContextInterface $context
+   *
+   * @return $this
+   */
+  public function addContext($token, ContextInterface $context);
+
+  /**
+   * @param string $token
+   * @param \Drupal\Core\Plugin\Context\ContextInterface $context
+   *
+   * @return $this
+   */
+  public function replaceContext($token, ContextInterface $context);
+
+  /**
+   * @param string $token
+   *
+   * @return $this
+   */
+  public function removeContext($token);
+
+  public function getContextDefinitions();
 
   /**
    * Gets the selection condition collection.
