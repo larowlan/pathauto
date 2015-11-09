@@ -33,7 +33,7 @@ use Drupal\pathauto\PathautoPatternInterface;
  *       "edit" = "Drupal\pathauto\Wizard\PatternWizard"
  *     }
  *   },
- *   config_prefix = "pathauto_pattern",
+ *   config_prefix = "pattern",
  *   admin_permission = "administer pathauto",
  *   entity_keys = {
  *     "id" = "id",

@@ -1,4 +1,4 @@
-pathauto.pathauto_pattern.*:
+pathauto.pattern.*:
   type: config_entity
   label: 'Pathauto pattern config'
   mapping:
