@@ -7,7 +7,7 @@
 
 namespace Drupal\pathauto\Tests;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
 use Drupal\node\Entity\NodeType;
 use Drupal\pathauto\PathautoManagerInterface;
@@ -139,14 +139,14 @@ class PathautoUnitTest extends KernelTestBase {
 
     // Test that HTML tags are removed.
     $tests['This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.'] = 'text-has-html-tags';
-    $tests[(string) SafeMarkup::checkPlain('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
+    $tests[Html::escape('This <span class="text">text</span> has <br /><a href="http://example.com"><strong>HTML tags</strong></a>.')] = 'text-has-html-tags';
 
     // Transliteration.
     $tests['ľščťžýáíéňô'] = 'lsctzyaieno';
 
     foreach ($tests as $input => $expected) {
-      $output = \Drupal::service('pathauto.manager')->cleanString($input);
-      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.manager')->cleanString('@input') expected '@expected', actual '@output'", array(
+      $output = \Drupal::service('pathauto.alias_cleaner')->cleanString($input);
+      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.alias_cleaner')->cleanString('@input') expected '@expected', actual '@output'", array(
         '@input' => $input,
         '@expected' => $expected,
         '@output' => $output,
@@ -356,6 +356,24 @@ class PathautoUnitTest extends KernelTestBase {
     $account = entity_create('user', $edit);
     $account->save();
     $this->assertEntityAlias($account, '/users/test-user');
+  }
+
+  /**
+   * Tests word safe alias truncating truncating.
+   */
+  function testPathAliasUniquifyWordsafe() {
+    $this->config('pathauto.settings')
+      ->set('max_length', 26)
+      ->save();
+
+    $node_1 = $this->drupalCreateNode(array('title' => 'thequick brownfox jumpedover thelazydog', 'type' => 'page'));
+    $node_2 = $this->drupalCreateNode(array('title' => 'thequick brownfox jumpedover thelazydog', 'type' => 'page'));
+
+    // Check that alias uniquifying is truncating with $wordsafe param set to
+    // TRUE.
+    // If it doesn't path alias result would be content/thequick-brownf-0
+    $this->assertEntityAlias($node_1, '/content/thequick-brownfox');
+    $this->assertEntityAlias($node_2, '/content/thequick-0');
   }
 
   protected function drupalCreateNode(array $settings = array()) {

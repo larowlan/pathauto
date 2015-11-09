@@ -56,7 +56,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   protected $prefix;
 
   /**
-   * Constructs a NodeAliasType instance.
+   * Constructs a EntityAliasTypeBase instance.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -174,6 +174,107 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   /**
    * {@inheritdoc}
    */
+  public function getPatterns() {
+    $patterns = [];
+    $languages = $this->languageManager->getLanguages();
+    if ($this->entityManager->getDefinition($this->getEntityTypeId())->hasKey('bundle')) {
+      foreach ($this->getBundles() as $bundle => $bundle_label) {
+        if (count($languages) && $this->isContentTranslationEnabled($bundle)) {
+          $patterns[$bundle] = $this->t('Default path pattern for @bundle (applies to all @bundle fields with blank patterns below)', array('@bundle' => $bundle_label));
+          foreach ($languages as $language) {
+            $patterns[$bundle . '_' . $language->getId()] = $this->t('Pattern for all @language @bundle paths', array(
+              '@bundle' => $bundle_label,
+              '@language' => $language->getName()
+            ));
+          }
+        }
+        else {
+          $patterns[$bundle] = $this->t('Pattern for all @bundle paths', array('@bundle' => $bundle_label));
+        }
+      }
+    }
+    return $patterns;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function batchUpdate(&$context) {
+    if (!isset($context['sandbox']['current'])) {
+      $context['sandbox']['count'] = 0;
+      $context['sandbox']['current'] = 0;
+    }
+
+    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
+    $id_key = $entity_type->getKey('id');
+
+    $query = db_select($entity_type->get('base_table'), 'base_table');
+    $query->leftJoin('url_alias', 'ua', "CONCAT('" . $this->getSourcePrefix() . "' , base_table.$id_key) = ua.source");
+    $query->addField('base_table', $id_key, 'id');
+    $query->isNull('ua.source');
+    $query->condition('base_table.' . $id_key, $context['sandbox']['current'], '>');
+    $query->orderBy('base_table.' . $id_key);
+    $query->addTag('pathauto_bulk_update');
+    $query->addMetaData('entity', $this->getEntityTypeId());
+
+    // Get the total amount of items to process.
+    if (!isset($context['sandbox']['total'])) {
+      $context['sandbox']['total'] = $query->countQuery()->execute()->fetchField();
+
+      // If there are no entities to update, then stop immediately.
+      if (!$context['sandbox']['total']) {
+        $context['finished'] = 1;
+        return;
+      }
+    }
+
+    $query->range(0, 25);
+    $ids = $query->execute()->fetchCol();
+
+    $this->bulkUpdate($ids);
+    $context['sandbox']['count'] += count($ids);
+    $context['sandbox']['current'] = max($ids);
+    $context['message'] = t('Updated alias for %label @id.', array('%label' => $entity_type->getLabel(), '@id' => end($ids)));
+
+    if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+      $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
+    }
+  }
+
+  /**
+   * Returns the entity type ID.
+   *
+   * @return string
+   *   The entity type ID.
+   */
+  protected function getEntityTypeId() {
+    return $this->getPluginId();
+  }
+
+  /**
+   * Update the URL aliases for multiple entities.
+   *
+   * @param array $ids
+   *   An array of entity IDs IDs.
+   * @param array $options
+   *   An optional array of additional options.
+   */
+  protected function bulkUpdate(array $ids, array $options = array()) {
+    $options += array('message' => FALSE);
+
+    $entities = $this->entityManager->getStorage($this->getEntityTypeId())->loadMultiple($ids);
+    foreach ($entities as $entity) {
+      \Drupal::service('pathauto.manager')->updateAlias($entity, 'bulkupdate', $options);
+    }
+
+    if (!empty($options['message'])) {
+      drupal_set_message(\Drupal::translation()->formatPlural(count($ids), 'Updated 1 %label URL alias.', 'Updated @count %label URL aliases.'), array('%label' => $this->getLabel()));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function calculateDependencies() {
   }
 
@@ -198,7 +299,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   protected function getBundles() {
     return array_map(function ($bundle_info) {
       return $bundle_info['label'];
-    }, $this->entityManager->getBundleInfo($this->getPluginId()));
+    }, $this->entityManager->getBundleInfo($this->getEntityTypeId()));
   }
 
   /**
@@ -211,7 +312,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    *   TRUE if content translation is enabled for the bundle.
    */
   protected function isContentTranslationEnabled($bundle) {
-    return $this->moduleHandler->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled($this->getPluginId(), $bundle);
+    return $this->moduleHandler->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled($this->getEntityTypeId(), $bundle);
   }
 
   /**

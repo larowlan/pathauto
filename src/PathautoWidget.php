@@ -1,26 +1,17 @@
 <?php
 /**
  * @file
- * Contains: Drupal\pathauto\Plugin\Field\FieldWidget\PathautoWidget
+ * Contains \Drupal\pathauto\PathautoWidget.
  */
 
-namespace Drupal\pathauto\Plugin\Field\FieldWidget;
+namespace Drupal\pathauto;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Url;
 use Drupal\path\Plugin\Field\FieldWidget\PathWidget;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'pathauto' widget.
- *
- * @FieldWidget(
- *   id = "pathauto",
- *   label = @Translation("Pathauto"),
- *   field_types = {
- *     "path"
- *   }
- * )
+ * Extends the core path widget.
  */
 class PathautoWidget extends PathWidget {
 

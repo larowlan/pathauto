@@ -16,15 +16,11 @@
  * @ingroup pathauto
  */
 
-
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\node\Entity\Node;
-use Drupal\user\Entity\User;
 
 /**
  * The default ignore word list.
@@ -127,78 +123,6 @@ function pathauto_entity_delete(EntityInterface $entity) {
 }
 
 /**
- * Update the URL aliases for multiple nodes.
- *
- * @param array $nids
- *   An array of node IDs.
- * @param string $op
- *   Operation being performed on the nodes ('insert', 'update' or
- *   'bulkupdate').
- * @param array $options
- *   An optional array of additional options.
- */
-function pathauto_node_update_alias_multiple(array $nids, $op, array $options = array()) {
-  $options += array('message' => FALSE);
-
-  $nodes = Node::loadMultiple($nids);
-  foreach ($nodes as $node) {
-    \Drupal::service('pathauto.manager')->updateAlias($node, $op, $options);
-  }
-
-  if (!empty($options['message'])) {
-    drupal_set_message(\Drupal::translation()->formatPlural(count($nids), 'Updated URL alias for 1 node.', 'Updated URL aliases for @count nodes.'));
-  }
-}
-
-/**
- * Update the URL aliases for multiple taxonomy terms.
- *
- * @param array $tids
- *   An array of term IDs.
- * @param string $op
- *   Operation being performed on the nodes ('insert', 'update' or
- *   'bulkupdate').
- * @param array $options
- *   An optional array of additional options.
- */
-function pathauto_taxonomy_term_update_alias_multiple(array $tids, $op, array $options = array()) {
-  $options += array('message' => FALSE);
-
-  $terms = entity_load_multiple('taxonomy_term', $tids);
-  foreach ($terms as $term) {
-    \Drupal::service('pathauto.manager')->updateAlias($term, $op, $options);
-  }
-
-  if (!empty($options['message'])) {
-    drupal_set_message(\Drupal::translation()->formatPlural(count($tids), 'Updated URL alias for 1 term.', 'Updated URL aliases for @count terms.'));
-  }
-}
-
-/**
- * Update the URL aliases for multiple user accounts.
- *
- * @param array $uids
- *   An array of user account IDs.
- * @param string $op
- *   Operation being performed on the accounts ('insert', 'update' or
- *   'bulkupdate').
- * @param array $options
- *   An optional array of additional options.
- */
-function pathauto_user_update_alias_multiple(array $uids, $op, array $options = array()) {
-  $options += array('message' => FALSE);
-
-  $accounts = User::loadMultiple($uids);
-  foreach ($accounts as $account) {
-    \Drupal::service('pathauto.manager')->updateAlias($account, $op, $options);
-  }
-
-  if (!empty($options['message'])) {
-    drupal_set_message(\Drupal::translation()->formatPlural(count($uids), 'Updated URL alias for 1 user account.', 'Updated URL aliases for @count user accounts.'));
-  }
-}
-
-/**
  * Implements hook_field_info_alter().
  */
 function pathauto_field_info_alter(&$info) {
@@ -206,17 +130,11 @@ function pathauto_field_info_alter(&$info) {
 }
 
 /**
- * Implements hook_entity_base_field_info_alter().
+ * Implements hook_field_widget_info_alter().
  */
-function pathauto_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
-  if (isset($fields['path']) && $fields['path']->getType() == 'path') {
-    $fields['path']->setDisplayOptions('form', array(
-      'type' => 'pathauto',
-      'weight' => 30,
-    ));
-  }
+function pathauto_field_widget_info_alter(&$widgets) {
+  $widgets['path']['class'] = 'Drupal\pathauto\PathautoWidget';
 }
-
 
 /**
  * Implements hook_entity_base_field_info().
@@ -230,7 +148,7 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', array(
-        'type' => 'pathauto',
+        'type' => 'path',
         'weight' => 30,
       ))
       ->setDisplayConfigurable('form', TRUE);

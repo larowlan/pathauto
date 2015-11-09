@@ -156,7 +156,7 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#tree' => TRUE,
     );
 
-    $punctuation = \Drupal::service('pathauto.manager')->getPunctuationCharacters();
+    $punctuation = \Drupal::service('pathauto.alias_cleaner')->getPunctuationCharacters();
 
     foreach ($punctuation as $name => $details) {
       if (!$config->get('punctuation.punctuation'. $name)) {

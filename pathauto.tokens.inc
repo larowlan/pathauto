@@ -38,7 +38,7 @@ function pathauto_tokens($type, $tokens, array $data, array $options, Bubbleable
           $values = array();
           foreach (token_element_children($array) as $key) {
             $value = is_array($array[$key]) ? render($array[$key]) : (string) $array[$key];
-            $value = \Drupal::service('pathauto.manager')->cleanString($value, $options);
+            $value = \Drupal::service('pathauto.alias_cleaner')->cleanString($value, $options);
             $values[] = $value;
           }
           $replacements[$original] = implode('/', $values);
