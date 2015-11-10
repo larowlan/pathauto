@@ -152,7 +152,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
 
     $form['default'] = array(
       '#type' => 'textfield',
-      '#title' => $this->getPatternDescription(),
+      '#title' => 'Path pattern',
       '#default_value' => !empty($this->configuration['default']) ? $this->configuration['default'] : '',
       '#size' => 65,
       '#maxlength' => 1280,
@@ -322,13 +322,6 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
     $definition = $this->entityManager->getDefinition($this->getDerivativeId());
     $class = $definition->getClass();
     return ($object instanceof $class);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPatternDescription() {
-    return $this->t('Replace this description with proper annotation effort.');
   }
 
   /**

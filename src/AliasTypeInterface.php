@@ -25,14 +25,6 @@ interface AliasTypeInterface extends ContextAwarePluginInterface, ConfigurablePl
   public function getLabel();
 
   /**
-   * Get the pattern description.
-   *
-   * @return string
-   *   The pattern description.
-   */
-  public function getPatternDescription();
-
-  /**
    * Get the token types.
    *
    * @return string[]

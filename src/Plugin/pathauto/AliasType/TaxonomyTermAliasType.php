@@ -25,13 +25,6 @@ class TaxonomyTermAliasType extends EntityAliasTypeBase implements AliasTypeBatc
   /**
    * {@inheritdoc}
    */
-  public function getPatternDescription() {
-    return $this->t('Default path pattern (applies to all vocabularies with blank patterns below)');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function defaultConfiguration() {
     return array('default' => array('/[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
   }

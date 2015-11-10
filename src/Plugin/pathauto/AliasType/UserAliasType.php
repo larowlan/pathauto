@@ -25,13 +25,6 @@ class UserAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
   /**
    * {@inheritdoc}
    */
-  public function getPatternDescription() {
-    return $this->t('Pattern for user account page paths');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function defaultConfiguration() {
     return array('default' => array('/users/[user:name]')) + parent::defaultConfiguration();
   }

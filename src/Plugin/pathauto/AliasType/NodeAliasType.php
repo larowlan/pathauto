@@ -25,13 +25,6 @@ class NodeAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
   /**
    * {@inheritdoc}
    */
-  public function getPatternDescription() {
-    return $this->t('Default path pattern (applies to all content types with blank patterns below)');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function defaultConfiguration() {
     return array('default' => array('/content/[node:title]')) + parent::defaultConfiguration();
   }

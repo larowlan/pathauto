@@ -25,13 +25,6 @@ class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdate
   /**
    * {@inheritdoc}
    */
-  public function getPatternDescription() {
-    return $this->t('Pattern for forums and forum containers');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPatterns() {
     return [];
   }
