@@ -38,7 +38,8 @@ use Drupal\pathauto\PathautoPatternInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "weight" = "weight"
  *   },
  *   links = {
  *     "collection" = "/admin/config/search/path/patterns",
@@ -48,6 +49,7 @@ use Drupal\pathauto\PathautoPatternInterface;
  * )
  */
 class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterface {
+
   /**
    * The Pathauto pattern ID.
    *
@@ -149,6 +151,9 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function postLoad(EntityStorageInterface $storage, array &$entities) {
     /** @var \Drupal\ctools\TypedDataResolver $resolver */
     $resolver = \Drupal::service('ctools.typed_data.resolver');
@@ -184,6 +189,20 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
     }
 
     return $this->getDependencies();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function urlRouteParameters($rel) {
+    $uri_route_parameters =  parent::urlRouteParameters($rel);
+    if ($rel = 'edit-form') {
+      $uri_route_parameters = [
+        'machine_name' => $this->id(),
+        'step' => 'general',
+      ];
+    }
+    return $uri_route_parameters;
   }
 
   /**

@@ -7,20 +7,28 @@
 
 namespace Drupal\pathauto;
 
-use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
+use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Url;
 
 /**
  * Provides a listing of Pathauto pattern entities.
  */
-class PathautoPatternListBuilder extends ConfigEntityListBuilder {
+class PathautoPatternListBuilder extends DraggableListBuilder {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId() {
+    return 'pathauto_pattern_list';
+  }
+
   /**
    * {@inheritdoc}
    */
   public function buildHeader() {
     $header['label'] = $this->t('Pathauto pattern');
     $header['id'] = $this->t('Machine name');
+    $header['type'] = $this->t('Pattern type');
     return $header + parent::buildHeader();
   }
 
@@ -28,20 +36,11 @@ class PathautoPatternListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['label'] = $this->getLabel($entity);
+    /* @var \Drupal\pathauto\PathautoPatternInterface $entity */
+    $row['label'] = $entity->label();
     $row['id'] = $entity->id();
-    // You probably want a few more properties here...
+    $row['type'] = $entity->getAliasType()->getLabel();
     return $row + parent::buildRow($entity);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
-    $operations['edit']['url'] = new Url('entity.pathauto_pattern.edit_form', ['machine_name' => $entity->id(), 'step' => 'general']);
-
-    return $operations;
   }
 
 }
