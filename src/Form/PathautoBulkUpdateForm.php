@@ -26,7 +26,7 @@ class PathautoBulkUpdateForm extends FormBase {
   protected $aliasTypeManager;
 
   /**
-   * Constructs a PathautoPatternsForm object.
+   * Constructs a PathautoBulkUpdateForm object.
    *
    * @param \Drupal\pathauto\AliasTypeManager $alias_type_manager
    *   The alias type manager.

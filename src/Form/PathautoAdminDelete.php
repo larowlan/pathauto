@@ -25,7 +25,7 @@ class PathautoAdminDelete extends FormBase {
   protected $aliasTypeManager;
 
   /**
-   * Constructs a PathautoPatternsForm object.
+   * Constructs a PathautoAdminDelete object.
    *
    * @param \Drupal\pathauto\AliasTypeManager $alias_type_manager
    *   The alias type manager.
