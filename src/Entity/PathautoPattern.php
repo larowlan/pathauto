@@ -196,7 +196,8 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
    */
   protected function urlRouteParameters($rel) {
     $uri_route_parameters =  parent::urlRouteParameters($rel);
-    if ($rel = 'edit-form') {
+    // @todo Improve detection, check the path string?
+    if (in_array($rel, ['edit-form', 'config-translation-overview'])) {
       $uri_route_parameters = [
         'machine_name' => $this->id(),
         'step' => 'general',

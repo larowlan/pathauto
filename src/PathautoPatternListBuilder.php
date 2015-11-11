@@ -38,8 +38,8 @@ class PathautoPatternListBuilder extends DraggableListBuilder {
   public function buildRow(EntityInterface $entity) {
     /* @var \Drupal\pathauto\PathautoPatternInterface $entity */
     $row['label'] = $entity->label();
-    $row['id'] = $entity->id();
-    $row['type'] = $entity->getAliasType()->getLabel();
+    $row['id']['#markup'] = $entity->id();
+    $row['type']['#markup'] = $entity->getAliasType()->getLabel();
     return $row + parent::buildRow($entity);
   }
 

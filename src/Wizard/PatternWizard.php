@@ -49,7 +49,7 @@ class PatternWizard extends EntityFormWizardBase {
   /**
    * {@inheritdoc}
    */
-  public function getOperations() {
+  public function getOperations($cached_values) {
     return [
       'general' => [
         'title' => $this->t('General information'),
