@@ -20,14 +20,7 @@ use Drupal\pathauto\AliasTypeBatchUpdateInterface;
  *   provider = "forum",
  * )
  */
-class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateInterface, ContainerFactoryPluginInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPatterns() {
-    return [];
-  }
+class ForumAliasType extends EntityAliasTypeBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}

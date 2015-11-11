@@ -11,12 +11,34 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\pathauto\Entity\PathautoPattern;
 use Drupal\taxonomy\VocabularyInterface;
 
 /**
  * Helper test class with some added functions for testing.
  */
 trait PathautoTestHelperTrait {
+
+  /**
+   * Creates a pathauto pattern.
+   *
+   * @param string $entity_type_id
+   *   The entity type.
+   * @param $pattern
+   *   The path pattern.
+   *
+   * @return \Drupal\pathauto\PathautoPatternInterface
+   *   The created pattern.
+   */
+  protected function createPattern($entity_type_id, $pattern) {
+    $pattern = PathautoPattern::create([
+      'id' => Unicode::strtolower($this->randomMachineName()),
+      'type' => 'canonical_entities:' . $entity_type_id,
+      'pattern' => $pattern,
+    ]);
+    $pattern->save();
+    return $pattern;
+  }
 
   public function assertToken($type, $object, $token, $expected) {
     $bubbleable_metadata = new BubbleableMetadata();

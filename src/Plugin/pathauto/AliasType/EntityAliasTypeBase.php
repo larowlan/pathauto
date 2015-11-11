@@ -14,6 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginBase;
+use Drupal\pathauto\AliasTypeBatchUpdateInterface;
 use Drupal\pathauto\AliasTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -25,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   deriver = "\Drupal\pathauto\Plugin\Deriver\EntityAliasTypeDeriver"
  * )
  */
-class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInterface, ContainerFactoryPluginInterface {
+class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInterface, AliasTypeBatchUpdateInterface, ContainerFactoryPluginInterface {
 
   /**
    * The module handler service.
@@ -174,31 +175,6 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   /**
    * {@inheritdoc}
    */
-  public function getPatterns() {
-    $patterns = [];
-    $languages = $this->languageManager->getLanguages();
-    if ($this->entityManager->getDefinition($this->getEntityTypeId())->hasKey('bundle')) {
-      foreach ($this->getBundles() as $bundle => $bundle_label) {
-        if (count($languages) && $this->isContentTranslationEnabled($bundle)) {
-          $patterns[$bundle] = $this->t('Default path pattern for @bundle (applies to all @bundle fields with blank patterns below)', array('@bundle' => $bundle_label));
-          foreach ($languages as $language) {
-            $patterns[$bundle . '_' . $language->getId()] = $this->t('Pattern for all @language @bundle paths', array(
-              '@bundle' => $bundle_label,
-              '@language' => $language->getName()
-            ));
-          }
-        }
-        else {
-          $patterns[$bundle] = $this->t('Pattern for all @bundle paths', array('@bundle' => $bundle_label));
-        }
-      }
-    }
-    return $patterns;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function batchUpdate(&$context) {
     if (!isset($context['sandbox']['current'])) {
       $context['sandbox']['count'] = 0;
@@ -248,7 +224,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    *   The entity type ID.
    */
   protected function getEntityTypeId() {
-    return $this->getPluginId();
+    return $this->getDerivativeId();
   }
 
   /**
@@ -291,35 +267,10 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   }
 
   /**
-   * Returns bundles.
-   *
-   * @return string[]
-   *   An array of bundle labels, keyed by bundle.
-   */
-  protected function getBundles() {
-    return array_map(function ($bundle_info) {
-      return $bundle_info['label'];
-    }, $this->entityManager->getBundleInfo($this->getEntityTypeId()));
-  }
-
-  /**
-   * Checks if a bundle is enabled for translation.
-   *
-   * @param string $bundle
-   *   The bundle.
-   *
-   * @return bool
-   *   TRUE if content translation is enabled for the bundle.
-   */
-  protected function isContentTranslationEnabled($bundle) {
-    return $this->moduleHandler->moduleExists('content_translation') && \Drupal::service('content_translation.manager')->isEnabled($this->getEntityTypeId(), $bundle);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function applies($object) {
-    $definition = $this->entityManager->getDefinition($this->getDerivativeId());
+    $definition = $this->entityManager->getDefinition($this->getEntityTypeId());
     $class = $definition->getClass();
     return ($object instanceof $class);
   }
@@ -329,16 +280,9 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    */
   public function getSourcePrefix() {
     if (empty($this->prefix)) {
-      $entity_type = $this->entityManager->getDefinition($this->getDerivativeId());
+      $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
       $path = $entity_type->getLinkTemplate('canonical');
-      // Remove slug(s)... This could probably be done cleaner, but I'm not in the mood.
-      $path_parts = explode('/', $path);
-      foreach ($path_parts as $key => $value) {
-        if (strpos($value, '}') === 0 && strpos($value, '{') == -1) {
-          unset ($path_parts[$key]);
-        }
-      }
-      $this->prefix = implode('/', $path_parts);
+      $this->prefix = substr($path, 0, strpos($path, '{'));
     }
     return $this->prefix;
   }

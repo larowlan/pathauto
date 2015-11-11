@@ -53,8 +53,10 @@ class PathautoBulkUpdateTest extends WebTestBase {
     );
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
-  }
 
+    $this->createPattern('node', '/content/[node:title]');
+    $this->createPattern('user', '/users/[user:name]');
+  }
 
   function testBulkUpdate() {
     // Create some nodes.
@@ -69,8 +71,8 @@ class PathautoBulkUpdateTest extends WebTestBase {
 
     // Bulk create aliases.
     $edit = array(
-      'update[node]' => TRUE,
-      'update[user]' => TRUE,
+      'update[canonical_entities:node]' => TRUE,
+      'update[canonical_entities:user]' => TRUE,
     );
     $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, t('Update'));
     $this->assertText('Generated 7 URL aliases.'); // 5 nodes + 2 users
