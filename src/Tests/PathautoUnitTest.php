@@ -9,6 +9,7 @@ namespace Drupal\pathauto\Tests;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\pathauto\PathautoManagerInterface;
 use Drupal\simpletest\KernelTestBase;
@@ -22,7 +23,7 @@ class PathautoUnitTest extends KernelTestBase {
 
   use PathautoTestHelperTrait;
 
-  public static $modules = array('system', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token', 'filter');
+  public static $modules = array('system', 'field', 'text', 'user', 'node', 'path', 'pathauto', 'taxonomy', 'token', 'filter', 'ctools', 'language');
 
   protected $currentUser;
 
@@ -42,6 +43,9 @@ class PathautoUnitTest extends KernelTestBase {
     $type->save();
     node_add_body_field($type);
 
+    $this->createPattern('node', '/content/[node:title]');
+    $this->createPattern('user', '/users/[user:name]');
+
     \Drupal::service('router.builder')->rebuild();
 
     $this->currentUser = entity_create('user', array('name' => $this->randomMachineName()));
@@ -59,52 +63,108 @@ class PathautoUnitTest extends KernelTestBase {
    * Test pathauto_pattern_load_by_entity().
    */
   public function testPatternLoadByEntity() {
-    $this->config('pathauto.pattern')
-      ->set('patterns.node.bundles.article.default', '/article/[node:title]')
-      ->set('patterns.node.bundles.article.languages.en', '/article/en/[node:title]')
-      ->set('patterns.node.bundles.page.default', '/[node:title]')
-      ->save();
+    $pattern = $this->createPattern('node', '/article/[node:title]');
+    $pattern->addSelectionCondition(
+        [
+          'id' => 'entity_type:node_type',
+          'bundles' => [
+            'article' => 'article',
+          ],
+          'negate' => FALSE,
+          'context_mapping' => [
+            'node' => 'node',
+          ]
+        ]
+      );
+    $pattern->setWeight(-1);
+    $pattern->save();
+
+    $pattern = $this->createPattern('node', '/article/[node:title]');
+    $pattern->addSelectionCondition(
+      [
+        'id' => 'entity_type:node_type',
+        'bundles' => [
+          'article' => 'article',
+        ],
+        'negate' => FALSE,
+        'context_mapping' => [
+          'node' => 'node',
+        ]
+      ]
+    );
+    $pattern->addSelectionCondition(
+      [
+        'id' => 'language',
+        'langcodes' => [
+          'fr' => 'fr',
+        ],
+        'negate' => FALSE,
+        'context_mapping' => [
+          'language' => 'node:langcode',
+        ]
+      ]
+    );
+    $pattern->set('context_definitions', [['id' => 'node:langcode', 'label' => 'Language']]);
+    $pattern->setWeight(-2);
+    $pattern->save();
+
+    $pattern = $this->createPattern('node', '/article/[node:title]');
+    $pattern->addSelectionCondition(
+      [
+        'id' => 'entity_type:node_type',
+        'bundles' => [
+          'page' => 'page',
+        ],
+        'negate' => FALSE,
+        'context_mapping' => [
+          'node' => 'node',
+        ]
+      ]
+    );
+    $pattern->setWeight(1);
+    $pattern->save();
 
     $tests = array(
       array(
         'entity' => 'node',
-        'bundle' => 'article',
-        'language' => 'fr',
+        'values' => [
+          'type' => 'article',
+          'langcode' => 'fr',
+        ],
         'expected' => '/article/[node:title]',
       ),
       array(
         'entity' => 'node',
-        'bundle' => 'article',
-        'language' => 'en',
+        'values' => [
+          'type' => 'article',
+          'langcode' => 'en',
+        ],
         'expected' => '/article/en/[node:title]',
       ),
       array(
         'entity' => 'node',
-        'bundle' => 'article',
-        'language' => Language::LANGCODE_NOT_SPECIFIED,
+        'values' => [
+          'type' => 'article',
+          'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+        ],
         'expected' => '/article/[node:title]',
       ),
       array(
         'entity' => 'node',
-        'bundle' => 'page',
-        'language' => 'en',
+        'values' => [
+          'type' => 'page',
+        ],
         'expected' => '/[node:title]',
       ),
       array(
         'entity' => 'user',
-        'bundle' => 'user',
-        'language' => Language::LANGCODE_NOT_SPECIFIED,
+        'values' => [],
         'expected' => '/users/[user:name]',
-      ),
-      array(
-        'entity' => 'invalid-entity',
-        'bundle' => '',
-        'language' => Language::LANGCODE_NOT_SPECIFIED,
-        'expected' => '',
       ),
     );
     foreach ($tests as $test) {
-      $actual = \Drupal::service('pathauto.manager')->getPatternByEntity($test['entity'], $test['bundle'], $test['language']);
+      $entity = \Drupal::entityManager()->getStorage($test['entity'])->create($test['values']);
+      $actual = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
       $this->assertIdentical($actual, $test['expected'], t("pathauto_pattern_load_by_entity('@entity', '@bundle', '@language') returned '@actual', expected '@expected'", array(
         '@entity' => $test['entity'],
         '@bundle' => $test['bundle'],

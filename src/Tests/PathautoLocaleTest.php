@@ -41,6 +41,8 @@ class PathautoLocaleTest extends WebTestBase {
    */
   function testLanguageAliases() {
 
+    $this->createPattern('node', '/content/[node:title]');
+
     // Add predefined French language.
     ConfigurableLanguage::createFromLangcode('fr')->save();
 

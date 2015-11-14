@@ -36,6 +36,10 @@ class ConfigurePatternForm extends FormBase {
     $tokens = $form['default']['#token_types'];
     $contexts = $pathauto_pattern->getContexts();
     foreach ($contexts as $context_id => $context) {
+      // @todo Figure out what to do with non-entity contexts.
+      if (strpos($context->getContextDefinition()->getDataType(), ':') === FALSE) {
+        continue;
+      }
       list($data_type, $entity_type) = explode(':', $context->getContextDefinition()->getDataType());
       if ($data_type == 'entity') {
         if ($entity_type == 'taxonomy_term') {
@@ -46,6 +50,7 @@ class ConfigurePatternForm extends FormBase {
         }
       }
     }
+
     $form['default']['#token_types'] = $tokens;
 
     return $form;

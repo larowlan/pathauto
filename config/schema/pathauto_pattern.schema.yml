@@ -20,8 +20,8 @@ pathauto.pattern.*:
       type: sequence
       label: 'Selection criteria'
       sequence:
-        - type: condition.plugin.[id]
-          label: 'Selection condition'
+        type: condition.plugin.[id]
+        label: 'Selection condition'
     selection_logic:
       type: string
       label: 'Selection logic'
