@@ -48,6 +48,8 @@ class PathautoUserWebTest extends WebTestBase {
     );
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
+
+    $this->createPattern('user', '/users/[user:name]');
   }
 
 

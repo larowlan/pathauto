@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\pathauto\Tests;
+use Drupal\pathauto\Entity\PathautoPattern;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -51,6 +52,9 @@ class PathautoNodeWebTest extends WebTestBase {
     );
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
+
+    $this->createPattern('node', '/content/[node:title]');
+
   }
 
   /**
@@ -116,9 +120,12 @@ class PathautoNodeWebTest extends WebTestBase {
 
     // Remove the pattern for nodes, the pathauto checkbox should not be
     // displayed.
-    $config = $this->config('pathauto.pattern');
-    $config->set('patterns.node.default', '');
-    $config->save();
+    $ids = \Drupal::entityQuery('pathauto_pattern')
+      ->condition('type', 'canonical_entities:node')
+      ->execute();
+    foreach (PathautoPattern::loadMultiple($ids) as $pattern) {
+      $pattern->delete();
+    }
     \Drupal::service('pathauto.manager')->resetCaches();
 
     $this->drupalGet('node/add/article');
