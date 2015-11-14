@@ -141,8 +141,15 @@ trait PathautoTestHelperTrait {
 
   public function assertEntityPattern($entity_type, $bundle, $langcode = Language::LANGCODE_NOT_SPECIFIED, $expected) {
     \Drupal::service('pathauto.manager')->resetCaches();
-    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity_type, $bundle, $langcode);
-    $this->assertIdentical($expected, $pattern);
+
+    $values = [
+      'langcode' => $langcode,
+      \Drupal::entityTypeManager()->getDefinition($entity_type)->getKey('bundle') => $bundle,
+    ];
+    $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->create($values);
+
+    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
+    $this->assertIdentical($expected, $pattern->getPattern());
   }
 
   public function drupalGetTermByName($name, $reset = FALSE) {

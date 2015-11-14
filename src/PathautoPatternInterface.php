@@ -26,6 +26,8 @@ interface PathautoPatternInterface extends ConfigEntityInterface {
    * Set the tokenized pattern to use during alias generation.
    *
    * @param string $pattern
+   *
+   * @return $this
    */
   public function setPattern($pattern);
 

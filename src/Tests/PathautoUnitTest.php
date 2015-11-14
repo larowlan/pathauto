@@ -10,6 +10,9 @@ namespace Drupal\pathauto\Tests;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
 use Drupal\pathauto\PathautoManagerInterface;
 use Drupal\simpletest\KernelTestBase;
@@ -27,6 +30,16 @@ class PathautoUnitTest extends KernelTestBase {
 
   protected $currentUser;
 
+  /**
+   * @var \Drupal\pathauto\PathautoPatternInterface
+   */
+  protected $nodePattern;
+
+  /**
+   * @var \Drupal\pathauto\PathautoPatternInterface
+   */
+  protected $userPattern;
+
   public function setUp() {
     parent::setup();
 
@@ -36,6 +49,8 @@ class PathautoUnitTest extends KernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
 
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
     $this->installSchema('node', array('node_access'));
     $this->installSchema('system', array('url_alias', 'sequences', 'router'));
 
@@ -43,8 +58,8 @@ class PathautoUnitTest extends KernelTestBase {
     $type->save();
     node_add_body_field($type);
 
-    $this->createPattern('node', '/content/[node:title]');
-    $this->createPattern('user', '/users/[user:name]');
+    $this->nodePattern = $this->createPattern('node', '/content/[node:title]');
+    $this->userPattern = $this->createPattern('user', '/users/[user:name]');
 
     \Drupal::service('router.builder')->rebuild();
 
@@ -79,7 +94,7 @@ class PathautoUnitTest extends KernelTestBase {
     $pattern->setWeight(-1);
     $pattern->save();
 
-    $pattern = $this->createPattern('node', '/article/[node:title]');
+    $pattern = $this->createPattern('node', '/article/en/[node:title]');
     $pattern->addSelectionCondition(
       [
         'id' => 'entity_type:node_type',
@@ -96,19 +111,22 @@ class PathautoUnitTest extends KernelTestBase {
       [
         'id' => 'language',
         'langcodes' => [
-          'fr' => 'fr',
+          'en' => 'en',
         ],
         'negate' => FALSE,
         'context_mapping' => [
-          'language' => 'node:langcode',
+          'language' => 'node:langcode:language',
         ]
       ]
     );
-    $pattern->set('context_definitions', [['id' => 'node:langcode', 'label' => 'Language']]);
+
+    $new_definition = new ContextDefinition('language', 'Language');
+    $new_context = new Context($new_definition);
+    $pattern->addContext('node:langcode:language', $new_context);
     $pattern->setWeight(-2);
     $pattern->save();
 
-    $pattern = $this->createPattern('node', '/article/[node:title]');
+    $pattern = $this->createPattern('node', '/[node:title]');
     $pattern->addSelectionCondition(
       [
         'id' => 'entity_type:node_type',
@@ -121,13 +139,14 @@ class PathautoUnitTest extends KernelTestBase {
         ]
       ]
     );
-    $pattern->setWeight(1);
+    $pattern->setWeight(-1);
     $pattern->save();
 
     $tests = array(
       array(
         'entity' => 'node',
         'values' => [
+          'title' => 'Article fr',
           'type' => 'article',
           'langcode' => 'fr',
         ],
@@ -136,6 +155,7 @@ class PathautoUnitTest extends KernelTestBase {
       array(
         'entity' => 'node',
         'values' => [
+          'title' => 'Article en',
           'type' => 'article',
           'langcode' => 'en',
         ],
@@ -144,6 +164,7 @@ class PathautoUnitTest extends KernelTestBase {
       array(
         'entity' => 'node',
         'values' => [
+          'title' => 'Article und',
           'type' => 'article',
           'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
         ],
@@ -152,25 +173,26 @@ class PathautoUnitTest extends KernelTestBase {
       array(
         'entity' => 'node',
         'values' => [
+          'title' => 'Page',
           'type' => 'page',
         ],
         'expected' => '/[node:title]',
       ),
       array(
         'entity' => 'user',
-        'values' => [],
+        'values' => [
+          'name' => 'User',
+        ],
         'expected' => '/users/[user:name]',
       ),
     );
     foreach ($tests as $test) {
       $entity = \Drupal::entityManager()->getStorage($test['entity'])->create($test['values']);
+      $entity->save();
       $actual = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
-      $this->assertIdentical($actual, $test['expected'], t("pathauto_pattern_load_by_entity('@entity', '@bundle', '@language') returned '@actual', expected '@expected'", array(
+      $this->assertIdentical($actual->getPattern(), $test['expected'], t("Correct pattern returned for @entity_type with @values", array(
         '@entity' => $test['entity'],
-        '@bundle' => $test['bundle'],
-        '@language' => $test['language'],
-        '@actual' => $actual,
-        '@expected' => $test['expected'],
+        '@values' => print_r($test['values'], TRUE),
       )));
     }
   }
@@ -316,9 +338,9 @@ class PathautoUnitTest extends KernelTestBase {
    */
   public function testNoTokensNoAlias() {
     $this->installConfig(['filter']);
-    $config = $this->config('pathauto.pattern');
-    $config->set('patterns.node.default', '/content/[node:body]');
-    $config->save();
+    $this->nodePattern
+      ->setPattern('/content/[node:body]')
+      ->save();
 
     $node = $this->drupalCreateNode();
     $this->assertNoEntityAliasExists($node);
@@ -332,9 +354,7 @@ class PathautoUnitTest extends KernelTestBase {
    * Test the handling of path vs non-path tokens in pathauto_clean_token_values().
    */
   public function testPathTokens() {
-    $config = $this->config('pathauto.pattern');
-    $config->set('patterns.taxonomy_term.default', '/[term:parent:url:path]/[term:name]');
-    $config->save();
+    $this->createPattern('taxonomy_term', '/[term:parent:url:path]/[term:name]');
 
     $vocab = $this->addVocabulary();
 
@@ -350,13 +370,25 @@ class PathautoUnitTest extends KernelTestBase {
   }
 
   public function testEntityBundleDeleting() {
-    $config = $this->config('pathauto.pattern');
-
     // Create a vocabulary and test that it's pattern variable works.
     $vocab = $this->addVocabulary(array('vid' => 'name'));
-    $config->set('patterns.taxonomy_term.default', 'base');
-    $config->set('patterns.taxonomy_term.bundles.name.default', 'bundle');
-    $config->save();
+    $this->createPattern('taxonomy_term', 'base');
+    $pattern = $this->createPattern('taxonomy_term', 'bundle');
+    $pattern->addSelectionCondition(
+      [
+        'id' => 'entity_type:taxonomy_vocabulary',
+        'bundles' => [
+          'name' => 'name',
+        ],
+        'negate' => FALSE,
+        'context_mapping' => [
+          'taxonomy_term' => 'taxonomy_term',
+        ]
+      ]
+    );
+    $pattern->setWeight(1);
+    $pattern->save();
+
 
     $this->assertEntityPattern('taxonomy_term', 'name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
 
@@ -371,8 +403,9 @@ class PathautoUnitTest extends KernelTestBase {
     $this->config('pathauto.settings')
       ->set('punctuation.period', PathautoManagerInterface::PUNCTUATION_DO_NOTHING)
       ->save();
-    $this->config('pathauto.pattern')
-      ->set('patterns.node.bundles.page.default', '[node:title]')
+
+    $this->nodePattern
+      ->setPattern('[node:title]')
       ->save();
     \Drupal::service('pathauto.manager')->resetCaches();
 
@@ -401,6 +434,7 @@ class PathautoUnitTest extends KernelTestBase {
    * Test programmatic entity creation for aliases.
    */
   function testProgrammaticEntityCreation() {
+    $this->createPattern('taxonomy_term', '/[term:vocabulary]/[term:name]');
     $node = $this->drupalCreateNode(array('title' => 'Test node', 'path' => array('pathauto' => TRUE)));
     $this->assertEntityAlias($node, '/content/test-node');
 
