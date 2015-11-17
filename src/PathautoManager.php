@@ -121,7 +121,7 @@ class PathautoManager implements PathautoManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function createAlias(EntityInterface $entity, $op) {
+  public function createEntityAlias(EntityInterface $entity, $op) {
     // Retrieve and apply the pattern for this content type.
     $pattern = $this->getPatternByEntity($entity);
     if (empty($pattern)) {
@@ -266,7 +266,7 @@ class PathautoManager implements PathautoManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function updateAlias(EntityInterface $entity, $op, array $options = array()) {
+  public function updateEntityAlias(EntityInterface $entity, $op, array $options = array()) {
     // Skip if the entity does not have the path field.
     if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
       return NULL;
@@ -294,14 +294,14 @@ class PathautoManager implements PathautoManagerInterface {
       }
     }
 
-    $result = $this->createAlias($entity, $op);
+    $result = $this->createEntityAlias($entity, $op);
 
     if ($type == 'taxonomy_term' && empty($options['is_child'])) {
       // For all children generate new aliases.
       $options['is_child'] = TRUE;
       unset($options['language']);
       foreach ($this->getTermTree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
-        $this->updateAlias($subterm, $op, $options);
+        $this->updateEntityAlias($subterm, $op, $options);
       }
     }
 

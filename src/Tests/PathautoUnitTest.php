@@ -274,7 +274,7 @@ class PathautoUnitTest extends KernelTestBase {
   }
 
   /**
-   * Test the different update actions in \Drupal::service('pathauto.manager')->createAlias().
+   * Test the different update actions in \Drupal::service('pathauto.manager')->createEntityAlias().
    */
   public function testUpdateActions() {
     $config = $this->config('pathauto.settings');
@@ -328,12 +328,12 @@ class PathautoUnitTest extends KernelTestBase {
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
     $node->setTitle('Sixth title');
-    \Drupal::service('pathauto.manager')->updateAlias($node, 'bulkupdate');
+    \Drupal::service('pathauto.manager')->updateEntityAlias($node, 'bulkupdate');
     $this->assertEntityAlias($node, '/content/sixth-title');
   }
 
   /**
-   * Test that \Drupal::service('pathauto.manager')->createAlias() will not create an alias for a pattern
+   * Test that \Drupal::service('pathauto.manager')->createEntityAlias() will not create an alias for a pattern
    * that does not get any tokens replaced.
    */
   public function testNoTokensNoAlias() {

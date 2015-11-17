@@ -72,7 +72,7 @@ interface PathautoManagerInterface {
    *
    * @see _pathauto_set_alias()
    */
-  public function createAlias(EntityInterface $entity, $op);
+  public function createEntityAlias(EntityInterface $entity, $op);
 
   /**
    * Creates or updates an alias for the given entity.
@@ -89,6 +89,6 @@ interface PathautoManagerInterface {
    *   - An array with alias data in case the alias has been created or updated.
    *   - NULL if no operation performed.
    */
-  public function updateAlias(EntityInterface $entity, $op, array $options = array());
+  public function updateEntityAlias(EntityInterface $entity, $op, array $options = array());
 
 }

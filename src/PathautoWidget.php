@@ -53,7 +53,7 @@ class PathautoWidget extends PathWidget {
       if (!$entity->isNew()) {
         module_load_include('inc', 'pathauto');
         $path = \Drupal::service('path.alias_manager')->getAliasByPath('/' . $entity->urlInfo()->getInternalPath(), $entity->language()->getId());
-        $pathauto_alias = \Drupal::service('pathauto.manager')->createAlias($entity, 'return');
+        $pathauto_alias = \Drupal::service('pathauto.manager')->createEntityAlias($entity, 'return');
         $entity->path->pathauto = ($path != '/' . $entity->urlInfo()->getInternalPath() && $path == $pathauto_alias);
       }
       else {
