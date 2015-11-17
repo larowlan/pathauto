@@ -40,7 +40,7 @@ class ForumAliasType extends EntityAliasTypeBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function getSourcePrefix() {
-    return 'forum/';
+    return '/forum/';
   }
 
   /**
