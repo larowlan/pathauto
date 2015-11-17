@@ -65,9 +65,9 @@ function pathauto_help($route_name, RouteMatchInterface $route_match) {
  */
 function pathauto_entity_bundle_delete($entity_type, $bundle) {
   // @todo Update or remove this.
-  $config = \Drupal::configFactory()->getEditable('pathauto.pattern');
-  $config->clear('patterns.' . $entity_type . '.bundles.' . $bundle);
-  $config->save();
+  // $config = \Drupal::configFactory()->getEditable('pathauto.pattern');
+  // $config->clear('patterns.' . $entity_type . '.bundles.' . $bundle);
+  // $config->save();
 }
 
 
