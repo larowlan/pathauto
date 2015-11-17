@@ -25,13 +25,6 @@ class PathautoGenerator implements PathautoGeneratorInterface {
   use StringTranslationTrait;
 
   /**
-   * Punctuation characters cache.
-   *
-   * @var array
-   */
-  protected $punctuationCharacters = array();
-
-  /**
    * Config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
@@ -53,11 +46,18 @@ class PathautoGenerator implements PathautoGeneratorInterface {
   protected $token;
 
   /**
-   * Calculated patterns for entities.
+   * Calculated pattern for a specific entity.
    *
    * @var array
    */
   protected $patterns = array();
+
+  /**
+   * Available patterns per entity type ID.
+   *
+   * @var array
+   */
+  protected $patternsByEntityType = array();
 
   /**
    * The alias cleaner.
@@ -129,7 +129,7 @@ class PathautoGenerator implements PathautoGeneratorInterface {
       return NULL;
     }
 
-    $source = '/' . $entity->urlInfo()->getInternalPath();
+    $source = '/' . $entity->toUrl()->getInternalPath();
     $config = $this->configFactory->get('pathauto.settings');
     $langcode = $entity->language()->getId();
 
@@ -221,25 +221,39 @@ class PathautoGenerator implements PathautoGeneratorInterface {
   }
 
   /**
+   * Loads pathauto patterns for a given entity type ID
+   *
+   * @param string $entity_type_id
+   *   An entity type ID.
+   *
+   * @return \Drupal\pathauto\PathautoPatternInterface[]
+   *   A list of patterns, sorted by weight.
+   */
+  protected function getPatternByEntityType($entity_type_id) {
+    if (!isset($this->patternsByEntityType[$entity_type_id])) {
+      $ids = \Drupal::entityQuery('pathauto_pattern')
+        ->condition('type', array_keys(\Drupal::service('plugin.manager.alias_type')
+          ->getPluginDefinitionByType($entity_type_id)))
+        ->sort('weight')
+        ->execute();
+
+      $this->patternsByEntityType[$entity_type_id] = \Drupal::entityTypeManager()
+        ->getStorage('pathauto_pattern')
+        ->loadMultiple($ids);
+    }
+
+    return $this->patternsByEntityType[$entity_type_id];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getPatternByEntity(EntityInterface $entity) {
     if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()])) {
-      foreach (\Drupal::service('plugin.manager.alias_type')->getPluginDefinitionByType($entity->getEntityTypeId()) as $plugin_id => $plugin_definition) {
-        /** @var \Drupal\pathauto\PathautoPatternInterface[] $patterns */
-        $patterns = \Drupal::entityManager()
-          ->getStorage('pathauto_pattern')
-          ->loadByProperties(['type' => $plugin_id]);
-        uasort($patterns, function (PathautoPatternInterface $a, PathautoPatternInterface $b) {
-          if ($a->getWeight() == $b->getWeight()) {
-            return 0;
-          }
-          return ($a->getWeight() > $b->getWeight()) ? -1 : 1;
-        });
-        foreach ($patterns as $pattern) {
-          if ($pattern->applies($entity)) {
-            $this->patterns[$entity->getEntityTypeId()][$entity->id()] = $pattern;
-          }
+      foreach ($this->getPatternByEntityType($entity->getEntityTypeId()) as $pattern) {
+        if ($pattern->applies($entity)) {
+          $this->patterns[$entity->getEntityTypeId()][$entity->id()] = $pattern;
+          break;
         }
       }
       // If still not set.
@@ -254,7 +268,8 @@ class PathautoGenerator implements PathautoGeneratorInterface {
    * {@inheritdoc}
    */
   public function resetCaches() {
-    $this->patterns = array();
+    $this->patterns = [];
+    $this->patternsByEntityType = [];
     $this->aliasCleaner->resetCaches();
   }
 

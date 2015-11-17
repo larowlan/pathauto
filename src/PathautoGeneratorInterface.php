@@ -7,7 +7,6 @@
 namespace Drupal\pathauto;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Provides and interface for PathautoGenerator.
@@ -50,7 +49,7 @@ interface PathautoGeneratorInterface {
   public function resetCaches();
 
   /**
-   * Load an URL alias pattern by entity, bundle, and language.
+   * Load an alias pattern entity by entity, bundle, and language.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity.

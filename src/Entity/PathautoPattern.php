@@ -41,6 +41,9 @@ use Drupal\pathauto\PathautoPatternInterface;
  *     "uuid" = "uuid",
  *     "weight" = "weight"
  *   },
+ *   lookup_keys = {
+ *     "type",
+ *   },
  *   links = {
  *     "collection" = "/admin/config/search/path/patterns",
  *     "edit-form" = "/admin/config/search/path/patterns/{machine_name}/{step}",
