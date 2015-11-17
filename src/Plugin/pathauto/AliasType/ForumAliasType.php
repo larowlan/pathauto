@@ -54,7 +54,7 @@ class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdate
    * {@inheritdoc}
    */
   public function getSourcePrefix() {
-    return 'forum/';
+    return '/forum/';
   }
 
 }
