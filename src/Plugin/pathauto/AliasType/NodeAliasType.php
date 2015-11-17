@@ -40,7 +40,7 @@ class NodeAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateI
    * {@inheritdoc}
    */
   public function getSourcePrefix() {
-    return 'node/';
+    return '/node/';
   }
 
 }

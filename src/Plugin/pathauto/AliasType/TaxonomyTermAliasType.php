@@ -40,7 +40,7 @@ class TaxonomyTermAliasType extends EntityAliasTypeBase implements AliasTypeBatc
    * {@inheritdoc}
    */
   public function getSourcePrefix() {
-    return 'taxonomy/term/';
+    return '/taxonomy/term/';
   }
 
 }
