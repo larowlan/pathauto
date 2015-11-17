@@ -34,9 +34,13 @@ class AliasTypeManager extends DefaultPluginManager {
   }
 
   /**
+   * Returns plugin definitions that support a given token type.
+   *
    * @param string $type
    *   The type of token plugin must support to be useful.
+   *
    * @return array
+   *   Plugin definitions.
    */
   public function getPluginDefinitionByType($type) {
     $definitions = array_filter($this->getDefinitions(), function ($definition) use ($type) {

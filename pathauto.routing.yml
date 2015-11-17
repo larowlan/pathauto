@@ -30,7 +30,7 @@ entity.pathauto_pattern.delete_form:
     _entity_form: 'pathauto_pattern.delete'
     _title: 'Delete Pathauto pattern'
   requirements:
-    _permission: 'administer pathauto'
+    _entity_access: pathauto_pattern.delete
 
 pathauto.pattern.relationship.add:
   path: '/admin/config/search/path/patterns/{machine_name}/relationship/{context}/add'
