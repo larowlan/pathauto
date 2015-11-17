@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\pathauto\PathautoManager.
+ * Contains \Drupal\pathauto\PathautoGenerator.
  */
 
 namespace Drupal\pathauto;
@@ -18,9 +18,9 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
 
 /**
- * Provides methods for managing pathauto aliases and related entities.
+ * Provides methods for generating path aliases.
  */
-class PathautoManager implements PathautoManagerInterface {
+class PathautoGenerator implements PathautoGeneratorInterface {
 
   use StringTranslationTrait;
 
@@ -129,29 +129,24 @@ class PathautoManager implements PathautoManagerInterface {
       return NULL;
     }
 
-    $entity_type_id = $entity->getEntityTypeId();
-    $source = $entity->urlInfo()->toString();
+    $source = '/' . $entity->urlInfo()->getInternalPath();
     $config = $this->configFactory->get('pathauto.settings');
     $langcode = $entity->language()->getId();
-    if ($entity->getEntityType()->getBundleEntityType()) {
-      $type = $entity->bundle();
-    }
-    else {
-      $type = NULL;
-    }
+
     $data = [
-      $entity_type_id => $entity
+      $entity->getEntityTypeId() => $entity
     ];
 
     // Allow other modules to alter the pattern.
     $context = array(
-      'module' => $entity_type_id,
+      'module' => $entity->getEntityType()->getProvider(),
       'op' => $op,
       'source' => $source,
       'data' => $data,
-      'type' => $type,
+      'bundle' => $entity->bundle(),
       'language' => &$langcode,
     );
+    // @todo Is still hook still useful?
     $this->moduleHandler->alter('pathauto_pattern', $pattern, $context);
 
     // Special handling when updating an item which is already aliased.
@@ -159,7 +154,7 @@ class PathautoManager implements PathautoManagerInterface {
     if ($op == 'update' || $op == 'bulkupdate') {
       if ($existing_alias = $this->aliasStorageHelper->loadBySource($source, $langcode)) {
         switch ($config->get('update_action')) {
-          case PathautoManagerInterface::UPDATE_ACTION_NO_NEW:
+          case PathautoGeneratorInterface::UPDATE_ACTION_NO_NEW:
             // If an alias already exists,
             // and the update action is set to do nothing,
             // then gosh-darn it, do nothing.

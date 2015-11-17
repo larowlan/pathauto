@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\pathauto\PathautoManagerInterface
+ * Contains Drupal\pathauto\PathautoGeneratorInterface
  */
 
 namespace Drupal\pathauto;
@@ -10,9 +10,9 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
- * Provides and interface for PathautoManager.
+ * Provides and interface for PathautoGenerator.
  */
-interface PathautoManagerInterface {
+interface PathautoGeneratorInterface {
 
   /**
    * "Do nothing. Leave the old alias intact."
