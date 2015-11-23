@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Tests\AliasType;
 
+use Drupal\node\Entity\NodeType;
 use Drupal\simpletest\KernelTestBase;
 
 /**
@@ -30,12 +31,14 @@ class NodeAliasTest extends KernelTestBase {
     /** @var \Drupal\pathauto\AliasTypeManager $manager */
     $manager = $this->container->get('plugin.manager.alias_type');
 
+    NodeType::create(['type' => 'article', 'name' => 'Article'])->save();
+
     /** @var \Drupal\pathauto\AliasTypeInterface $node_type */
     $node_type = $manager->createInstance('node');
 
     $patterns = $node_type->getPatterns();
-    $this->assertTrue((array_key_exists('node', $patterns)), "Node pattern exists.");
-    $this->assertEqual($patterns['node'], 'Pattern for all Content paths', "Node pattern description matches.");
+    $this->assertTrue((array_key_exists('article', $patterns)), "Article pattern exists.");
+    $this->assertEqual($patterns['article'], 'Pattern for all Article paths', "Article pattern description matches.");
 
     $token_types = $node_type->getTokenTypes();
     $this->assertTrue(in_array('node', $token_types), "Node token type exists.");
