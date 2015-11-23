@@ -16,7 +16,7 @@ class CriteriaForm extends ConditionConfigure {
   /**
    * {@inheritdoc}
    */
-  protected function getParentRouteInfo() {
+  protected function getParentRouteInfo($cached_values) {
     return ['entity.pathauto_pattern.edit_form', ['machine_name' => $this->machine_name, 'step' => 'selection_criteria']];
   }
 

@@ -30,7 +30,7 @@ class SelectionCriteriaForm extends ManageConditions {
   /**
    * {@inheritdoc}
    */
-  protected function getAddRoute() {
+  protected function getAddRoute($cached_values) {
     return 'pathauto.pattern.condition.add';
   }
 
@@ -44,7 +44,7 @@ class SelectionCriteriaForm extends ManageConditions {
   /**
    * {@inheritdoc}
    */
-  protected function getOperationsRouteInfo($machine_name, $row) {
+  protected function getOperationsRouteInfo($cached_values, $machine_name, $row) {
     return ['pathauto.pattern.condition', ['machine_name' => $machine_name, 'condition' => $row]];
   }
 
