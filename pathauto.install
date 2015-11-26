@@ -21,7 +21,26 @@ function pathauto_install() {
 /**
  * Updates pathauto widgets to use the path widget ID.
  */
-function pathauto_update_8002() {
+function pathauto_update_8001() {
+
+  // Replace values in the 'entity.definitions.installed' keyvalue collection.
+  $collection = \Drupal::service('keyvalue')->get('entity.definitions.installed');
+  foreach ($collection->getAll() as $key => $definitions) {
+    if (!is_array($definitions) || empty($definitions['path'])) {
+      continue;
+    }
+
+    // Retrieve and change path base field definition.
+    $path_definition = $definitions['path'];
+    if (($options = $path_definition->getDisplayOptions('form')) && $options['type'] = 'pathauto') {
+      $options['type'] = 'path';
+      $path_definition->setDisplayOptions('form', $options);
+      // Save the new value.
+      $collection->set($key, $path_definition);
+    }
+
+  }
+
   foreach (EntityFormDisplay::loadMultiple() as $form_display) {
     if ($component = $form_display->getComponent('path')) {
       if (isset($component['type']) && $component['type'] == 'pathauto') {
