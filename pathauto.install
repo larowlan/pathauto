@@ -7,6 +7,8 @@
  * @ingroup pathauto
  */
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+
 /**
  * Implements hook_install().
  */
@@ -14,4 +16,19 @@ function pathauto_install() {
   // Set the weight to 1
   module_set_weight('pathauto', 1);
 
+}
+
+/**
+ * Updates pathauto widgets to use the path widget ID.
+ */
+function pathauto_update_8002() {
+  foreach (EntityFormDisplay::loadMultiple() as $form_display) {
+    if ($component = $form_display->getComponent('path')) {
+      if (isset($component['type']) && $component['type'] == 'pathauto') {
+        $component['type'] = 'path';
+        $form_display->setComponent('path', $component);
+        $form_display->save();
+      }
+    }
+  }
 }
