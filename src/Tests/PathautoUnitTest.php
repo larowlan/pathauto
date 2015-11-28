@@ -295,7 +295,6 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($term2, '/My Crazy/Alias/child-term');
   }
 
-
   /**
    * Test using fields for path structures.
    */
@@ -308,15 +307,19 @@ class PathautoUnitTest extends KernelTestBase {
     Vocabulary::create(['vid' => 'tags'])->save();
 
     $fieldname = 'a' . Unicode::strtolower($this->randomMachineName());
-    $field_storage = FieldStorageConfig::create(['entity_type' => 'taxonomy_term', 'field_name' => $fieldname, 'type' => 'text']);
+    $field_storage = FieldStorageConfig::create(['entity_type' => 'taxonomy_term', 'field_name' => $fieldname, 'type' => 'string']);
     $field_storage->save();
     $field = FieldConfig::create(['field_storage' => $field_storage, 'bundle' => 'tags']);
     $field->save();
 
+    $display = entity_get_display('taxonomy_term', 'tags', 'default');
+    $display->setComponent($fieldname, ['type' => 'string']);
+    $display->save();
+
     // Make the path pattern of a field use the value of this field appended
     // to the parent taxonomy term's pattern if there is one.
     $config = $this->config('pathauto.pattern');
-    $config->set('patterns.taxonomy_term.default', '[term:parents:join-path]/[term:' . $fieldname . ']');
+    $config->set('patterns.taxonomy_term.default', '/[term:parents:join-path]/[term:' . $fieldname . ']');
     $config->save();
 
     // Start by creating a parent term.
@@ -326,13 +329,12 @@ class PathautoUnitTest extends KernelTestBase {
     // Create the child term.
     $child = Term::create(['vid' => 'tags', $fieldname => $this->randomMachineName(), 'parent' => $parent, 'name' => $this->randomMachineName()]);
     $child->save();
-    $this->assertEntityAlias($child, Unicode::strtolower($parent->getName() . '/' . $child->$fieldname->value));
+    $this->assertEntityAlias($child, '/' . Unicode::strtolower($parent->getName() . '/' . $child->$fieldname->value));
 
     // Re-saving the parent term should not modify the child term's alias.
     $parent->save();
-    $this->assertEntityAlias($child, Unicode::strtolower($parent->getName() . '/' . $child->$fieldname->value));
+    $this->assertEntityAlias($child, '/' . Unicode::strtolower($parent->getName() . '/' . $child->$fieldname->value));
   }
-
 
   public function testEntityBundleDeleting() {
     $config = $this->config('pathauto.pattern');
