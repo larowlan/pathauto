@@ -15,6 +15,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
 use Drupal\pathauto\PathautoGeneratorInterface;
+use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\KernelTestBase;
 
 /**
@@ -285,7 +286,7 @@ class PathautoUnitTest extends KernelTestBase {
     $node = $this->drupalCreateNode(array('title' => 'First title'));
     $this->assertEntityAlias($node, '/content/first-title');
 
-    $node->path->pathauto = TRUE;
+    $node->path->pathauto = PathautoState::CREATE;
 
     // Default action is PATHAUTO_UPDATE_ACTION_DELETE.
     $config->set('update_action', PathautoGeneratorInterface::UPDATE_ACTION_DELETE);

@@ -48,18 +48,6 @@ class PathautoWidget extends PathWidget {
       return $element;
     }
 
-
-    if (!isset($entity->path->pathauto)) {
-      if (!$entity->isNew()) {
-        module_load_include('inc', 'pathauto');
-        $path = \Drupal::service('path.alias_manager')->getAliasByPath('/' . $entity->urlInfo()->getInternalPath(), $entity->language()->getId());
-        $pathauto_alias = \Drupal::service('pathauto.manager')->createEntityAlias($entity, 'return');
-        $entity->path->pathauto = ($path != '/' . $entity->urlInfo()->getInternalPath() && $path == $pathauto_alias);
-      }
-      else {
-        $entity->path->pathauto = TRUE;
-      }
-    }
     $element['pathauto'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Generate automatic URL alias'),
@@ -76,9 +64,9 @@ class PathautoWidget extends PathWidget {
     // Override path.module's vertical tabs summary.
     $element['alias']['#attached']['library'] = ['pathauto/widget'];
 
-    if ($entity->path->pathauto && !empty($entity->old_alias) && empty($entity->path->alias)) {
-      $element['alias']['#default_value'] = $entity->old_alias;
-      $entity->path->alias = $entity->old_alias;
+    if ($entity->path->pathauto == PathautoState::CREATE && !empty($entity->path->old_alias) && empty($entity->path->alias)) {
+      $element['alias']['#default_value'] = $entity->path->old_alias;
+      $entity->path->alias = $entity->path->old_alias;
     }
 
 

@@ -283,7 +283,7 @@ class PathautoGenerator implements PathautoGeneratorInterface {
     }
 
     // Skip if pathauto processing is disabled.
-    if (isset($entity->path->pathauto) && empty($entity->path->pathauto) && empty($options['force'])) {
+    if ($entity->path->pathauto != PathautoState::CREATE && empty($options['force'])) {
       return NULL;
     }
 

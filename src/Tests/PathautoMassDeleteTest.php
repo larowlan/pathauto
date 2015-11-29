@@ -161,7 +161,7 @@ class PathautoMassDeleteTest extends WebTestBase {
     // Check that we have aliases for the entities.
     foreach (array('nodes', 'accounts', 'terms') as $attribute) {
       foreach ($this->{$attribute} as $entity) {
-        $this->assertEntityAliasExists($node);
+        $this->assertEntityAliasExists($entity);
       }
     }
   }

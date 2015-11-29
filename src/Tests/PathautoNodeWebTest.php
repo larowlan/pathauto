@@ -7,6 +7,8 @@
 
 namespace Drupal\pathauto\Tests;
 use Drupal\pathauto\Entity\PathautoPattern;
+use Drupal\node\Entity\Node;
+use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -167,6 +169,89 @@ class PathautoNodeWebTest extends WebTestBase {
 
     $this->assertEntityAlias($node1, '/content/' . $node1->getTitle());
     $this->assertEntityAlias($node2, '/node/' . $node2->id());
+  }
+
+  /**
+   * @todo Merge this with existing node test methods?
+   */
+  public function testNodeState() {
+    $nodeNoAliasUser = $this->drupalCreateUser(array('bypass node access'));
+    $nodeAliasUser = $this->drupalCreateUser(array('bypass node access', 'create url aliases'));
+
+    $node = $this->drupalCreateNode(array(
+      'title' => 'Node version one',
+      'type' => 'page',
+      'path' => array(
+        'pathauto' => PathautoState::SKIP,
+      ),
+    ));
+
+    $this->assertNoEntityAlias($node);
+
+    // Set a manual path alias for the node.
+    $node->path->alias = '/test-alias';
+    $node->save();
+
+    // Ensure that the pathauto field was saved to the database.
+    \Drupal::entityManager()->getStorage('node')->resetCache();
+    $node = Node::load($node->id());
+    $this->assertIdentical($node->path->pathauto, PathautoState::SKIP);
+
+    // Ensure that the manual path alias was saved and an automatic alias was not generated.
+    $this->assertEntityAlias($node, '/test-alias');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-one');
+
+    // Save the node as a user who does not have access to path fieldset.
+    $this->drupalLogin($nodeNoAliasUser);
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertNoFieldByName('path[0][pathauto]');
+
+    $edit = array('title[0][value]' => 'Node version two');
+    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->assertText('Basic page Node version two has been updated.');
+
+    $this->assertEntityAlias($node, '/test-alias');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-one');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-two');
+
+    // Load the edit node page and check that the Pathauto checkbox is unchecked.
+    $this->drupalLogin($nodeAliasUser);
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertNoFieldChecked('edit-path-0-pathauto');
+
+    // Edit the manual alias and save the node.
+    $edit = array(
+      'title[0][value]' => 'Node version three',
+      'path[0][alias]' => '/manually-edited-alias',
+    );
+    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->assertText('Basic page Node version three has been updated.');
+
+    $this->assertEntityAlias($node, '/manually-edited-alias');
+    $this->assertNoEntityAliasExists($node, '/test-alias');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-one');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-two');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-three');
+
+    // Programatically save the node with an automatic alias.
+    \Drupal::entityManager()->getStorage('node')->resetCache();
+    $node = Node::load($node->id());
+    $node->path->pathauto = PathautoState::CREATE;
+    $node->save();
+
+    // Ensure that the pathauto field was saved to the database.
+    \Drupal::entityManager()->getStorage('node')->resetCache();
+    $node = Node::load($node->id());
+    $this->assertIdentical($node->path->pathauto, PathautoState::CREATE);
+
+    $this->assertEntityAlias($node, '/content/node-version-three');
+    $this->assertNoEntityAliasExists($node, '/manually-edited-alias');
+    $this->assertNoEntityAliasExists($node, '/test-alias');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-one');
+    $this->assertNoEntityAliasExists($node, '/content/node-version-two');
+
+    $node->delete();
+    $this->assertNull(\Drupal::keyValue('pathauto_state.node')->get($node->id()), 'Pathauto state was deleted');
   }
 
 }

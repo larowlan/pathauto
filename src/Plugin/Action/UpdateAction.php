@@ -9,6 +9,7 @@ namespace Drupal\pathauto\Plugin\Action;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\pathauto\PathautoState;
 
 /**
  * Pathauto entity update action.
@@ -24,8 +25,7 @@ class UpdateAction extends ActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $entity->path = new \stdClass();
-    $entity->path->pathauto = TRUE;
+    $entity->path->pathauto = PathautoState::CREATE;
     \Drupal::service('pathauto.manager')->updateEntityAlias($entity, 'bulkupdate', array('message' => TRUE));
   }
 
