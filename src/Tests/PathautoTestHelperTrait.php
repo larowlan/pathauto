@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\pathauto\Entity\PathautoPattern;
+use Drupal\pathauto\PathautoPatternInterface;
 use Drupal\taxonomy\VocabularyInterface;
 
 /**
@@ -24,20 +25,48 @@ trait PathautoTestHelperTrait {
    *
    * @param string $entity_type_id
    *   The entity type.
-   * @param $pattern
+   * @param string $pattern
    *   The path pattern.
+   * @param int $weight
+   *   (optional) The pattern weight.
    *
    * @return \Drupal\pathauto\PathautoPatternInterface
    *   The created pattern.
    */
-  protected function createPattern($entity_type_id, $pattern) {
+  protected function createPattern($entity_type_id, $pattern, $weight = 10) {
     $pattern = PathautoPattern::create([
       'id' => Unicode::strtolower($this->randomMachineName()),
       'type' => 'canonical_entities:' . $entity_type_id,
       'pattern' => $pattern,
+      'weight' => $weight,
     ]);
     $pattern->save();
     return $pattern;
+  }
+
+  /**
+   * Add a bundle condition to a pathauto pattern.
+   *
+   * @param \Drupal\pathauto\PathautoPatternInterface $pattern
+   *   The pattern.
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param string $bundle
+   *   The bundle
+   */
+  protected function addBundleCondition(PathautoPatternInterface $pattern, $entity_type, $bundle) {
+    $pattern->addSelectionCondition(
+      [
+        'id' => 'entity_bundle:' . $entity_type,
+        'bundles' => [
+          $bundle => $bundle,
+        ],
+        'negate' => FALSE,
+        'context_mapping' => [
+          $entity_type => $entity_type,
+        ]
+      ]
+    );
   }
 
   public function assertToken($type, $object, $token, $expected) {
@@ -144,7 +173,6 @@ trait PathautoTestHelperTrait {
   }
 
   public function assertEntityPattern($entity_type, $bundle, $langcode = Language::LANGCODE_NOT_SPECIFIED, $expected) {
-    \Drupal::service('pathauto.generator')->resetCaches();
 
     $values = [
       'langcode' => $langcode,

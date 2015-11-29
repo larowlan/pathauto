@@ -128,7 +128,6 @@ class PathautoNodeWebTest extends WebTestBase {
     foreach (PathautoPattern::loadMultiple($ids) as $pattern) {
       $pattern->delete();
     }
-    \Drupal::service('pathauto.generator')->resetCaches();
 
     $this->drupalGet('node/add/article');
     $this->assertNoFieldById('edit-path-0-pathauto');

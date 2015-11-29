@@ -152,6 +152,9 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
         'label' => $context->getContextDefinition()->getLabel()
       ];
     }
+
+    // Invalidate the static caches.
+    \Drupal::service('pathauto.generator')->resetCaches();
   }
 
   /**
@@ -177,6 +180,15 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
       }
     }
     parent::postLoad($storage, $entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+    // Invalidate the static caches.
+    \Drupal::service('pathauto.generator')->resetCaches();
   }
 
   /**

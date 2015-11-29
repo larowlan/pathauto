@@ -67,6 +67,10 @@ class PathautoMassDeleteTest extends WebTestBase {
     );
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
+
+    $this->createPattern('node', '/content/[node:title]');
+    $this->createPattern('user', '/users/[user:name]');
+    $this->createPattern('taxonomy_term', '/[term:vocabulary]/[term:name]');
   }
 
   /**
@@ -87,7 +91,7 @@ class PathautoMassDeleteTest extends WebTestBase {
 
     // 2. Test deleting only specific (entity type) aliases.
     $manager = $this->container->get('plugin.manager.alias_type');
-    $pathauto_plugins = array('node' => 'nodes', 'taxonomy_term' => 'terms', 'user' => 'accounts');
+    $pathauto_plugins = array('canonical_entities:node' => 'nodes', 'canonical_entities:taxonomy_term' => 'terms', 'canonical_entities:user' => 'accounts');
     foreach ($pathauto_plugins as $pathauto_plugin => $attribute) {
       $this->generateAliases();
       $edit = array(
