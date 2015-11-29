@@ -21,6 +21,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\pathauto\PathautoState;
 
 /**
  * The default ignore word list.
@@ -70,34 +71,6 @@ function pathauto_entity_bundle_delete($entity_type, $bundle) {
 }
 
 /**
- * Implements hook_entity_load().
- */
-function pathauto_entity_load($entities, $entity_type) {
-  // Statically cache which entity types have data in the pathauto_state
-  // table to avoid unnecessary queries for entities that would not have any
-  // data anyway.
-  static $loadable_types;
-  if (!isset($loadable_types)) {
-    $loadable_types = &drupal_static(__FUNCTION__);
-    if (!isset($loadable_types)) {
-      $loadable_types = db_query("SELECT DISTINCT entity_type FROM {pathauto_state}")->fetchCol();
-    }
-  }
-
-  // Check if this entity type has loadable records.
-  if (!in_array($entity_type, $loadable_types)) {
-    return;
-  }
-
-  $states = pathauto_entity_state_load_multiple($entity_type, array_keys($entities));
-  foreach ($states as $id => $state) {
-    if ($entities[$id]->hasField('path') && !isset($entities[$id]->path->pathauto)) {
-      $entities[$id]->path->pathauto = $state;
-    }
-  }
-}
-
-/**
  * Implements hook_entity_presave().
  */
 function pathauto_entity_presave($entity) {
@@ -105,15 +78,8 @@ function pathauto_entity_presave($entity) {
     return;
   }
 
-  if (isset($entity->path->pathauto)) {
-    // We must set an empty alias string for the path to prevent saving an
-    // alias.
-    $entity->path->alias = '';
-  }
-
   // About to be saved (before insert/update)
-  if (!empty($entity->path->pathauto) && isset($entity->path->old_alias)
-      && $entity->path->alias == '' && $entity->path->old_alias != '') {
+  if ($entity->path->pathauto == PathautoState::SKIP && $entity->path->old_alias != '') {
     /*
      * There was an old alias, but when pathauto_perform_alias was checked
      * the javascript disabled the textbox which led to an empty value being
@@ -121,14 +87,6 @@ function pathauto_entity_presave($entity) {
      * from deleting any old alias before Pathauto gets control.
      */
     $entity->path->alias = $entity->path->old_alias;
-  }
-
-  // Help prevent errors with progromatically creating entities by defining
-  // path['alias'] as an empty string.
-  // @see http://drupal.org/node/1328180
-  // @see http://drupal.org/node/1576552
-  if (isset($entity->path->pathauto) && !isset($entity->path->alias)) {
-    $entity->path->alias = '';
   }
 }
 
@@ -154,80 +112,9 @@ function pathauto_entity_delete(EntityInterface $entity) {
   if ($entity->hasLinkTemplate('canonical')) {
     \Drupal::service('pathauto.alias_storage_helper')->deleteEntityPathAll($entity);
   }
-  if ($entity instanceof ContentEntityInterface && $entity->hasField('path') && isset($entity->path->pathauto)) {
-    pathauto_entity_state_delete($entity);
+  if ($entity instanceof ContentEntityInterface && $entity->hasField('path')) {
+    $entity->path->first()->get('pathauto')->purge();
   }
-}
-
-
-/**
- * Load a pathauto state for an entity.
- *
- * @param string $entity_type
- *   An entity type.
- * @param int $entity_id
- *   An entity ID.
- *
- * @return bool
- *   A value that evaluates to TRUE if Pathauto should control this entity's
- *   path. A value that evaluates to FALSE if Pathauto should not manage the
- *   entity's path.
- */
-function pathauto_entity_state_load($entity_type, $entity_id) {
-  $pathauto_state = pathauto_entity_state_load_multiple($entity_type, array($entity_id));
-  return !empty($pathauto_state) ? reset($pathauto_state) : FALSE;
-}
-
-/**
- * Load a pathauto state for multiple entities.
- *
- * @param string $entity_type
- *   The entity type.
- * @param int[] $entity_ids
- *   The array of entity IDs.
- *
- * @return bool[]
- *   An array of Pathauto states keyed by entity ID.
- */
-function pathauto_entity_state_load_multiple($entity_type, $entity_ids) {
-  return db_query("SELECT entity_id, pathauto FROM {pathauto_state} WHERE entity_type = :entity_type AND entity_id IN (:entity_ids[])", array(':entity_type' => $entity_type, ':entity_ids[]' => $entity_ids))->fetchAllKeyed();
-}
-
-/**
- * Save the pathauto state for an entity.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity object.
- * @param bool $pathauto_state
- *   A value that evaluates to TRUE means that Pathauto should keep controlling
- *   this entity's path in the future. A value that evaluates to FALSE means
- *   that Pathauto should not manage the entity's path.
- */
-function pathauto_entity_state_save($entity, $pathauto_state) {
-  db_merge('pathauto_state')
-    ->key(array(
-      'entity_type' => $entity->getEntityTypeId(),
-      'entity_id' => $entity->id(),
-    ))
-    ->fields(array(
-      'pathauto' => $pathauto_state ? 1 : 0,
-    ))
-    ->execute();
-  drupal_static_reset('pathauto_entity_load');
-}
-
-/**
- * Delete the pathauto state for an entity.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity object.
- */
-function pathauto_entity_state_delete($entity) {
-  db_delete('pathauto_state')
-    ->condition('entity_type', $entity->getEntityTypeId())
-    ->condition('entity_id', $entity->id())
-    ->execute();
-  drupal_static_reset('pathauto_entity_load');
 }
 
 /**
@@ -255,6 +142,7 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setCustomStorage(TRUE)
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
+      ->setComputed(TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'path',
         'weight' => 30,
@@ -262,5 +150,16 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function pathauto_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
+  if (isset($fields['path'])) {
+    // Path fields need to be computed so that the pathauto state can be
+    // accessed even if there is no alias being set.
+    $fields['path']->setComputed(TRUE);
   }
 }

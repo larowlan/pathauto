@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Tests;
 use Drupal\node\Entity\Node;
+use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -174,7 +175,7 @@ class PathautoNodeWebTest extends WebTestBase {
       'title' => 'Node version one',
       'type' => 'page',
       'path' => array(
-        'pathauto' => FALSE,
+        'pathauto' => PathautoState::SKIP,
       ),
     ));
 
@@ -187,7 +188,7 @@ class PathautoNodeWebTest extends WebTestBase {
     // Ensure that the pathauto field was saved to the database.
     \Drupal::entityManager()->getStorage('node')->resetCache();
     $node = Node::load($node->id());
-    $this->assertFalse($node->path->pathauto);
+    $this->assertIdentical($node->path->pathauto, PathautoState::SKIP);
 
     // Ensure that the manual path alias was saved and an automatic alias was not generated.
     $this->assertEntityAlias($node, '/test-alias');
@@ -228,19 +229,22 @@ class PathautoNodeWebTest extends WebTestBase {
     // Programatically save the node with an automatic alias.
     \Drupal::entityManager()->getStorage('node')->resetCache();
     $node = Node::load($node->id());
-    $node->path->pathauto = TRUE;
+    $node->path->pathauto = PathautoState::CREATE;
     $node->save();
 
     // Ensure that the pathauto field was saved to the database.
     \Drupal::entityManager()->getStorage('node')->resetCache();
     $node = Node::load($node->id());
-    $this->assertTrue($node->path->pathauto);
+    $this->assertIdentical($node->path->pathauto, PathautoState::CREATE);
 
     $this->assertEntityAlias($node, '/content/node-version-three');
     $this->assertNoEntityAliasExists($node, '/manually-edited-alias');
     $this->assertNoEntityAliasExists($node, '/test-alias');
     $this->assertNoEntityAliasExists($node, '/content/node-version-one');
     $this->assertNoEntityAliasExists($node, '/content/node-version-two');
+
+    $node->delete();
+    $this->assertNull(\Drupal::keyValue('pathauto_state.node')->get($node->id()), 'Pathauto state was deleted');
   }
 
 }

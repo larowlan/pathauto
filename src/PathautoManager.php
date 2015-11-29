@@ -263,11 +263,9 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     // Skip if pathauto processing is disabled.
-    if (isset($entity->path->pathauto) && empty($entity->path->pathauto) && empty($options['force'])) {
+    if ($entity->path->pathauto != PathautoState::CREATE && empty($options['force'])) {
       return NULL;
     }
-
-    pathauto_entity_state_save($entity, $entity->path->pathauto);
 
     $options += array('language' => $entity->language()->getId());
     $type = $entity->getEntityTypeId();

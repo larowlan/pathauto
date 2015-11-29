@@ -74,8 +74,8 @@ trait PathautoTestHelperTrait {
         break;
       }
     }
-    $this->assertIdentical($alias['alias'], $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.",
-      array('%source' => $source, '%actual' => $alias['alias'], '%expected' => $expected_alias, '@language' => $langcode)));
+    $this->assertIdentical($alias['alias'], $expected_alias, t("Alias for %source with language '@language' is correct.",
+      array('%source' => $source, '@language' => $langcode)));
   }
 
   public function assertAliasExists($conditions) {

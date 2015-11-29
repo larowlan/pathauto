@@ -11,6 +11,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
 use Drupal\node\Entity\NodeType;
 use Drupal\pathauto\PathautoManagerInterface;
+use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\KernelTestBase;
 
 /**
@@ -30,7 +31,6 @@ class PathautoUnitTest extends KernelTestBase {
     parent::setup();
 
     $this->installConfig(array('pathauto', 'taxonomy', 'system', 'node'));
-    $this->installSchema('pathauto', array('pathauto_state'));
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
@@ -204,7 +204,7 @@ class PathautoUnitTest extends KernelTestBase {
     $node = $this->drupalCreateNode(array('title' => 'First title'));
     $this->assertEntityAlias($node, '/content/first-title');
 
-    $node->path->pathauto = TRUE;
+    $node->path->pathauto = PathautoState::CREATE;
 
     // Default action is PATHAUTO_UPDATE_ACTION_DELETE.
     $config->set('update_action', PathautoManagerInterface::UPDATE_ACTION_DELETE);
