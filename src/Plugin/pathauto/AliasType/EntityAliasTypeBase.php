@@ -9,6 +9,7 @@ namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -270,9 +271,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    * {@inheritdoc}
    */
   public function applies($object) {
-    $definition = $this->entityManager->getDefinition($this->getEntityTypeId());
-    $class = $definition->getClass();
-    return ($object instanceof $class);
+    return $object instanceof FieldableEntityInterface && $object->getEntityTypeId() == $this->getEntityTypeId();
   }
 
   /**
