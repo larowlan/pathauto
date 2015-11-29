@@ -95,14 +95,14 @@ function pathauto_entity_presave($entity) {
  * Implements hook_entity_insert().
  */
 function pathauto_entity_insert(EntityInterface $entity) {
-  \Drupal::service('pathauto.manager')->updateEntityAlias($entity, 'insert');
+  \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'insert');
 }
 
 /**
  * Implements hook_entity_update().
  */
 function pathauto_entity_update(EntityInterface $entity) {
-  \Drupal::service('pathauto.manager')->updateEntityAlias($entity, 'update');
+  \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'update');
 }
 
 

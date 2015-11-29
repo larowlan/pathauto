@@ -144,7 +144,7 @@ trait PathautoTestHelperTrait {
   }
 
   public function assertEntityPattern($entity_type, $bundle, $langcode = Language::LANGCODE_NOT_SPECIFIED, $expected) {
-    \Drupal::service('pathauto.manager')->resetCaches();
+    \Drupal::service('pathauto.generator')->resetCaches();
 
     $values = [
       'langcode' => $langcode,
@@ -152,7 +152,7 @@ trait PathautoTestHelperTrait {
     ];
     $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->create($values);
 
-    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
+    $pattern = \Drupal::service('pathauto.generator')->getPatternByEntity($entity);
     $this->assertIdentical($expected, $pattern->getPattern());
   }
 

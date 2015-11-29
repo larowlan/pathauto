@@ -190,7 +190,7 @@ class PathautoUnitTest extends KernelTestBase {
     foreach ($tests as $test) {
       $entity = \Drupal::entityManager()->getStorage($test['entity'])->create($test['values']);
       $entity->save();
-      $actual = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
+      $actual = \Drupal::service('pathauto.generator')->getPatternByEntity($entity);
       $this->assertIdentical($actual->getPattern(), $test['expected'], t("Correct pattern returned for @entity_type with @values", array(
         '@entity' => $test['entity'],
         '@values' => print_r($test['values'], TRUE),
@@ -210,7 +210,7 @@ class PathautoUnitTest extends KernelTestBase {
     $config->set('max_component_length', 35);
     $config->set('transliterate', TRUE);
     $config->save();
-    \Drupal::service('pathauto.manager')->resetCaches();
+    \Drupal::service('pathauto.generator')->resetCaches();
 
     // Test the 'ignored words' removal.
     $tests['this'] = 'this';
@@ -250,7 +250,7 @@ class PathautoUnitTest extends KernelTestBase {
 
     foreach ($tests as $input => $expected) {
       $output = \Drupal::service('pathauto.alias_cleaner')->cleanAlias($input);
-      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.manager')->cleanAlias('@input') expected '@expected', actual '@output'", array(
+      $this->assertEqual($output, $expected, t("Drupal::service('pathauto.generator')->cleanAlias('@input') expected '@expected', actual '@output'", array(
         '@input' => $input,
         '@expected' => $expected,
         '@output' => $output,
@@ -275,7 +275,7 @@ class PathautoUnitTest extends KernelTestBase {
   }
 
   /**
-   * Test the different update actions in \Drupal::service('pathauto.manager')->createEntityAlias().
+   * Test the different update actions in \Drupal::service('pathauto.generator')->createEntityAlias().
    */
   public function testUpdateActions() {
     $config = $this->config('pathauto.settings');
@@ -329,12 +329,12 @@ class PathautoUnitTest extends KernelTestBase {
     // Test PATHAUTO_UPDATE_ACTION_NO_NEW with unaliased node and 'bulkupdate'.
     $this->deleteAllAliases();
     $node->setTitle('Sixth title');
-    \Drupal::service('pathauto.manager')->updateEntityAlias($node, 'bulkupdate');
+    \Drupal::service('pathauto.generator')->updateEntityAlias($node, 'bulkupdate');
     $this->assertEntityAlias($node, '/content/sixth-title');
   }
 
   /**
-   * Test that \Drupal::service('pathauto.manager')->createEntityAlias() will not create an alias for a pattern
+   * Test that \Drupal::service('pathauto.generator')->createEntityAlias() will not create an alias for a pattern
    * that does not get any tokens replaced.
    */
   public function testNoTokensNoAlias() {
@@ -408,7 +408,7 @@ class PathautoUnitTest extends KernelTestBase {
     $this->nodePattern
       ->setPattern('[node:title]')
       ->save();
-    \Drupal::service('pathauto.manager')->resetCaches();
+    \Drupal::service('pathauto.generator')->resetCaches();
 
     // Check that Pathauto does not create an alias of '/admin'.
     $node = $this->drupalCreateNode(array('title' => 'Admin', 'type' => 'page'));

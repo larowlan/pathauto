@@ -1,5 +1,5 @@
 services:
-  pathauto.manager:
+  pathauto.generator:
     class: Drupal\pathauto\PathautoGenerator
     arguments: ['@config.factory', '@module_handler', '@token', '@pathauto.alias_cleaner', '@pathauto.alias_storage_helper', '@pathauto.alias_uniquifier', '@pathauto.verbose_messenger', '@string_translation']
   pathauto.alias_cleaner:

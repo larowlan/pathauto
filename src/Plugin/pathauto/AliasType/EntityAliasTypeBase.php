@@ -240,7 +240,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
 
     $entities = $this->entityManager->getStorage($this->getEntityTypeId())->loadMultiple($ids);
     foreach ($entities as $entity) {
-      \Drupal::service('pathauto.manager')->updateEntityAlias($entity, 'bulkupdate', $options);
+      \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'bulkupdate', $options);
     }
 
     if (!empty($options['message'])) {

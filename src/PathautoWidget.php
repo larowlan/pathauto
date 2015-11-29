@@ -43,7 +43,7 @@ class PathautoWidget extends PathWidget {
 
 
 
-    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity);
+    $pattern = \Drupal::service('pathauto.generator')->getPatternByEntity($entity);
     if (empty($pattern)) {
       return $element;
     }
