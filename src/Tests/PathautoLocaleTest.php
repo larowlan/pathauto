@@ -10,6 +10,7 @@ namespace Drupal\pathauto\Tests;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -65,7 +66,7 @@ class PathautoLocaleTest extends WebTestBase {
     $this->saveAlias('/node/invalid', '/content/english-node', Language::LANGCODE_NOT_SPECIFIED);
 
     // Update the node, triggering a change in the English alias.
-    $node->path->pathauto = TRUE;
+    $node->path->pathauto = PathautoState::CREATE;
     $node->save();
 
     // Check that the new English alias replaced the old one.

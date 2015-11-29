@@ -58,8 +58,12 @@ trait PathautoTestHelperTrait {
     $this->assertEntityAlias($entity, '/' . $entity->urlInfo()->getInternalPath(), $langcode);
   }
 
-  public function assertNoEntityAliasExists(EntityInterface $entity) {
-    $this->assertNoAliasExists(array('source' => '/' . $entity->urlInfo()->getInternalPath()));
+  public function assertNoEntityAliasExists(EntityInterface $entity, $alias = NULL) {
+    $path = array('source' => '/' . $entity->urlInfo()->getInternalPath());
+    if (!empty($alias)) {
+      $path['alias'] = $alias;
+    }
+    $this->assertNoAliasExists($path);
   }
 
   public function assertAlias($source, $expected_alias, $langcode = Language::LANGCODE_NOT_SPECIFIED) {
@@ -70,8 +74,8 @@ trait PathautoTestHelperTrait {
         break;
       }
     }
-    $this->assertIdentical($alias['alias'], $expected_alias, t("Alias for %source with language '@language' was %actual, expected %expected.",
-      array('%source' => $source, '%actual' => $alias['alias'], '%expected' => $expected_alias, '@language' => $langcode)));
+    $this->assertIdentical($alias['alias'], $expected_alias, t("Alias for %source with language '@language' is correct.",
+      array('%source' => $source, '@language' => $langcode)));
   }
 
   public function assertAliasExists($conditions) {

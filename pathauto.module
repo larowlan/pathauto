@@ -21,6 +21,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\pathauto\PathautoState;
 
 /**
  * The default ignore word list.
@@ -69,7 +70,6 @@ function pathauto_entity_bundle_delete($entity_type, $bundle) {
   $config->save();
 }
 
-
 /**
  * Implements hook_entity_presave().
  */
@@ -77,9 +77,9 @@ function pathauto_entity_presave($entity) {
   if (!($entity instanceof ContentEntityInterface) || $entity->hasField('path')) {
     return;
   }
+
   // About to be saved (before insert/update)
-  if (!empty($entity->path->pathauto) && isset($entity->path->old_alias)
-      && $entity->path->alias == '' && $entity->path->old_alias != '') {
+  if ($entity->path->pathauto == PathautoState::SKIP && $entity->path->old_alias != '') {
     /*
      * There was an old alias, but when pathauto_perform_alias was checked
      * the javascript disabled the textbox which led to an empty value being
@@ -87,14 +87,6 @@ function pathauto_entity_presave($entity) {
      * from deleting any old alias before Pathauto gets control.
      */
     $entity->path->alias = $entity->path->old_alias;
-  }
-
-  // Help prevent errors with progromatically creating entities by defining
-  // path['alias'] as an empty string.
-  // @see http://drupal.org/node/1328180
-  // @see http://drupal.org/node/1576552
-  if (isset($entity->path->pathauto) && !isset($entity->path->alias)) {
-    $entity->path->alias = '';
   }
 }
 
@@ -119,6 +111,9 @@ function pathauto_entity_update(EntityInterface $entity) {
 function pathauto_entity_delete(EntityInterface $entity) {
   if ($entity->hasLinkTemplate('canonical')) {
     \Drupal::service('pathauto.alias_storage_helper')->deleteEntityPathAll($entity);
+  }
+  if ($entity instanceof ContentEntityInterface && $entity->hasField('path')) {
+    $entity->path->first()->get('pathauto')->purge();
   }
 }
 
@@ -147,6 +142,7 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setCustomStorage(TRUE)
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
+      ->setComputed(TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'path',
         'weight' => 30,
@@ -154,5 +150,16 @@ function pathauto_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function pathauto_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
+  if (isset($fields['path'])) {
+    // Path fields need to be computed so that the pathauto state can be
+    // accessed even if there is no alias being set.
+    $fields['path']->setComputed(TRUE);
   }
 }

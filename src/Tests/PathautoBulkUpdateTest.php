@@ -7,6 +7,7 @@
 
 namespace Drupal\pathauto\Tests;
 
+use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -73,7 +74,11 @@ class PathautoBulkUpdateTest extends WebTestBase {
       'update[user]' => TRUE,
     );
     $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, t('Update'));
-    $this->assertText('Generated 7 URL aliases.'); // 5 nodes + 2 users
+
+    // This has generated 6 aliases. 5 nodes and one user that we created. There
+    // is also UID 1 but that user was created before the path field existed,
+    // so he does not have a pathauto state.
+    $this->assertText('Generated 6 URL aliases.');
 
     // Check that aliases have actually been created.
     foreach ($this->nodes as $node) {
@@ -82,12 +87,12 @@ class PathautoBulkUpdateTest extends WebTestBase {
     $this->assertEntityAliasExists($this->adminUser);
 
     // Add a new node.
-    $new_node = $this->drupalCreateNode(array('path' => array('alias' => '', 'pathauto' => FALSE)));
+    $new_node = $this->drupalCreateNode(array('path' => array('alias' => '', 'pathauto' => PathautoState::SKIP)));
 
-    // Run the update again which should only run against the new node.
+    // Run the update again which should not run against any nodes.
     $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, t('Update'));
-    $this->assertText('Generated 1 URL alias.'); // 1 node + 0 users
+    $this->assertText('No new URL aliases to generate.');
 
-    $this->assertEntityAliasExists($new_node);
+    $this->assertNoEntityAliasExists($new_node);
   }
 }
