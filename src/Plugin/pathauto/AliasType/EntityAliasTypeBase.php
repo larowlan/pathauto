@@ -7,11 +7,9 @@
 
 namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginBase;
@@ -46,9 +44,9 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   /**
    * The entity manager service.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * The path prefix for this entity type.
@@ -70,15 +68,14 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    *   The module handler service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager service.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, EntityManagerInterface $entity_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;
-    $this->entityManager = $entity_manager;
-    $this->setConfiguration($configuration);
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -91,32 +88,8 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
       $plugin_definition,
       $container->get('module_handler'),
       $container->get('language_manager'),
-      $container->get('entity.manager')
+      $container->get('entity_type.manager')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfiguration() {
-    return $this->configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfiguration(array $configuration) {
-    $this->configuration = NestedArray::mergeDeep(
-      $this->defaultConfiguration(),
-      $configuration
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return array();
   }
 
   /**
@@ -146,43 +119,13 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form = array(
-      '#type' => 'details',
-      '#title' => $this->getLabel(),
-    );
-
-    $form['default'] = array(
-      '#type' => 'textfield',
-      '#title' => 'Path pattern',
-      '#default_value' => !empty($this->configuration['default']) ? $this->configuration['default'] : '',
-      '#size' => 65,
-      '#maxlength' => 1280,
-      '#element_validate' => array('token_element_validate'),
-      '#after_build' => array('token_element_validate'),
-      '#token_types' => $this->getTokenTypes(),
-      '#min_tokens' => 1,
-    );
-
-    // Show the token help relevant to this pattern type.
-    $form['token_help'] = array(
-      '#theme' => 'token_tree',
-      '#token_types' => $this->getTokenTypes(),
-      '#dialog' => TRUE,
-    );
-    return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function batchUpdate(&$context) {
     if (!isset($context['sandbox']['current'])) {
       $context['sandbox']['count'] = 0;
       $context['sandbox']['current'] = 0;
     }
 
-    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
+    $entity_type = $this->entityTypeManager->getDefinition($this->getEntityTypeId());
     $id_key = $entity_type->getKey('id');
 
     $query = db_select($entity_type->get('base_table'), 'base_table');
@@ -239,7 +182,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
   protected function bulkUpdate(array $ids, array $options = array()) {
     $options += array('message' => FALSE);
 
-    $entities = $this->entityManager->getStorage($this->getEntityTypeId())->loadMultiple($ids);
+    $entities = $this->entityTypeManager->getStorage($this->getEntityTypeId())->loadMultiple($ids);
     foreach ($entities as $entity) {
       \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'bulkupdate', $options);
     }
@@ -253,18 +196,9 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $dependencies = [];
+    $dependencies['module'][] = $this->entityTypeManager->getDefinition($this->getEntityTypeId())->getProvider();
+    return $dependencies;
   }
 
   /**
@@ -279,7 +213,7 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
    */
   public function getSourcePrefix() {
     if (empty($this->prefix)) {
-      $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
+      $entity_type = $this->entityTypeManager->getDefinition($this->getEntityTypeId());
       $path = $entity_type->getLinkTemplate('canonical');
       $this->prefix = substr($path, 0, strpos($path, '{'));
     }

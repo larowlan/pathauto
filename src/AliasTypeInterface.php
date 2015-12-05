@@ -7,14 +7,13 @@
 
 namespace Drupal\pathauto;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
-use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
  * Provides an interface for pathauto alias types.
  */
-interface AliasTypeInterface extends ContextAwarePluginInterface, ConfigurablePluginInterface, PluginFormInterface {
+interface AliasTypeInterface extends ContextAwarePluginInterface, DerivativeInspectionInterface {
 
   /**
    * Get the label.

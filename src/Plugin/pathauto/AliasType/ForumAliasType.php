@@ -8,7 +8,6 @@
 namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\pathauto\AliasTypeBatchUpdateInterface;
 
 /**
  * A pathauto alias type plugin for forum terms.
@@ -22,12 +21,6 @@ use Drupal\pathauto\AliasTypeBatchUpdateInterface;
  */
 class ForumAliasType extends EntityAliasTypeBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return array('default' => array('/[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
-  }
 
   /**
    * {@inheritdoc}

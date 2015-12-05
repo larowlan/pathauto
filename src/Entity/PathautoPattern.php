@@ -26,12 +26,12 @@ use Drupal\pathauto\PathautoPatternInterface;
  *   handlers = {
  *     "list_builder" = "Drupal\pathauto\PathautoPatternListBuilder",
  *     "form" = {
+ *       "default" = "Drupal\pathauto\Form\PatternEditForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
- *     "wizard" = {
- *       "add" = "Drupal\pathauto\Wizard\PatternWizardAdd",
- *       "edit" = "Drupal\pathauto\Wizard\PatternWizard"
- *     }
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   config_prefix = "pattern",
  *   admin_permission = "administer pathauto",
@@ -46,7 +46,7 @@ use Drupal\pathauto\PathautoPatternInterface;
  *   },
  *   links = {
  *     "collection" = "/admin/config/search/path/patterns",
- *     "edit-form" = "/admin/config/search/path/patterns/{machine_name}/{step}",
+ *     "edit-form" = "/admin/config/search/path/patterns/{pathauto_pattern}",
  *     "delete-form" = "/admin/config/search/path/patterns/{pathauto_pattern}/delete"
  *   }
  * )
@@ -204,21 +204,6 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
     }
 
     return $this->getDependencies();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function urlRouteParameters($rel) {
-    $uri_route_parameters =  parent::urlRouteParameters($rel);
-    // @todo Improve detection, check the path string?
-    if (in_array($rel, ['edit-form', 'config-translation-overview'])) {
-      $uri_route_parameters = [
-        'machine_name' => $this->id(),
-        'step' => 'general',
-      ];
-    }
-    return $uri_route_parameters;
   }
 
   /**

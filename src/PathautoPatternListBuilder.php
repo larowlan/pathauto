@@ -26,9 +26,10 @@ class PathautoPatternListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Pathauto pattern');
-    $header['id'] = $this->t('Machine name');
+    $header['label'] = $this->t('Label');
+    $header['pattern'] = $this->t('Pattern');
     $header['type'] = $this->t('Pattern type');
+    $header['conditions'] = $this->t('Conditions');
     return $header + parent::buildHeader();
   }
 
@@ -38,8 +39,12 @@ class PathautoPatternListBuilder extends DraggableListBuilder {
   public function buildRow(EntityInterface $entity) {
     /* @var \Drupal\pathauto\PathautoPatternInterface $entity */
     $row['label'] = $entity->label();
-    $row['id']['#markup'] = $entity->id();
+    $row['patern']['#markup'] = $entity->getPattern();
     $row['type']['#markup'] = $entity->getAliasType()->getLabel();
+    $row['conditions']['#theme'] = 'item_list';
+    foreach ($entity->getSelectionConditions() as $condition) {
+      $row['conditions']['#items'][] = $condition->summary();
+    }
     return $row + parent::buildRow($entity);
   }
 
