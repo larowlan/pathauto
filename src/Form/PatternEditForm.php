@@ -143,7 +143,7 @@ class PatternEditForm extends EntityForm {
           }
         }
 
-        if ($bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type->id())) {
+        if ($entity_type->hasKey('bundle') && $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type->id())) {
           $bundle_options = [];
           foreach ($bundles as $id => $info) {
             $bundle_options[$id] = $info['label'];
