@@ -277,7 +277,9 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     // Deal with taxonomy specific logic.
+    $data = array($type => $entity);
     if ($type == 'taxonomy_term') {
+      $data['term'] = $entity;
 
       $config_forum = $this->configFactory->get('forum.settings');
       if ($entity->getVocabularyId() == $config_forum->get('vocabulary')) {
@@ -286,13 +288,11 @@ class PathautoManager implements PathautoManagerInterface {
     }
 
     $result = $this->createAlias(
-      $type, $op, '/' . $entity->urlInfo()->getInternalPath(), array($type => $entity), $bundle, $options['language']);
+      $type, $op, '/' . $entity->urlInfo()->getInternalPath(), $data, $bundle, $options['language']);
 
-    if ($type == 'taxonomy_term' && empty($options['is_child'])) {
-      // For all children generate new aliases.
-      $options['is_child'] = TRUE;
+    if ($type == 'taxonomy_term') {
       unset($options['language']);
-      foreach ($this->getTermTree($entity->getVocabularyId(), $entity->id(), NULL, TRUE) as $subterm) {
+      foreach ($this->loadTermChildren($entity->id()) as $subterm) {
         $this->updateAlias($subterm, $op, $options);
       }
     }
@@ -301,29 +301,16 @@ class PathautoManager implements PathautoManagerInterface {
   }
 
   /**
-   * Create a hierarchical representation of a vocabulary.
+   * Finds all children of a term ID.
    *
-   * @param int $vid
-   *   The vocabulary ID to generate the tree for.
-   * @param int $parent
-   *   The term ID under which to generate the tree. If 0, generate the tree
-   *   for the entire vocabulary.
-   * @param int $max_depth
-   *   The number of levels of the tree to return. Leave NULL to return all levels.
-   * @param bool $load_entities
-   *   If TRUE, a full entity load will occur on the term objects. Otherwise they
-   *   are partial objects queried directly from the {taxonomy_term_field_data}
-   *   table to save execution time and memory consumption when listing large
-   *   numbers of terms. Defaults to FALSE.
+   * @param int $tid
+   *   Term ID to retrieve parents for.
    *
-   * @return array
-   *   An array of all term objects in the tree. Each term object is extended
-   *   to have "depth" and "parents" attributes in addition to its normal ones.
-   *   Results are statically cached. Term objects will be partial or complete
-   *   depending on the $load_entities parameter.
+   * @return \Drupal\taxonomy\TermInterface[]
+   *   An array of term objects that are the children of the term $tid.
    */
-  protected function getTermTree($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE) {
-    return \Drupal::entityManager()->getStorage('taxonomy_term')->loadTree($vid, $parent, $max_depth, $load_entities);
+  protected function loadTermChildren($tid) {
+    return \Drupal::entityManager()->getStorage('taxonomy_term')->loadChildren($tid);
   }
 
 }
