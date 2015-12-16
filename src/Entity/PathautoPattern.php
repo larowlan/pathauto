@@ -218,7 +218,6 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
    */
   public function setPattern($pattern) {
     $this->pattern = $pattern;
-    $this->getAliasType()->setConfiguration(['default' => $pattern]);
     return $this;
   }
 
