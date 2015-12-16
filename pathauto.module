@@ -75,7 +75,7 @@ function pathauto_entity_bundle_delete($entity_type, $bundle) {
  * Implements hook_entity_presave().
  */
 function pathauto_entity_presave($entity) {
-  if (!($entity instanceof ContentEntityInterface) || $entity->hasField('path')) {
+  if (!($entity instanceof ContentEntityInterface) || !$entity->hasField('path')) {
     return;
   }
 
