@@ -44,6 +44,7 @@ class PathautoState extends TypedData {
       // @todo: Investigate why this happens.
       if ($entity->isNew()) {
         $this->value = static::CREATE;
+        return $this->value;
       }
 
       // If no value has been set or loaded yet, try to load a value if this
