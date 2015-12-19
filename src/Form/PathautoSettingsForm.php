@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\pathauto\Form\MaillogSettingsForm.
+ * Contains \Drupal\pathauto\Form\PathautoSettingsForm.
  */
 
 namespace Drupal\pathauto\Form;
