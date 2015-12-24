@@ -36,7 +36,7 @@ function pathauto_update_8001() {
       $options['type'] = 'path';
       $path_definition->setDisplayOptions('form', $options);
       // Save the new value.
-      $collection->set($key, $path_definition);
+      $collection->set($key, $definitions);
     }
 
   }
