@@ -168,9 +168,8 @@ abstract class EntityAliasTypeBase extends PluginBase implements AliasTypeInterf
 
     // Show the token help relevant to this pattern type.
     $form['token_help'] = array(
-      '#theme' => 'token_tree',
+      '#theme' => 'token_tree_link',
       '#token_types' => $this->getTokenTypes(),
-      '#dialog' => TRUE,
     );
     return $form;
   }
