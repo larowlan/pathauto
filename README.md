@@ -1,9 +1,6 @@
 #Pathauto [![Build Status](https://travis-ci.org/md-systems/pathauto.svg?branch=8.x-1.x)](https://travis-ci.org/md-systems/pathauto)
 
-Please read this file and also the INSTALL.txt.
-They contain answers to many common questions.
-If you are developing for this module, the API.txt may be interesting.
-If you are upgrading, check the CHANGELOG.txt for major changes.
+If you are developing for this module, have a look at pathauto.api.php.
 
 ##Description
 
@@ -27,10 +24,6 @@ automatically using keywords based directly on the page content in the URL,
 relevant search engine hits for your page can be significantly
 enhanced.
 
-##Installation AND Upgrades
-
-See the INSTALL.txt file.
-
 ##Notices
 
 Pathauto just adds URL aliases to content, users, and taxonomy terms.
@@ -52,17 +45,15 @@ Global Redirect modules, which allow you to set forwarding either per item or
 across the site to your aliased URLs.
 
 URLs (not) Getting Replaced With Aliases:
-Please bear in mind that only URLs passed through Drupal's l() or url()
-functions will be replaced with their aliases during page output. If a module
-or your template contains hardcoded links, such as 'href="node/$node->nid"'
-those won't get replaced with their corresponding aliases. Use the
-Drupal API instead:
+Please bear in mind that only URLs passed through Drupal's Link::fromTextAndUrl
+or Url::fromRoute() will be replaced with their aliases during page output. If
+a module or your template contains hardcoded links, such as
+'href="node/$node->nid"', those won't get replaced with their corresponding
+aliases.
 
-* 'href="'. url("node/$node->nid") .'"' or
-* l("Your link title", "node/$node->nid")
-
-See http://api.drupal.org/api/HEAD/function/url and
-http://api.drupal.org/api/HEAD/function/l for more information.
+See https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Link.php/function/Link%3A%3AfromTextAndUrl/8
+and https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Url.php/function/Url%3A%3AfromRoute/8
+for more information.
 
 ## Disabling Pathauto for a specific content type (or taxonomy)
 
