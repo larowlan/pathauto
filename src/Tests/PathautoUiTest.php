@@ -84,20 +84,26 @@ class PathautoUiTest extends WebTestBase {
   }
 
   function testPatternsValidation() {
-    $edit = array();
-    $this->drupalGet('admin/config/search/path/patterns');
-    $edit['node[default]'] = '[node:title]/[user:name]/[term:name]';
-    $edit['node[bundles][page][default]'] = 'page';
-    $this->drupalPostForm('admin/config/search/path/patterns', $edit, 'Save configuration');
-    $this->assertText('The Default path pattern (applies to all content types with blank patterns below) is using the following invalid tokens: [user:name], [term:name].');
-    $this->assertText('The Pattern for all Basic page paths cannot contain fewer than one token.');
+    // Try to save an invalid pattern.
+    $this->drupalGet('admin/config/search/path/patterns/add');
+    $edit = array(
+      'type' => 'canonical_entities:node',
+    );
+    $this->drupalPostAjaxForm(NULL, $edit, 'type');
+    $edit += array(
+      'pattern' => '[node:title]/[user:name]/[term:name]',
+      'bundles[page]' => TRUE,
+      'label' => 'Page pattern',
+      'id' => 'page_pattern',
+    );
+    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->assertText('The Path pattern is using the following invalid tokens: [user:name], [term:name].');
     $this->assertNoText('The configuration options have been saved.');
 
-    $edit['node[default]'] = '[node:title]';
-    $edit['node[bundles][page][default]'] = 'page/[node:title]';
-    $edit['node[bundles][article][default]'] = '';
-    $this->drupalPostForm('admin/config/search/path/patterns', $edit, 'Save configuration');
-    $this->assertText('The configuration options have been saved.');
+    // Fix the pattern, then check that it gets saved successfully.
+    $edit['pattern'] = '[node:title]';
+    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->assertText('Pattern Page pattern saved.');
   }
 
 }
