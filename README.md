@@ -12,8 +12,8 @@ Implementations are provided for core entity types: content, taxonomy terms,
 and users (including blogs and forum pages).
 
 Pathauto also provides a way to delete large numbers of aliases.  This feature
-is available at  Administer > Configuration > Search and metadata > URL aliases
-> Delete aliases.
+is available at  Administer > Configuration > Search and metadata > URL aliases >
+Delete aliases.
 
 ##Benefits
 
@@ -44,16 +44,12 @@ For external links, you might want to consider the Path Redirect or
 Global Redirect modules, which allow you to set forwarding either per item or
 across the site to your aliased URLs.
 
-URLs (not) Getting Replaced With Aliases:
-Please bear in mind that only URLs passed through Drupal's Link::fromTextAndUrl
-or Url::fromRoute() will be replaced with their aliases during page output. If
+###URLs (not) Getting Replaced With Aliases:
+Please bear in mind that only URLs passed through Drupal's Drupal's URL and
+Link APIs will be replaced with their aliases during page output. If
 a module or your template contains hardcoded links, such as
 'href="node/$node->nid"', those won't get replaced with their corresponding
 aliases.
-
-See https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Link.php/function/Link%3A%3AfromTextAndUrl/8
-and https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Url.php/function/Url%3A%3AfromRoute/8
-for more information.
 
 ## Disabling Pathauto for a specific content type (or taxonomy)
 
