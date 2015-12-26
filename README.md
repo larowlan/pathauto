@@ -1,9 +1,6 @@
 #Pathauto [![Build Status](https://travis-ci.org/md-systems/pathauto.svg?branch=8.x-1.x)](https://travis-ci.org/md-systems/pathauto)
 
-Please read this file and also the INSTALL.txt.
-They contain answers to many common questions.
-If you are developing for this module, the API.txt may be interesting.
-If you are upgrading, check the CHANGELOG.txt for major changes.
+If you are developing for this module, have a look at pathauto.api.php.
 
 ##Description
 
@@ -15,8 +12,8 @@ Implementations are provided for core entity types: content, taxonomy terms,
 and users (including blogs and forum pages).
 
 Pathauto also provides a way to delete large numbers of aliases.  This feature
-is available at  Administer > Configuration > Search and metadata > URL aliases
-> Delete aliases.
+is available at  Administer > Configuration > Search and metadata > URL aliases >
+Delete aliases.
 
 ##Benefits
 
@@ -26,10 +23,6 @@ heavy weight to search terms which appear in a page's URL. By
 automatically using keywords based directly on the page content in the URL,
 relevant search engine hits for your page can be significantly
 enhanced.
-
-##Installation AND Upgrades
-
-See the INSTALL.txt file.
 
 ##Notices
 
@@ -51,18 +44,12 @@ For external links, you might want to consider the Path Redirect or
 Global Redirect modules, which allow you to set forwarding either per item or
 across the site to your aliased URLs.
 
-URLs (not) Getting Replaced With Aliases:
-Please bear in mind that only URLs passed through Drupal's l() or url()
-functions will be replaced with their aliases during page output. If a module
-or your template contains hardcoded links, such as 'href="node/$node->nid"'
-those won't get replaced with their corresponding aliases. Use the
-Drupal API instead:
-
-* 'href="'. url("node/$node->nid") .'"' or
-* l("Your link title", "node/$node->nid")
-
-See http://api.drupal.org/api/HEAD/function/url and
-http://api.drupal.org/api/HEAD/function/l for more information.
+###URLs (not) Getting Replaced With Aliases:
+Please bear in mind that only URLs passed through Drupal's Drupal's URL and
+Link APIs will be replaced with their aliases during page output. If
+a module or your template contains hardcoded links, such as
+'href="node/$node->nid"', those won't get replaced with their corresponding
+aliases.
 
 ## Disabling Pathauto for a specific content type (or taxonomy)
 
