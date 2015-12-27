@@ -124,9 +124,8 @@ class PatternEditForm extends EntityForm {
 
       // Show the token help relevant to this pattern type.
       $form['pattern_container']['token_help'] = array(
-        '#theme' => 'token_tree',
+        '#theme' => 'token_tree_link',
         '#token_types' => $alias_type->getTokenTypes(),
-        '#dialog' => TRUE,
       );
 
       // Expose bundle and language conditions.
