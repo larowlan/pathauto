@@ -378,25 +378,20 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($child, '/' . Unicode::strtolower($parent->getName() . '/' . $child->$fieldname->value));
   }
 
-  public function testEntityBundleDeleting() {
+  /**
+   * Tests aliases on taxonomy terms.
+   */
+  public function testTaxonomyPattern() {
     // Create a vocabulary and test that it's pattern variable works.
     $vocab = $this->addVocabulary(array('vid' => 'name'));
     $this->createPattern('taxonomy_term', 'base');
     $pattern = $this->createPattern('taxonomy_term', 'bundle', -1);
     $this->addBundleCondition($pattern, 'taxonomy_term', 'name');
     $pattern->save();
-
-
     $this->assertEntityPattern('taxonomy_term', 'name', Language::LANGCODE_NOT_SPECIFIED, 'bundle');
-
-    // Delete the vocabulary, which should cause its pattern variable to also
-    // be deleted.
-    $vocab->delete();
-    $this->assertEntityPattern('taxonomy_term', 'name', Language::LANGCODE_NOT_SPECIFIED, 'base');
   }
 
   function testNoExistingPathAliases() {
-
     $this->config('pathauto.settings')
       ->set('punctuation.period', PathautoGeneratorInterface::PUNCTUATION_DO_NOTHING)
       ->save();
@@ -449,7 +444,7 @@ class PathautoUnitTest extends KernelTestBase {
   }
 
   /**
-   * Tests word safe alias truncating truncating.
+   * Tests word safe alias truncating.
    */
   function testPathAliasUniquifyWordsafe() {
     $this->config('pathauto.settings')
@@ -466,6 +461,15 @@ class PathautoUnitTest extends KernelTestBase {
     $this->assertEntityAlias($node_2, '/content/thequick-0');
   }
 
+  /**
+   * Creates a node programmatically.
+   *
+   * @param array $settings
+   *   The array of values for the node.
+   *
+   * @return \Drupal\node\Entity\Node
+   *   The created node.
+   */
   protected function drupalCreateNode(array $settings = array()) {
     // Populate defaults array.
     $settings += array(
