@@ -8,6 +8,7 @@
  */
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Utility\UpdateException;
 
 /**
  * Implements hook_install().
@@ -49,5 +50,103 @@ function pathauto_update_8001() {
         $form_display->save();
       }
     }
+  }
+}
+
+/**
+ * Converts patterns from configuration objects to configuration entities.
+ */
+function pathauto_update_8100(&$sandbox) {
+  $messages = array();
+  $delete_config = TRUE;
+
+  if (!\Drupal::service('module_handler')->moduleExists('ctools')) {
+    throw new UpdateException('Please, install Chaos tools suite (https://www.drupal.org/project/ctools) before running this databsae update.');
+  }
+
+  $entity_manager = \Drupal::service('entity.manager');
+  $entity_info = $entity_manager->getDefinitions();
+
+  // 1. Load all patterns.
+  $config = \Drupal::service('config.factory')->getEditable('pathauto.pattern');
+  $patterns = $config->get('patterns');
+
+  // 2. Create a configuration entity per pattern.
+  foreach ($patterns as $entity_type => $pattern_config) {
+    if (!array_key_exists($entity_type, $entity_info)) {
+      // We found an entity type which we don't know how to process. Report it.
+      $messages[] = t('Entity of type @type was not processed.', array('@type' => $entity_type));
+      $delete_config = FALSE;
+      continue;
+    }
+    $entity_label = (string) $entity_info[$entity_type]->get('label');
+    // Create and save the default pattern for this entity.
+    if (isset($pattern_config['default'])) {
+      // Check if the administrator created this pattern before running updates.
+      // If there is a pattern, skip to the next one.
+      $entity = entity_load('pathauto_pattern', $entity_type);
+      if ($entity) {
+        continue;
+      }
+      // There is no default pattern. Create and save.
+      $entity = entity_create('pathauto_pattern', [
+        'id' => $entity_type,
+        'label' => $entity_label,
+        'type' => 'canonical_entities:' . $entity_type,
+        'pattern' => $pattern_config['default'],
+        'weight' => 0,
+      ]);
+      $entity->save();
+    }
+    // Loop over bundles and create patterns if they override the default
+    // pattern.
+    if (isset($pattern_config['bundles'])) {
+      foreach ($pattern_config['bundles'] as $bundle => $bundle_config) {
+        if (!empty($bundle_config['default'])) {
+          $id = $entity_type . '_' . $bundle;
+          // Check if the administrator created this pattern before running updates.
+          // If there is a pattern, skip to the next one.
+          $entity = entity_load('pathauto_pattern', $id);
+          if ($entity) {
+            continue;
+          }
+
+          // Figure out the label of this pattern.
+          $bundle_info = $entity_manager->getBundleInfo($entity_type);
+          $bundle_label = $bundle_info[$bundle]['label'];
+          $label = $entity_label . ' ' . $bundle_label;
+
+          // Create and save the pattern for this entity bundle.
+          $entity = entity_create('pathauto_pattern', [
+            'id' => $id,
+            'label' => $label,
+            'type' => 'canonical_entities:' . $entity_type,
+            'pattern' => $bundle_config['default'],
+            'weight' => -5,
+          ]);
+
+          // Add the bundle condition.
+          $entity->addSelectionCondition([
+            'id' => 'entity_bundle:' . $entity_type,
+            'bundles' => array($bundle),
+            'negate' => FALSE,
+            'context_mapping' => [
+              $entity_type => $entity_type,
+            ],
+          ]);
+
+          $entity->save();
+        }
+      }
+    }
+  }
+
+  // 3. Delete the old configuration object that stores patterns only if all
+  // configuration objects were processed.
+  if ($delete_config) {
+    $config->delete();
+  }
+  if (!empty($messages)) {
+    return implode('</br>', $messages);
   }
 }
