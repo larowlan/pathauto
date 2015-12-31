@@ -12,6 +12,8 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\pathauto\AliasTypeManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -231,16 +233,20 @@ class PatternEditForm extends EntityForm {
 
       if ($languages = array_filter((array) $form_state->getValue('languages'))) {
         $default_weight -= 5;
+        $language_mapping = $entity_type . ':' . $this->entityTypeManager->getDefinition($entity_type)->getKey('langcode') . ':language';
         $entity->addSelectionCondition(
           [
             'id' => 'language',
             'langcodes' => array_combine($languages, $languages),
             'negate' => FALSE,
             'context_mapping' => [
-              'language' => $entity_type . ':' . $this->entityTypeManager->getDefinition($entity_type)->getKey('langcode') . ':language',
+              'language' => $language_mapping,
             ]
           ]
         );
+        $new_definition = new ContextDefinition('language', 'Language');
+        $new_context = new Context($new_definition);
+        $entity->addContext($language_mapping, $new_context);
       }
 
     }
