@@ -9,6 +9,9 @@
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Utility\UpdateException;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\pathauto\Entity\PathautoPattern;
 
 /**
  * Implements hook_install().
@@ -65,7 +68,7 @@ function pathauto_update_8100(&$sandbox) {
   $entity_manager = \Drupal::service('entity.manager');
   $entity_type_manager = \Drupal::service('entity_type.manager');
   $language_manager = \Drupal::service('language_manager');
-  $entity_info = $entity_manager->getDefinitions();
+  $entity_types = $entity_manager->getDefinitions();
 
   // 1. Load all patterns.
   $config = \Drupal::service('config.factory')->getEditable('pathauto.pattern');
@@ -73,7 +76,7 @@ function pathauto_update_8100(&$sandbox) {
 
   // 2. Create a configuration entity per pattern.
   foreach ($patterns as $entity_type => $entity_patterns) {
-    if (!array_key_exists($entity_type, $entity_info)) {
+    if (!array_key_exists($entity_type, $entity_types)) {
       // We found an unknown entity type. Report it.
       $messages[] = t('Entity of type @type was not processed. It defines the following patterns: @patterns', array(
         '@type' => $entity_type,
@@ -81,18 +84,18 @@ function pathauto_update_8100(&$sandbox) {
       ));
       continue;
     }
-    $entity_label = $entity_info[$entity_type]->getLabel();
+    $entity_label = $entity_types[$entity_type]->getLabel();
 
     if (isset($entity_patterns['default'])) {
       // This is a pattern for an entity type, such as "node".
-      $entity = entity_create('pathauto_pattern', [
+      $pattern = PathautoPattern::create([
         'id' => $entity_type,
         'label' => $entity_label,
         'type' => 'canonical_entities:' . $entity_type,
         'pattern' => $entity_patterns['default'],
         'weight' => 0,
       ]);
-      $entity->save();
+      $pattern->save();
     }
 
     // Loop over bundles and create patterns if they have a value.
@@ -107,7 +110,7 @@ function pathauto_update_8100(&$sandbox) {
 
         if (isset($bundle_info[$bundle])) {
           // This is a pattern for a bundle, such as "node_article".
-          $entity = entity_create('pathauto_pattern', [
+          $pattern = PathautoPattern::create([
             'id' => $entity_type . '_' . $bundle,
             'label' => $entity_label . ' ' . $bundle_info[$bundle]['label'],
             'type' => 'canonical_entities:' . $entity_type,
@@ -116,14 +119,14 @@ function pathauto_update_8100(&$sandbox) {
           ]);
 
           // Add the bundle condition.
-          $entity->addSelectionCondition([
+          $pattern->addSelectionCondition([
             'id' => 'entity_bundle:' . $entity_type,
             'bundles' => array($bundle),
             'negate' => FALSE,
             'context_mapping' => [ $entity_type => $entity_type ],
           ]);
 
-          $entity->save();
+          $pattern->save();
         }
         else {
           // This is either a language dependent pattern such as "article_es" or
@@ -146,8 +149,8 @@ function pathauto_update_8100(&$sandbox) {
           }
 
           // This is a pattern for a bundle and a language, such as "node_article_es".
-          $entity = entity_create('pathauto_pattern', [
-            'id' => $entity_type . '_' . $extracted_bundle . '_' . $langcode,
+          $pattern = PathautoPattern::create([
+            'id' => $entity_type . '_' . $extracted_bundle . '_' . str_replace('-', '_', $langcode),
             'label' => $entity_label . ' ' . $bundle_info[$extracted_bundle]['label'] . ' ' . $language->getName(),
             'type' => 'canonical_entities:' . $entity_type,
             'pattern' => $bundle_patterns['default'],
@@ -155,30 +158,36 @@ function pathauto_update_8100(&$sandbox) {
           ]);
 
           // Add the bundle condition.
-          $entity->addSelectionCondition([
+          $pattern->addSelectionCondition([
             'id' => 'entity_bundle:' . $entity_type,
-            'bundles' => array($extracted_bundle),
+            'bundles' => array($extracted_bundle => $extracted_bundle),
             'negate' => FALSE,
             'context_mapping' => [ $entity_type => $entity_type ],
           ]);
 
           // Add the language condition.
-          $entity->addSelectionCondition([
+          $language_mapping = $entity_type . ':' . $entity_type_manager->getDefinition($entity_type)->getKey('langcode') . ':language';
+          $pattern->addSelectionCondition([
             'id' => 'language',
             'langcodes' => [ $langcode => $langcode ],
             'negate' => FALSE,
             'context_mapping' => [
-              'language' => $entity_type . ':' . $entity_type_manager->getDefinition($entity_type)->getKey('langcode') . ':language',
+              'language' => $language_mapping,
             ]
           ]);
 
-          $entity->save();
+          // Add the context relationship for this language.
+          $new_definition = new ContextDefinition('language', 'Language');
+          $new_context = new Context($new_definition);
+          $pattern->addContext($language_mapping, $new_context);
+
+          $pattern->save();
         }
       }
     }
   }
 
-  // 3. Delete the old configuration object that stores patterns only if all
+  // 3. Delete the old configuration object that stores patterns.
   $config->delete();
 
   // 4. Print out messages.
