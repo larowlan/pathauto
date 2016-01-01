@@ -16,6 +16,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
+use Drupal\token\TokenEntityMapperInterface;
 
 /**
  * Provides methods for generating path aliases.
@@ -88,6 +89,11 @@ class PathautoGenerator implements PathautoGeneratorInterface {
   protected $messenger;
 
   /**
+   * @var \Drupal\token\TokenEntityMapperInterface
+   */
+  protected $tokenEntityMapper;
+
+  /**
    * Creates a new Pathauto manager.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -107,7 +113,7 @@ class PathautoGenerator implements PathautoGeneratorInterface {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelperInterface $alias_storage_helper, AliasUniquifierInterface $alias_uniquifier, MessengerInterface $messenger, TranslationInterface $string_translation) {
+  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, Token $token, AliasCleanerInterface $alias_cleaner, AliasStorageHelperInterface $alias_storage_helper, AliasUniquifierInterface $alias_uniquifier, MessengerInterface $messenger, TranslationInterface $string_translation, TokenEntityMapperInterface $token_entity_mappper) {
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
     $this->token = $token;
@@ -116,6 +122,7 @@ class PathautoGenerator implements PathautoGeneratorInterface {
     $this->aliasUniquifier = $alias_uniquifier;
     $this->messenger = $messenger;
     $this->stringTranslation = $string_translation;
+    $this->tokenEntityMapper = $token_entity_mappper;
   }
 
   /**
@@ -135,11 +142,9 @@ class PathautoGenerator implements PathautoGeneratorInterface {
 
     // Build token data.
     $data = [
-      $entity->getEntityTypeId() => $entity
+      $this->tokenEntityMapper->getTokenTypeForEntityType($entity->getEntityTypeId()) => $entity,
     ];
-    if ($entity->getEntityTypeId() == 'taxonomy_term') {
-      $data['term'] = $entity;
-    }
+    debug(array_keys($data));
 
     // Allow other modules to alter the pattern.
     $context = array(
@@ -237,7 +242,7 @@ class PathautoGenerator implements PathautoGeneratorInterface {
     if (!isset($this->patternsByEntityType[$entity_type_id])) {
       $ids = \Drupal::entityQuery('pathauto_pattern')
         ->condition('type', array_keys(\Drupal::service('plugin.manager.alias_type')
-          ->getPluginDefinitionByType($entity_type_id)))
+          ->getPluginDefinitionByType($this->tokenEntityMapper->getTokenTypeForEntityType($entity_type_id))))
         ->sort('weight')
         ->execute();
 
@@ -300,6 +305,7 @@ class PathautoGenerator implements PathautoGeneratorInterface {
     }
 
     // Deal with taxonomy specific logic.
+    // @todo Update and test forum related code.
     if ($type == 'taxonomy_term') {
 
       $config_forum = $this->configFactory->get('forum.settings');
@@ -310,8 +316,8 @@ class PathautoGenerator implements PathautoGeneratorInterface {
 
     $result = $this->createEntityAlias($entity, $op);
 
+    // @todo Move this to a method on the pattern plugin.
     if ($type == 'taxonomy_term') {
-      unset($options['language']);
       foreach ($this->loadTermChildren($entity->id()) as $subterm) {
         $this->updateEntityAlias($subterm, $op, $options);
       }
