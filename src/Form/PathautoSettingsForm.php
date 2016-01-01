@@ -159,16 +159,15 @@ class PathautoSettingsForm extends ConfigFormBase {
     $punctuation = \Drupal::service('pathauto.alias_cleaner')->getPunctuationCharacters();
 
     foreach ($punctuation as $name => $details) {
-      if (!$config->get('punctuation.punctuation'. $name)) {
-        $details['default'] = PathautoGeneratorInterface::PUNCTUATION_REMOVE;
+      // Use the value from config if it exists.
+      if ($config->get('punctuation.' . $name) !== NULL) {
+        $details['default'] = $config->get('punctuation.' . $name) !== NULL;
       }
       else {
-        $details['default'] = $config->get('punctuation.punctuation'. $name);
+        // Otherwise use the correct default.
+        $details['default'] = $details['value'] == $config->get('separator') ? PathautoGeneratorInterface::PUNCTUATION_REPLACE : PathautoGeneratorInterface::PUNCTUATION_REMOVE;
       }
-      if ($details['value'] == $config->get('separator')) {
-        $details['default'] = PathautoGeneratorInterface::PUNCTUATION_REPLACE;
-      }
-      $form['punctuation']['punctuation' . $name] = array(
+      $form['punctuation'][$name] = array(
         '#type' => 'select',
         '#title' => $details['name'] . ' (<code>' . SafeMarkup::checkPlain($details['value']) . '</code>)',
         '#default_value' => $details['default'],
