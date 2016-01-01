@@ -8,7 +8,6 @@
 namespace Drupal\pathauto\Plugin\pathauto\AliasType;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\pathauto\AliasTypeBatchUpdateInterface;
 
 /**
  * A pathauto alias type plugin for forum terms.
@@ -20,28 +19,8 @@ use Drupal\pathauto\AliasTypeBatchUpdateInterface;
  *   provider = "forum",
  * )
  */
-class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdateInterface, ContainerFactoryPluginInterface {
+class ForumAliasType extends EntityAliasTypeBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPatternDescription() {
-    return $this->t('Pattern for forums and forum containers');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPatterns() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return array('default' => array('/[term:vocabulary]/[term:name]')) + parent::defaultConfiguration();
-  }
 
   /**
    * {@inheritdoc}
@@ -55,6 +34,18 @@ class ForumAliasType extends EntityAliasTypeBase implements AliasTypeBatchUpdate
    */
   public function getSourcePrefix() {
     return '/forum/';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($object) {
+    if (parent::applies($object)) {
+      /** @var \Drupal\taxonomy\TermInterface $object */
+      $config_forum = $this->configFactory->get('forum.settings');
+      return $object->getVocabularyId() == $config_forum->get('vocabulary');
+    }
+    return FALSE;
   }
 
 }

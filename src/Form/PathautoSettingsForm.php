@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\pathauto\Form\MaillogSettingsForm.
+ * Contains \Drupal\pathauto\Form\PathautoSettingsForm.
  */
 
 namespace Drupal\pathauto\Form;
@@ -10,7 +10,7 @@ namespace Drupal\pathauto\Form;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Url;
-use Drupal\pathauto\PathautoManagerInterface;
+use Drupal\pathauto\PathautoGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -119,9 +119,9 @@ class PathautoSettingsForm extends ConfigFormBase {
       '#title' => t('Update action'),
       '#default_value' => $config->get('update_action'),
       '#options' => array(
-        PathautoManagerInterface::UPDATE_ACTION_NO_NEW => t('Do nothing. Leave the old alias intact.'),
-        PathautoManagerInterface::UPDATE_ACTION_LEAVE => t('Create a new alias. Leave the existing alias functioning.'),
-        PathautoManagerInterface::UPDATE_ACTION_DELETE => t('Create a new alias. Delete the old alias.'),
+        PathautoGeneratorInterface::UPDATE_ACTION_NO_NEW => t('Do nothing. Leave the old alias intact.'),
+        PathautoGeneratorInterface::UPDATE_ACTION_LEAVE => t('Create a new alias. Leave the existing alias functioning.'),
+        PathautoGeneratorInterface::UPDATE_ACTION_DELETE => t('Create a new alias. Delete the old alias.'),
       ),
       '#description' => $description,
     );
@@ -159,18 +159,22 @@ class PathautoSettingsForm extends ConfigFormBase {
     $punctuation = \Drupal::service('pathauto.alias_cleaner')->getPunctuationCharacters();
 
     foreach ($punctuation as $name => $details) {
-      $details['default'] = PathautoManagerInterface::PUNCTUATION_REMOVE;
-      if ($details['value'] == $config->get('separator')) {
-        $details['default'] = PathautoManagerInterface::PUNCTUATION_REPLACE;
+      // Use the value from config if it exists.
+      if ($config->get('punctuation.' . $name) !== NULL) {
+        $details['default'] = $config->get('punctuation.' . $name) !== NULL;
       }
-      $form['punctuation']['punctuation' . $name] = array(
+      else {
+        // Otherwise use the correct default.
+        $details['default'] = $details['value'] == $config->get('separator') ? PathautoGeneratorInterface::PUNCTUATION_REPLACE : PathautoGeneratorInterface::PUNCTUATION_REMOVE;
+      }
+      $form['punctuation'][$name] = array(
         '#type' => 'select',
         '#title' => $details['name'] . ' (<code>' . SafeMarkup::checkPlain($details['value']) . '</code>)',
         '#default_value' => $details['default'],
         '#options' => array(
-          PathautoManagerInterface::PUNCTUATION_REMOVE => t('Remove'),
-          PathautoManagerInterface::PUNCTUATION_REPLACE => t('Replace by separator'),
-          PathautoManagerInterface::PUNCTUATION_DO_NOTHING => t('No action (do not replace)'),
+          PathautoGeneratorInterface::PUNCTUATION_REMOVE => t('Remove'),
+          PathautoGeneratorInterface::PUNCTUATION_REPLACE => t('Replace by separator'),
+          PathautoGeneratorInterface::PUNCTUATION_DO_NOTHING => t('No action (do not replace)'),
         ),
       );
     }

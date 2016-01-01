@@ -1,5 +1,5 @@
 pathauto.patterns.form:
-  route_name: pathauto.patterns.form
+  route_name: entity.pathauto_pattern.collection
   base_route: path.admin_overview
   title: 'Patterns'
   weight: 10

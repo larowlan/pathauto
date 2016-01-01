@@ -62,15 +62,6 @@ function pathauto_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Implements hook__entity_bundle_delete().
- */
-function pathauto_entity_bundle_delete($entity_type, $bundle) {
-  $config = \Drupal::configFactory()->getEditable('pathauto.pattern');
-  $config->clear('patterns.' . $entity_type . '.bundles.' . $bundle);
-  $config->save();
-}
-
-/**
  * Implements hook_entity_presave().
  */
 function pathauto_entity_presave($entity) {
@@ -94,14 +85,14 @@ function pathauto_entity_presave($entity) {
  * Implements hook_entity_insert().
  */
 function pathauto_entity_insert(EntityInterface $entity) {
-  \Drupal::service('pathauto.manager')->updateAlias($entity, 'insert');
+  \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'insert');
 }
 
 /**
  * Implements hook_entity_update().
  */
 function pathauto_entity_update(EntityInterface $entity) {
-  \Drupal::service('pathauto.manager')->updateAlias($entity, 'update');
+  \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'update');
 }
 
 

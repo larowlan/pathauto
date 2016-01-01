@@ -59,13 +59,8 @@ class PathautoState extends TypedData {
           ->getAliasByPath(
             $entity_path, $entity->language()->getId()
           );
-        $pathauto_alias = \Drupal::service('pathauto.manager')
-          ->createAlias(
-            $entity->getEntityTypeId(), 'return', $entity_path, array(
-            $entity->getEntityType()
-              ->id() => $entity
-          ), $entity->bundle(), $entity->language()->getId()
-          );
+        $pathauto_alias = \Drupal::service('pathauto.generator')
+          ->createEntityAlias($entity, 'return');
         if (($path != $entity_path && $path == $pathauto_alias)) {
           $this->value = static::CREATE;
         }
@@ -80,8 +75,7 @@ class PathautoState extends TypedData {
   /**
    * {@inheritdoc}
    */
-  public
-  function setValue($value, $notify = TRUE) {
+  public function setValue($value, $notify = TRUE) {
     $this->value = $value;
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
@@ -92,16 +86,14 @@ class PathautoState extends TypedData {
   /**
    * Returns TRUE if a value was set.
    */
-  public
-  function hasValue() {
+  public function hasValue() {
     return $this->value !== NULL;
   }
 
   /**
    * Persists the state.
    */
-  public
-  function persist() {
+  public function persist() {
     \Drupal::keyValue($this->getCollection())->set(
       $this->parent->getEntity()
         ->id(), $this->value
@@ -111,18 +103,16 @@ class PathautoState extends TypedData {
   /**
    * Deletes the stored state.
    */
-  public
-  function purge() {
+  public function purge() {
     \Drupal::keyValue($this->getCollection())
       ->delete($this->parent->getEntity()->id());
   }
 
   /**
+   * Returns the key value collection that should be used for the given entity.
    * @return string
    */
-  protected
-  function getCollection() {
-    return 'pathauto_state.' . $this->parent->getEntity()
-      ->getEntityTypeId();
+  protected function getCollection() {
+    return 'pathauto_state.' . $this->parent->getEntity()->getEntityTypeId();
   }
 }

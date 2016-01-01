@@ -1,26 +1,3 @@
-pathauto.pattern:
-  type: config_object
-  mapping:
-    patterns:
-      type: sequence
-      sequence:
-        type: mapping
-        mapping:
-          default:
-            type: string
-          bundles:
-            type: sequence
-            sequence:
-              type: mapping
-              mapping:
-                default:
-                  type: string
-                languages:
-                  type: sequence
-                  sequence:
-                    type: string
-
-
 pathauto.settings:
   type: config_object
   mapping:

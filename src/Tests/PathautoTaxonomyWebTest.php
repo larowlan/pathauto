@@ -46,6 +46,8 @@ class PathautoTaxonomyWebTest extends WebTestBase {
     );
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
+
+    $this->createPattern('taxonomy_term', '/[term:vocabulary]/[term:name]');
   }
 
 

@@ -33,4 +33,23 @@ class AliasTypeManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'pathauto_alias_types');
   }
 
+  /**
+   * Returns plugin definitions that support a given token type.
+   *
+   * @param string $type
+   *   The type of token plugin must support to be useful.
+   *
+   * @return array
+   *   Plugin definitions.
+   */
+  public function getPluginDefinitionByType($type) {
+    $definitions = array_filter($this->getDefinitions(), function ($definition) use ($type) {
+      if (!empty($definition['types']) && in_array($type, $definition['types'])) {
+        return TRUE;
+      }
+      return FALSE;
+    });
+    return $definitions;
+  }
+
 }

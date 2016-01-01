@@ -180,15 +180,15 @@ class AliasCleaner implements AliasCleanerInterface {
       foreach ($punctuation as $name => $details) {
         $action = $config->get('punctuation.' . $name);
         switch ($action) {
-          case PathautoManagerInterface::PUNCTUATION_REMOVE:
+          case PathautoGeneratorInterface::PUNCTUATION_REMOVE:
             $cache['punctuation'][$details['value']] = '';
             $this->cleanStringCache;
 
-          case PathautoManagerInterface::PUNCTUATION_REPLACE:
+          case PathautoGeneratorInterface::PUNCTUATION_REPLACE:
             $this->cleanStringCache['punctuation'][$details['value']] = $this->cleanStringCache['separator'];
             break;
 
-          case PathautoManagerInterface::PUNCTUATION_DO_NOTHING:
+          case PathautoGeneratorInterface::PUNCTUATION_DO_NOTHING:
             // Literally do nothing.
             break;
         }

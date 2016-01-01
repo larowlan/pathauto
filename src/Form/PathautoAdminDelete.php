@@ -25,7 +25,7 @@ class PathautoAdminDelete extends FormBase {
   protected $aliasTypeManager;
 
   /**
-   * Constructs a PathautoPatternsForm object.
+   * Constructs a PathautoAdminDelete object.
    *
    * @param \Drupal\pathauto\AliasTypeManager $alias_type_manager
    *   The alias type manager.
@@ -111,7 +111,7 @@ class PathautoAdminDelete extends FormBase {
         ->execute();
       drupal_set_message(t('All of your %label path aliases have been deleted.', array('%label' => $alias_type->getLabel())));
     }
-    $form_state->setRedirect('pathauto.bulk.update.form');
+    $form_state->setRedirect('pathauto.admin.delete');
   }
 
 }

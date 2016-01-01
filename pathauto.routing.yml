@@ -1,8 +1,17 @@
-pathauto.patterns.form:
+entity.pathauto_pattern.collection:
   path: '/admin/config/search/path/patterns'
   defaults:
-    _form: '\Drupal\pathauto\Form\PathautoPatternsForm'
+    _entity_list: 'pathauto_pattern'
     _title: 'Patterns'
+  requirements:
+    _permission: 'administer pathauto'
+
+entity.pathauto_pattern.add_form:
+  path: '/admin/config/search/path/patterns/add'
+  defaults:
+    _entity_form: 'pathauto_pattern.default'
+    _title: 'Add Pathauto pattern'
+    tempstore_id: 'pathauto.pattern'
   requirements:
     _permission: 'administer pathauto'
 

@@ -43,7 +43,7 @@ class PathautoWidget extends PathWidget {
 
 
 
-    $pattern = \Drupal::service('pathauto.manager')->getPatternByEntity($entity->getEntityTypeId(), $entity->bundle(), $entity->language()->getId());
+    $pattern = \Drupal::service('pathauto.generator')->getPatternByEntity($entity);
     if (empty($pattern)) {
       return $element;
     }
@@ -52,7 +52,7 @@ class PathautoWidget extends PathWidget {
       '#type' => 'checkbox',
       '#title' => $this->t('Generate automatic URL alias'),
       '#default_value' => $entity->path->pathauto,
-      '#description' => $this->t('Uncheck this to create a custom alias below. <a href="@admin_link">Configure URL alias patterns.</a>', array('@admin_link' => \Drupal::url('pathauto.patterns.form'))),
+      '#description' => $this->t('Uncheck this to create a custom alias below. <a href="@admin_link">Configure URL alias patterns.</a>', array('@admin_link' => \Drupal::url('entity.pathauto_pattern.collection'))),
       '#weight' => -1,
     );
 
