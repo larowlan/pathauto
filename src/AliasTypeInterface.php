@@ -42,10 +42,11 @@ interface AliasTypeInterface extends ContextAwarePluginInterface, DerivativeInsp
   /**
    * Determines if this plugin type can apply a given object.
    *
-   * @param $object
+   * @param object $object
    *   The object used to determine if this plugin can apply.
    *
    * @return bool
+   *   Whether this plugin applies to the given object.
    */
   public function applies($object);
 

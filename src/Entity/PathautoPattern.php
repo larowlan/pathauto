@@ -197,7 +197,7 @@ class PathautoPattern extends ConfigEntityBase implements PathautoPatternInterfa
   public function calculateDependencies() {
     parent::calculateDependencies();
 
-    // @todo get dependencies from the alias type plugin.
+    $this->calculatePluginDependencies($this->getAliasType());
 
     foreach ($this->getSelectionConditions() as $instance) {
       $this->calculatePluginDependencies($instance);
