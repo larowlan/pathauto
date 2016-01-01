@@ -144,7 +144,6 @@ class PathautoGenerator implements PathautoGeneratorInterface {
     $data = [
       $this->tokenEntityMapper->getTokenTypeForEntityType($entity->getEntityTypeId()) => $entity,
     ];
-    debug(array_keys($data));
 
     // Allow other modules to alter the pattern.
     $context = array(
