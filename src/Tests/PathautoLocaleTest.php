@@ -9,9 +9,7 @@ namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\pathauto\PathautoState;
 use Drupal\simpletest\WebTestBase;
 
@@ -97,7 +95,6 @@ class PathautoLocaleTest extends WebTestBase {
     $this->drupalLogin($this->rootUser);
 
     // Add French language.
-    // Add predefined French language.
     $edit = array(
       'predefined_langcode' => 'fr',
     );
