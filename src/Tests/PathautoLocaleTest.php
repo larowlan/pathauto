@@ -9,8 +9,6 @@ namespace Drupal\pathauto\Tests;
 
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -115,44 +113,36 @@ class PathautoLocaleTest extends WebTestBase {
     $article_language_settings->save();
 
     // Create a pattern for English articles.
-    $pattern = $this->createPattern('node', '/the-articles/[node:title]');
-    $pattern->addSelectionCondition([
-      'id' => 'entity_bundle:node',
-      'bundles' => ['article' => 'article'],
-      'negate' => FALSE,
-      'context_mapping' => ['node' => 'node'],
-    ]);
-    $language_mapping = 'node:langcode:language';
-    $pattern->addSelectionCondition([
-      'id' => 'language',
-      'langcodes' => ['en' => 'en'],
-      'negate' => FALSE,
-      'context_mapping' => ['language' => $language_mapping],
-    ]);
-    $new_definition = new ContextDefinition('language', 'Language');
-    $new_context = new Context($new_definition);
-    $pattern->addContext($language_mapping, $new_context);
-    $pattern->save();
+    $this->drupalGet('admin/config/search/path/patterns/add');
+    $edit = array(
+      'type' => 'canonical_entities:node',
+    );
+    $this->drupalPostAjaxForm(NULL, $edit, 'type');
+    $edit += array(
+      'pattern' => '/the-articles/[node:title]',
+      'label' => 'English articles',
+      'id' => 'english_articles',
+      'bundles[article]' => TRUE,
+      'languages[en]' => TRUE,
+    );
+    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->assertText('Pattern English articles saved.');
 
     // Create a pattern for French articles.
-    $pattern = $this->createPattern('node', '/les-articles/[node:title]');
-    $pattern->addSelectionCondition([
-      'id' => 'entity_bundle:node',
-      'bundles' => ['article' => 'article'],
-      'negate' => FALSE,
-      'context_mapping' => ['node' => 'node'],
-    ]);
-    $language_mapping = 'node:langcode:language';
-    $pattern->addSelectionCondition([
-      'id' => 'language',
-      'langcodes' => ['fr' => 'fr'],
-      'negate' => FALSE,
-      'context_mapping' => ['language' => $language_mapping],
-    ]);
-    $new_definition = new ContextDefinition('language', 'Language');
-    $new_context = new Context($new_definition);
-    $pattern->addContext($language_mapping, $new_context);
-    $pattern->save();
+    $this->drupalGet('admin/config/search/path/patterns/add');
+    $edit = array(
+      'type' => 'canonical_entities:node',
+    );
+    $this->drupalPostAjaxForm(NULL, $edit, 'type');
+    $edit += array(
+      'pattern' => '/les-articles/[node:title]',
+      'label' => 'French articles',
+      'id' => 'french_articles',
+      'bundles[article]' => TRUE,
+      'languages[fr]' => TRUE,
+    );
+    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->assertText('Pattern French articles saved.');
 
     // Create a node and its translation. Assert aliases.
     $edit = array(
