@@ -37,10 +37,8 @@ class PathautoLocaleTest extends WebTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Create Article node types.
-    if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
-    }
+    // Create Article node type.
+    $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
   }
 
   /**
