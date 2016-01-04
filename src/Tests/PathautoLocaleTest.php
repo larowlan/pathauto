@@ -97,18 +97,20 @@ class PathautoLocaleTest extends WebTestBase {
     $this->drupalLogin($this->rootUser);
 
     // Add French language.
-    ConfigurableLanguage::createFromLangcode('fr')->save();
+    // Add predefined French language.
+    $edit = array(
+      'predefined_langcode' => 'fr',
+    );
+    $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add language'));
 
     // Enable content translation on articles.
-    \Drupal::service('content_translation.manager')->setEnabled('node', 'article', TRUE);
-    drupal_static_reset();
-    \Drupal::entityManager()->clearCachedDefinitions();
-    \Drupal::service('router.builder')->rebuild();
-    \Drupal::service('entity.definition_update_manager')->applyUpdates();
-    // Enable the language selector when editing nodes.
-    $article_language_settings = \Drupal::service('entity.manager')->getStorage('language_content_settings')->load('node.article');
-    $article_language_settings->set('language_alterable', 1);
-    $article_language_settings->save();
+    $this->drupalGet('admin/config/regional/content-language');
+    $edit = array(
+      'entity_types[node]' => TRUE,
+      'settings[node][article][translatable]' => TRUE,
+      'settings[node][article][settings][language][language_alterable]' => TRUE,
+    );
+    $this->drupalPostForm(NULL, $edit, t('Save configuration'));
 
     // Create a pattern for English articles.
     $this->drupalGet('admin/config/search/path/patterns/add');
@@ -151,8 +153,8 @@ class PathautoLocaleTest extends WebTestBase {
     $english_node = $this->drupalGetNodeByTitle('English node');
     $this->assertAlias('/node/' . $english_node->id(), '/the-articles/english-node', 'en');
 
-    $add_translation_url = Url::fromRoute('entity.node.content_translation_add', ['node' => $english_node->id(), 'source' => 'en', 'target' => 'fr']);
-    $this->drupalGet($add_translation_url);
+    $this->drupalGet('node/' . $english_node->id() . '/translations');
+    $this->clickLink(t('Add'));
     $edit = array(
       'title[0][value]' => 'French node',
     );
