@@ -179,6 +179,16 @@ class EntityAliasTypeBase extends ContextAwarePluginBase implements AliasTypeInt
     $entities = $this->entityTypeManager->getStorage($this->getEntityTypeId())->loadMultiple($ids);
     foreach ($entities as $entity) {
       \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'bulkupdate', $options);
+
+      // Create aliases for the entity translations.
+      if ($entity->isTranslatable()) {
+        foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
+          if ($entity->hasTranslation($langcode)) {
+            $translated_entity = $entity->getTranslation($langcode);
+            \Drupal::service('pathauto.generator')->updateEntityAlias($translated_entity, 'bulkupdate', $options);
+          }
+        }
+      }
     }
 
     if (!empty($options['message'])) {

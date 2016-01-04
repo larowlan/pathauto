@@ -109,6 +109,10 @@ class PathautoLocaleTest extends WebTestBase {
     \Drupal::entityManager()->clearCachedDefinitions();
     \Drupal::service('router.builder')->rebuild();
     \Drupal::service('entity.definition_update_manager')->applyUpdates();
+    // Enable the language selector when editing nodes.
+    $article_language_settings = \Drupal::service('entity.manager')->getStorage('language_content_settings')->load('node.article');
+    $article_language_settings->set('language_alterable', 1);
+    $article_language_settings->save();
 
     // Create a pattern for English articles.
     $pattern = $this->createPattern('node', '/the-articles/[node:title]');
@@ -153,17 +157,18 @@ class PathautoLocaleTest extends WebTestBase {
     // Create a node and its translation. Assert aliases.
     $edit = array(
       'title[0][value]' => 'English node',
+      'langcode[0][value]' => 'en',
     );
     $this->drupalPostForm('node/add/article', $edit, t('Save and publish'));
-    $this->drupalGet('node/1/edit');
     $english_node = $this->drupalGetNodeByTitle('English node');
     $this->assertAlias('/node/' . $english_node->id(), '/the-articles/english-node', 'en');
 
     $add_translation_url = Url::fromRoute('entity.node.content_translation_add', ['node' => $english_node->id(), 'source' => 'en', 'target' => 'fr']);
+    $this->drupalGet($add_translation_url);
     $edit = array(
       'title[0][value]' => 'French node',
     );
-    $this->drupalPostForm($add_translation_url, $edit, t('Save and keep published (this translation)'));
+    $this->drupalPostForm(NULL, $edit, t('Save and keep published (this translation)'));
     $this->rebuildContainer();
     $english_node = $this->drupalGetNodeByTitle('English node');
     $french_node = $english_node->getTranslation('fr');
@@ -176,7 +181,7 @@ class PathautoLocaleTest extends WebTestBase {
       'update[canonical_entities:node]' => TRUE,
     );
     $this->drupalPostForm('admin/config/search/path/update_bulk', $edit, t('Update'));
-    $this->assertText('Generated 1 URL alias.');
+    $this->assertText(t('Generated 2 URL aliases.'));
     $this->assertAlias('/node/' . $english_node->id(), '/the-articles/english-node', 'en');
     $this->assertAlias('/node/' . $french_node->id(), '/les-articles/french-node', 'fr');
   }
