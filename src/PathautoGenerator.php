@@ -257,19 +257,20 @@ class PathautoGenerator implements PathautoGeneratorInterface {
    * {@inheritdoc}
    */
   public function getPatternByEntity(EntityInterface $entity) {
-    if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()])) {
+    $langcode = $entity->language()->getId();
+    if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()][$langcode])) {
       foreach ($this->getPatternByEntityType($entity->getEntityTypeId()) as $pattern) {
         if ($pattern->applies($entity)) {
-          $this->patterns[$entity->getEntityTypeId()][$entity->id()] = $pattern;
+          $this->patterns[$entity->getEntityTypeId()][$entity->id()][$langcode] = $pattern;
           break;
         }
       }
       // If still not set.
-      if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()])) {
-        $this->patterns[$entity->getEntityTypeId()][$entity->id()] = NULL;
+      if (!isset($this->patterns[$entity->getEntityTypeId()][$entity->id()][$langcode])) {
+        $this->patterns[$entity->getEntityTypeId()][$entity->id()][$langcode] = NULL;
       }
     }
-    return $this->patterns[$entity->getEntityTypeId()][$entity->id()];
+    return $this->patterns[$entity->getEntityTypeId()][$entity->id()][$langcode];
   }
 
   /**
