@@ -12,6 +12,7 @@
   ],
 
   "require": {
-    "drupal/token": "8.1.x-dev"
+    "drupal/token": "8.1.x-dev",
+    "drupal/ctools": "8.3.x-dev"
   }
 }
